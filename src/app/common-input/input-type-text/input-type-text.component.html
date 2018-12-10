@@ -1,0 +1,6 @@
+<input class="form-control"
+       type="text"
+       [value]="value || formControlInput.value"
+       [readonly]="readOnly"
+       [placeholder]="formControlInput.value ? '' : placeholder"
+       [formControl]="formControlInput">

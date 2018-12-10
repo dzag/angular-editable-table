@@ -1,0 +1,5 @@
+<select class="form-control" [formControl]="formControlInput">
+  <option *ngFor="let option of options" [value]="option.id">
+    {{option.value}}
+  </option>
+</select>

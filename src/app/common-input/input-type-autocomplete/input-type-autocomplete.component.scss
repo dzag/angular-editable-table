@@ -1,0 +1,27 @@
+.ng-select {
+    padding-bottom: 0;
+}
+/deep/.ng-select .ng-select-container:after{
+    border: none;
+}
+/deep/.ng-select .ng-select-container .ng-value-container {
+    padding: 0 0 0 10px;
+}
+/deep/.ng-select .ng-select-container .ng-value-container .ng-input>input{
+    padding-left: 10px;
+}
+/deep/.ng-dropdown-panel.ng-select-top{
+    bottom: calc(100% - .15em);
+    box-shadow: none;
+}
+/deep/.ng-dropdown-panel.ng-select-bottom {
+    top: calc(100% - .15em);
+    box-shadow: none;
+}
+/deep/.ng-select.ng-select-single .ng-select-container .ng-arrow-wrapper{
+    bottom: 10px;
+}
+/deep/.ng-select .ng-select-container{
+    border: 1px solid#ebedf2;
+    min-height: 40px;
+}

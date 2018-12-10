@@ -1,0 +1,12 @@
+<div class="input-group date">
+  <input type="text" class="form-control"
+         #dp="bsDatepicker"
+         bsDatepicker
+         placeholder="{{ datePickerFormat }}"
+         [formControl]="formControlInput"
+         [bsConfig]="datePickerConfig"
+         [readonly]="readOnly">
+  <div class="input-group-append">
+    <span class="input-group-text" (click)="dp.toggle()" [attr.aria-expanded]="dp.isOpen"><i class="la la-calendar"></i></span>
+  </div>
+</div>

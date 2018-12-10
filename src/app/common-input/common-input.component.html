@@ -1,0 +1,11 @@
+<div [attr.type]="type" class="mb-2 {{ !label ? '' : 'row' }}">
+    <label *ngIf="label" class="{{labelClass}} pr-0">{{ label }}
+        <span *ngIf="label && checkRequired()" class="text-danger">(*)</span>
+    </label>
+    <div class="{{contentClass}}" [ngClass]="{ 'disable-click': readOnly }">
+        <template #inputElement></template>
+        <p class="text-danger mb-1" *ngIf="checkError()">
+            {{ errorMsg }}</p>
+    </div>
+    <ng-content></ng-content>
+</div>
