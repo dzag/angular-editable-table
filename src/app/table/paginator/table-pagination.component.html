@@ -1,0 +1,13 @@
+<div class="pagination d-flex align-items-center" [ngClass]="{'justify-content-end': alignItem == 'align-right', 'justify-content-center': alignItem == 'align-center'}">
+  <div class="step-backward d-flex mx-2" (click)="pagination.first()" [ngClass]="{ 'disabled-pagination': (canPrev | async) }"><i class="fa arrow-left" aria-hidden="true" [ngClass]="{ 'disabled-pagination': (canPrev | async) }"></i></div>
+  <div class="d-flex mx-2" (click)="pagination.previous()" [ngClass]="{ 'disabled-pagination': (canPrev | async) }"><i class="fa arrow-left" aria-hidden="true"></i></div>
+  <div class="d-flex mx-1">
+    <div class="flex-shrink-0 align-self-center">Tới trang:</div>
+    <select [formControl]="pageControl" class="custom-selection form-control d-inline mx-2 p-0">
+      <option *ngFor="let item of listPage$ | async" [value]="item">{{ item }}</option>
+    </select>
+    <div class="flex-shrink-0 align-self-center">Trên {{ totalPages$ | async | prependZero }}</div>
+  </div>
+  <div class="d-flex mx-2" (click)="pagination.next()" [ngClass]="{ 'disabled-pagination': (canNext | async) }"><i class="fa arrow-right" aria-hidden="true"></i></div>
+  <div class="step-forward d-flex mx-2 justify-content-end" (click)="pagination.last()" [ngClass]="{ 'disabled-pagination': (canNext | async) }"><i class="fa arrow-right" aria-hidden="true"></i></div>
+</div>

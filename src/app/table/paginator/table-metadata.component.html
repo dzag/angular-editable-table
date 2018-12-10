@@ -1,0 +1,10 @@
+<div class="lines-per-page d-flex pb-3 text-right"
+     [ngClass]="{'justify-content-end': alignItem == 'align-right', 'justify-content-center': alignItem == 'align-center'}">
+  <div class="d-flex align-items-center font-italic">Tổng số bản ghi: {{ total$ | async }}</div>
+  <div class="align-self-center flex-grow-1 font-italic mr-2">Số dòng mỗi trang: </div>
+  <div>
+    <select [formControl]="selectControl" class="custom-selection form-control d-inline p-0">
+      <option *ngFor="let item of linesPerPage" [value]="item">{{ item }}</option>
+    </select>
+  </div>
+</div>

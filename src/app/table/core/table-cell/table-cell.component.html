@@ -1,0 +1,27 @@
+<div *ngIf="active">
+  <common-input [formControl]="formControl"
+                [type]="descriptor['type']"
+                [data]="{ 'options': descriptor.options }"
+                gaStopPropagation
+  ></common-input>
+</div>
+<div *ngIf="!active">
+  <ng-container [ngSwitch]="descriptor.type">
+    <ng-container *ngSwitchCase="'select'">
+      {{ descriptor['$$options'][data] }}
+    </ng-container>
+    <ng-container *ngSwitchCase="'date'">
+      {{ data | dateToString }}
+    </ng-container>
+    <ng-container *ngSwitchCase="'link'">
+      <a class="text-link" *ngIf="descriptor.link && descriptor.useRouter" [routerLink]="cell.url">{{ cell.value }}</a>
+      <a class="text-link" *ngIf="descriptor.link && !descriptor.useRouter" [href]="cell.url">{{ cell.value }}</a>
+    </ng-container>
+    <ng-container *ngSwitchCase="'currency'">
+      {{ data | vnd }}
+    </ng-container>
+    <ng-container *ngSwitchDefault>
+      {{ data }}
+    </ng-container>
+  </ng-container>
+</div>
