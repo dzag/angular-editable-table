@@ -24,6 +24,7 @@ defineLocale('vi', vnViLocale);
         BsDatepickerModule.forRoot()
     ],
     exports: [
+1        ReactiveFormsModule,
         CommonInputComponent,
         RequireInputFileComponent
     ],
