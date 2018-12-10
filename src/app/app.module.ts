@@ -5,6 +5,7 @@ import { AppComponent } from './app.component';
 import { SheetExampleComponent } from './examples/sheet-example/sheet-example.component';
 import { AppRoutingModule } from './app-routing.module';
 import { FormContainerModule } from './common-input/form-container.module';
+import { TableModule } from './table';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { FormContainerModule } from './common-input/form-container.module';
     BrowserModule,
     AppRoutingModule,
     FormContainerModule,
+    TableModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
