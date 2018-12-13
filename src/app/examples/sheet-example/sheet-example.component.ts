@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { random } from 'lodash';
 import { ColumnDescriptor } from '../../table';
+import { TableConfigurations } from '../../table/core/table-configurations';
 
 @Component({
   selector: 'app-sheet-example',
@@ -43,7 +44,9 @@ export class SheetExampleComponent implements OnInit {
     {
       prop: 'total',
       colName: 'Total',
-      type: 'currency'
+      type: 'currency',
+      subHeader: '(1)',
+
     },
     {
       prop: 'col1',
@@ -101,9 +104,66 @@ export class SheetExampleComponent implements OnInit {
     ]
   };
 
+  configs = new TableConfigurations({
+    columns: [
+      {
+        prop: 'total',
+        colName: 'Total',
+        type: 'currency',
+        subHeader: '(1)',
+      },
+      {
+        prop: 'col1',
+        colName: 'Col 1',
+        type: 'currency'
+      },
+      {
+        prop: 'col2',
+        colName: 'Col 2',
+        type: 'currency'
+      },
+      {
+        prop: 'col3',
+        colName: 'Col 3',
+        type: 'currency'
+      },
+      {
+        prop: 'col4',
+        colName: 'Col 4',
+        type: 'currency'
+      },
+      {
+        prop: 'col5',
+        colName: 'Col 5',
+        type: 'currency'
+      },
+      {
+        prop: 'col6',
+        colName: 'Col 6',
+        type: 'currency'
+      },
+      {
+        prop: 'col7',
+        colName: 'Col 7',
+        type: 'currency'
+      },
+      {
+        prop: 'col8',
+        colName: 'Col 8',
+        type: 'currency'
+      },
+      {
+        prop: 'col9',
+        colName: 'Col 9',
+        type: 'currency'
+      },
+    ],
+  });
+
   constructor () { }
 
   ngOnInit () {
+    this.configs.renameColumn(0, 'hello');
   }
 
 }

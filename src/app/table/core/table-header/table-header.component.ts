@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ColumnDescriptor, ColumnGroup } from '../table.models';
-import { buildPropToPathMap, emptyArrays, getPath, insertAt, pushEmptyArrays, totalSubGroupProps, depth as getDepth } from '../table.utils';
+import { buildPropToPathMap, depth as getDepth, emptyArrays, getPath, insertAt, pushEmptyArrays, totalSubGroupProps } from '../table.utils';
 import { get, last } from 'lodash';
+import { TableConfigurations } from '../table-configurations';
 
 type RowSpan = number;
 type ColSpan = number;
@@ -23,45 +23,30 @@ export class TableHeaderComponent implements OnInit {
   @Input() withIndex;
   @Input() class;
   @Input() prop;
+  @Input() indexName;
+  @Input() indexClass;
 
-  @Input()
-  get descriptors (): ColumnDescriptor<Object>[] {
-    return this._descriptors;
-  }
-
-  set descriptors (value: ColumnDescriptor<Object>[]) {
-    this._descriptors = value;
-    this.headers = this.buildHeaders();
-  }
-
-  @Input()
-  get colGroups (): ColumnGroup<Object>[] {
-    return this._colGroups;
-  }
-
-  set colGroups (value: ColumnGroup<Object>[]) {
-    this._colGroups = value || [];
-    this.headers = this.buildHeaders();
-  }
+  @Input() configurations: TableConfigurations;
 
   public headers;
 
-  private _descriptors;
-  private _colGroups = [];
-  indexName;
-  indexClass;
-
   constructor() { }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.headers = this.buildHeaders();
+    this.watchConfigsChanges();
+  }
 
   /**
    * This also build another matrix for the table header
    */
   private buildHeaders () {
-    const isValidColGroupsInput = this.colGroups.length !== 0;
+    const colGroups = this.configurations.states.columnGroups;
+    const descriptors = this.configurations.states.columns;
+
+    const isValidColGroupsInput = (colGroups || []).length !== 0;
     if (!isValidColGroupsInput) {
-      const headers = this.descriptors
+      const headers = descriptors
         .map(descriptor => ([descriptor.colName, descriptor.colClass, 1, 1]));
 
       if (this.withIndex) {
@@ -71,7 +56,7 @@ export class TableHeaderComponent implements OnInit {
       return [headers];
     }
 
-    const propToGroupIndexMap: any = buildPropToPathMap(this.colGroups);
+    const propToGroupIndexMap: any = buildPropToPathMap(colGroups);
 
     /*
       groupNames should have a structure like this
@@ -88,7 +73,7 @@ export class TableHeaderComponent implements OnInit {
     const mainGroupArrayCache = {};
     const simpleCache = {};
 
-    for (const descriptor of this.descriptors) {
+    for (const descriptor of descriptors) {
       const hasDescriptorsProp = propToGroupIndexMap.hasOwnProperty(descriptor.prop);
       const objectToAdd = {name: descriptor.colName || '', class: descriptor.colClass};
       if (hasDescriptorsProp) {
@@ -147,9 +132,8 @@ export class TableHeaderComponent implements OnInit {
     const traverseGroups = (_groups: any[]) => {
       deepLevel++;
       const groupPath = last(_groups);
-      // log('traverse', 'groupName', deepLevel, (get(this.colGroups, groupPath) || {} as any).groupName || '');
 
-      const theGroup = get(this._colGroups, groupPath);
+      const theGroup = get(colGroups, groupPath);
       if (theGroup) {
         const propsLength = theGroup.subGroups
           ? totalSubGroupProps(theGroup.subGroups) + theGroup.props.length
@@ -185,6 +169,17 @@ export class TableHeaderComponent implements OnInit {
     }
 
     return groupTuple;
+  }
+
+  private buildSubHeaders () {
+    const descriptors = this.configurations.states.columns;
+    return descriptors.map(descriptor => descriptor.subHeader || '');
+  }
+
+  private watchConfigsChanges() {
+    this.configurations['changeObs'].subscribe(() => {
+      this.headers = this.buildHeaders();
+    });
   }
 
 }
