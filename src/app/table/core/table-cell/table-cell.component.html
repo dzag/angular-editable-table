@@ -2,7 +2,7 @@
   <common-input [formControl]="formControl"
                 [type]="descriptor['type']"
                 [data]="{ 'options': descriptor.options }"
-                gaStopPropagation
+                stopPropagation
   ></common-input>
 </div>
 <div *ngIf="!active">

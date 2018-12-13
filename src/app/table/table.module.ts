@@ -12,6 +12,7 @@ import { TableMetadataComponent } from './paginator/table-metadata.component';
 import { TablePaginationComponent } from './paginator/table-pagination.component';
 import { StopPropagationDirective } from './stop-propagation.directive';
 import { RouterModule } from '@angular/router';
+import { TableHeaderComponent } from './core/table-header/table-header.component';
 
 const PIPES = [
   DateToStringPipe,
@@ -31,6 +32,7 @@ const PAGINATOR = [
 
 const TABLE_CORE = [
   TableCellComponent,
+  TableHeaderComponent,
 ];
 
 const TABLE_IMPLEMENTS = [

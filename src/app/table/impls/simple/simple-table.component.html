@@ -1,27 +1,8 @@
 <table-metadata *ngIf="metadata" alignItem="align-right"></table-metadata>
 <table class="table table-bordered">
-    <thead>
-    <tr class="text-center font-weight-bold" *ngFor="let header of headers">
-        <ng-container *ngFor="let col of header">
-            <th *ngIf="col.length > 0"
-                [class]="col[1]"
-                [attr.rowspan]="col[2]"
-                [attr.colspan]="col[3]">
-                {{ col[0] }}
-            </th>
-        </ng-container>
-    </tr>
-    </thead>
+    <thead table-header [headers]="headers"></thead>
 
     <tbody>
-    <tr *ngIf="subHeader">
-        <td *ngIf="withIndex" [class]="'text-center ' + indexSubHeaderClass">{{ indexSubHeader }}</td>
-        <td [class]="descriptors[i].subHeaderClass ? descriptors[i].subHeaderClass || '' : subHeaderClass"
-            *ngFor="let sub of subHeaders; let i = index">
-            <div [id]="'subheader-' + descriptors[i].prop ">{{ sub }}</div>
-        </td>
-    </tr>
-
     <tr *ngFor="let row of tableData.data; let rowIndex = index; trackBy: trackByIndex" style="height: 30px">
         <td *ngIf="withIndex" class="{{ 'text-center ' + indexClass }} ">{{ rowIndex + (currentOffset$ | async) + 1 }}</td>
         <td *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex"
@@ -32,8 +13,7 @@
             [columnWord]="words[colIndex]"
             [wordAddress]="words[colIndex] + '.' + rowIndex"
             [row]="rowIndex"
-            [descriptor]="descriptors[colIndex]"
-            (click)="onCellClick(cell)">
+            [descriptor]="descriptors[colIndex]">
         </td>
     </tr>
     </tbody>

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { FormControl } from '@angular/forms';
-import { filter, withLatestFrom } from 'rxjs/operators';
+import { distinctUntilChanged, filter, withLatestFrom } from 'rxjs/operators';
 import { TableCellComponent } from './table-cell.component';
 import { TableDataService } from '../data/table-data.service';
 
@@ -9,7 +9,7 @@ import { TableDataService } from '../data/table-data.service';
 export class CellService {
 
   private active$ = new BehaviorSubject(null);
-  private activeObservable = this.active$.asObservable();
+  private activeObservable = this.active$.asObservable().pipe(distinctUntilChanged());
 
   public readonly formControl = new FormControl();
 

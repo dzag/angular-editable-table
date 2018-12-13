@@ -79,15 +79,10 @@ export class SimpleTableComponent extends BaseTableComponent implements OnInit, 
 
   constructor (paginationService: PaginationService,
                changeDetectorRef: ChangeDetectorRef,
-               public cellService: CellService,
                private dataService: TableDataService,
                private cellManager: CellManager,
   ) {
     super(paginationService, changeDetectorRef);
-  }
-
-  onCellClick(cell) {
-    this.cellService.setActive(cell);
   }
 
   ngOnInit () {

@@ -1,5 +1,5 @@
 /* tslint:disable:component-selector */
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { ColumnDescriptor } from '../table.models';
 import { TableDataService } from '../data/table-data.service';
@@ -50,6 +50,11 @@ export class TableCellComponent implements OnInit, OnDestroy {
 
   ngOnDestroy (): void {
     this._cellManager.unregister(this);
+  }
+
+  @HostListener('click')
+  onClicked() {
+    this._cellService.setActive(this);
   }
 
   get address () {
