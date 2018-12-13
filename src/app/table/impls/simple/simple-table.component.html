@@ -21,7 +21,7 @@
             <div [id]="'subheader-' + descriptors[i].prop ">{{ sub }}</div>
         </td>
     </tr>
-2
+
     <tr *ngFor="let row of tableData.data; let rowIndex = index; trackBy: trackByIndex" style="height: 30px">
         <td *ngIf="withIndex" class="{{ 'text-center ' + indexClass }} ">{{ rowIndex + (currentOffset$ | async) + 1 }}</td>
         <td *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex"

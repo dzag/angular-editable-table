@@ -13,7 +13,7 @@ import { PaginationService } from './paginator/pagination.service';
 const log = (...message: any[]) => console.log('[TableComponent]', ...message);
 
 @Component({
-  selector: 'ga-table',
+  selector: 'ng-table',
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
@@ -23,7 +23,7 @@ const log = (...message: any[]) => console.log('[TableComponent]', ...message);
 })
 export class TableComponent implements OnInit, OnDestroy {
 
-  @HostBinding('class') hostClass = 'xt-table';
+  @HostBinding('class') hostClass = 'ng-table';
 
   // Simple table only
   @Input() data;

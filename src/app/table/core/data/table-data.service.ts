@@ -16,7 +16,7 @@ interface ValueSetterOptions {
 const defaultValueSetterOptions = {
   detect: true,
   emitEvent: true,
-  formulaCheck: false,
+  formulaCheck: true,
 };
 
 const getColumnFromSymbol = (symbol: string) => parseInt(symbol.substr(1), 10);
