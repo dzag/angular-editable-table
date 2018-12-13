@@ -13,7 +13,7 @@ import { PaginationService } from './paginator/pagination.service';
 const log = (...message: any[]) => console.log('[TableComponent]', ...message);
 
 @Component({
-  selector: 'xt-table',
+  selector: 'ga-table',
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
