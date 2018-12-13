@@ -68,7 +68,6 @@ export class RowGroupingTableComponent extends BaseTableComponent implements OnI
   ngOnInit () {
     super.ngOnInit();
 
-    this.headers = this.buildHeaders();
     this.subHeaders = this.buildSubHeaders();
 
     if (this._groupData) {
