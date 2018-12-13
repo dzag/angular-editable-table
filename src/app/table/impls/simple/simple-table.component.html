@@ -1,6 +1,6 @@
 <table-metadata *ngIf="metadata" alignItem="align-right"></table-metadata>
 <table class="table table-bordered">
-    <thead table-header [headers]="headers"></thead>
+    <thead table-header [descriptors]="descriptors" [colGroups]="colGroups"></thead>
 
     <tbody>
     <tr *ngFor="let row of tableData.data; let rowIndex = index; trackBy: trackByIndex" style="height: 30px">

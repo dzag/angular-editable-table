@@ -99,7 +99,6 @@ export class SimpleTableComponent extends BaseTableComponent implements OnInit, 
 
     // OLD STUFF, MIGHT NEED SOMETHING HERE
     this.rows = this.buildRows(this.data);
-    this.headers = this.buildHeaders();
     this.subHeaders = this.buildSubHeaders();
 
     for (const descriptor of this.descriptors) {
