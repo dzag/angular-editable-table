@@ -2,8 +2,8 @@
   <table class="table-responsive table-bordered">
     <thead table-header [configurations]="configurations"></thead>
     <tbody>
-    <tr *ngFor="let row of tableData.data; let rowIndex = index">
-      <td *ngFor="let data of row; let colIndex = index"
+    <tr *ngFor="let row of tableData.data; let rowIndex = index; trackBy: trackByIndex">
+      <td *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex"
           table-cell
           #cell
           [rowSpan]="cell['rowspan']"

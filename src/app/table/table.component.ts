@@ -25,6 +25,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
   @Input() configurations: TableConfigurations;
   @Input() data: any[];
+  @Input() groupData: any[];
 
   public readonly words = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
     'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
@@ -45,9 +46,13 @@ export class TableComponent implements OnInit, OnDestroy {
 
   ngOnDestroy (): void {}
 
+  trackByIndex (index) {
+    return index;
+  }
+
   private patchConfigs() {
     const configs: any = this.configurations;
-    configs._cd = this.detectorRef;
+    configs.cd = this.detectorRef;
   }
 
 }
