@@ -123,10 +123,6 @@ export class TableHeaderComponent implements OnInit {
 
     const depth = getDepth(groups);
 
-    // [ [Dates, 1, 6]   , []                  , []                   , []                    , []               , []               , [Something, 1, 2], []              ,
-    //   [Noi Dung, 3, 1], [Ngay bat dau, 3, 1], [Dates 2, 1, 2]      , []                    , [Dates 3, 1, 2]  , []               , [Tong tien, 3, 1], [Dung sai, 3, 1],
-    //   []             , []                  , [Ngay ket thuc, 2, 1], [Dates sub, 1, 1]     , [Tinh hinh, 2, 1], [Trang thai, 2, 1], []               , [],
-    //   []             , []                  , []                   , [Kien toan viem, 1, 1], []               , []                , [],              , [],             ]
     const groupTuple = emptyArrays(depth);
     let deepLevel = -1;
     const traverseGroups = (_groups: any[]) => {

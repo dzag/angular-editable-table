@@ -2,6 +2,14 @@ import { ChangeDetectorRef } from '@angular/core';
 import { set, cloneDeep } from 'lodash';
 import { Subject } from 'rxjs';
 
+interface ConfigSetterOptions {
+  detect?: boolean;
+}
+
+const defaultSetterOptions: ConfigSetterOptions = {
+  detect: true
+};
+
 export class TableConfigurations {
   public readonly states: any;
 
@@ -19,9 +27,12 @@ export class TableConfigurations {
     this.set(`columns[${columnIndex}].colName`, newName);
   }
 
-  private set(path: string, value) {
+  private set(path: string, value, options: ConfigSetterOptions = defaultSetterOptions) {
     set(this.states, path, value);
-    this.detectChanges();
+
+    if (options.detect) {
+      this.detectChanges();
+    }
   }
 
   private detectChanges(type: 'table' | 'header' = 'table') {
