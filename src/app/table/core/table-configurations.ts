@@ -12,7 +12,11 @@ const defaultSetterOptions: ConfigSetterOptions = {
   emmitEvent: true,
 };
 
-export interface Configs {
+export interface Anything {
+  [p: string]: any;
+}
+
+export interface Configs extends Anything {
   columns: any;
   columnGroups?: any;
 }

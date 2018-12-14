@@ -88,7 +88,7 @@ export class SimpleTableComponent extends BaseTableComponent implements OnInit, 
   ngOnInit () {
     super.ngOnInit();
 
-    this.tableData = new TableData(this.descriptors, this.data);
+    // this.tableData = new TableData(this.descriptors, this.data);
     this.dataService.tableData  = this.tableData;
     this.dataService.formulaParser = new FormulaParser(this.descriptors, this.formulas);
 

@@ -1,4 +1,5 @@
-import { cloneDeep } from 'lodash';
+import { cloneDeep, groupBy, flatMap } from 'lodash';
+import { TableConfigurations } from '../table-configurations';
 
 const wordMapper = {
   A: 0, B: 1, C: 2, D: 3, E: 4, F: 5, G: 6, H: 7, I: 8, K: 9, L: 10,
@@ -13,12 +14,18 @@ export interface CellData {
 export class TableData {
 
   public readonly data: CellData[][] = [];
+  public rowGroups;
+  public readonly descriptors;
 
-  constructor (public readonly descriptors,
+  private internalData;
+
+  constructor (private readonly configs: TableConfigurations,
                public readonly initialData,
   ) {
-    this.data = this.buildRows(descriptors, initialData);
+    this.descriptors = configs.states.columns;
     this.initialData = cloneDeep(initialData);
+    this.internalData = cloneDeep(initialData);
+    this.data = this.buildRows(this.internalData, this.descriptors, this.configs.states.rowGroups);
   }
 
   getCell(row, col) {
@@ -46,9 +53,42 @@ export class TableData {
     return this.descriptors[column]['prop'];
   }
 
-  private buildRows<T> (descriptors, data: Object[] | null | undefined) {
+  private buildRows<T> (data: Object[], descriptors, rowGroups?: any[]) {
     if (!data) {
       return;
+    }
+
+    if (rowGroups) {
+      const group = rowGroups[0];
+      const grouped = groupBy(data, group.groupBy);
+      const groups = {};
+      Object.entries(grouped).forEach(([key, value], index) => {
+        groups[key] = {
+          $$index: index,
+          groupName: group.name(value[0]),
+          data: value.map(item => {
+            const row = [];
+            descriptors.forEach(({prop, link, transformer}) => {
+              const result: any = {};
+              result.value = transformer
+                ? transformer(item[prop])
+                : item[prop];
+
+              if (link) {
+                result.url = link(item);
+              }
+              row.push(result);
+            });
+            return row;
+          })
+        };
+      });
+      this.rowGroups = groups;
+      // const flattedData = flatMap(Object.values(grouped));
+      // console.log(flattedData);
+      // flattedData.forEach(d => {
+      //   d['$$groupIndex'] = 0;
+      // });
     }
 
     return data.map(item => {

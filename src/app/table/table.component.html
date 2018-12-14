@@ -2,18 +2,41 @@
   <table class="table-responsive table-bordered">
     <thead table-header [configurations]="configurations"></thead>
     <tbody>
-    <tr *ngFor="let row of tableData.data; let rowIndex = index; trackBy: trackByIndex">
-      <td *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex"
-          table-cell
-          #cell
-          [rowSpan]="cell['rowspan']"
-          [column]="colIndex"
-          [row]="rowIndex"
-          [columnWord]="words[colIndex]"
-          [wordAddress]="words[colIndex] + '.' + rowIndex"
-          [descriptor]="configurations.states.columns[colIndex]">
-      </td>
-    </tr>
+    <ng-container *ngIf="!tableData.rowGroups">
+        <tr *ngFor="let row of tableData.data; let rowIndex = index; trackBy: trackByIndex">
+            <td *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex"
+                table-cell
+                #cell
+                [rowSpan]="cell['rowspan']"
+                [column]="colIndex"
+                [row]="rowIndex"
+                [columnWord]="words[colIndex]"
+                [wordAddress]="words[colIndex] + '.' + rowIndex"
+                [descriptor]="configurations.states.columns[colIndex]">
+            </td>
+        </tr>
+    </ng-container>
+    <ng-container *ngIf="tableData.rowGroups">
+        <ng-container *ngFor="let groups of tableData.rowGroups | keyvalue:keyDescOrder">
+            <tr>
+               <td colspan="9999">
+                   {{ groups.value.groupName }}
+               </td>
+            </tr>
+            <tr *ngFor="let row of groups.value.data; let rowIndex = index; trackBy: trackByIndex">
+                <td *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex"
+                    table-cell
+                    #cell
+                    [rowSpan]="cell['rowspan']"
+                    [column]="colIndex"
+                    [row]="rowIndex"
+                    [columnWord]="words[colIndex]"
+                    [wordAddress]="words[colIndex] + '.' + rowIndex"
+                    [descriptor]="configurations.states.columns[colIndex]">
+                </td>
+            </tr>
+        </ng-container>
+    </ng-container>
     </tbody>
   </table>
 </div>
