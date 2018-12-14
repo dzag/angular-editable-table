@@ -14,11 +14,11 @@ export interface CellData {
 export class TableData {
 
   public data: CellData[][] = [];
-  private groupData: any;
 
   public rowGroups;
   public readonly descriptors;
 
+  private groupData: any;
   private internalData;
 
   constructor (private readonly configs: TableConfigurations,
@@ -70,8 +70,28 @@ export class TableData {
     if (!data) {
       return;
     }
+    const isGroup = rowGroups && rowGroups.length > 0;
 
-    if (rowGroups && rowGroups.length > 0) {
+    if (!isGroup) {
+      this.data = data.map(item => {
+        const row = [];
+        descriptors.forEach(({prop, link, transformer}) => {
+          const result: any = {};
+          result.value = transformer
+            ? transformer(item[prop])
+            : item[prop];
+
+          if (link) {
+            result.url = link(item);
+          }
+          row.push(result);
+        });
+        return row;
+      });
+      return;
+    }
+
+    if (isGroup) {
       const group = rowGroups[0];
       const grouped = groupBy(data, group.groupBy);
       this.groupData = grouped;
@@ -112,22 +132,6 @@ export class TableData {
       this.rowGroups = groups;
       return;
     }
-
-    this.data = data.map(item => {
-      const row = [];
-      descriptors.forEach(({prop, link, transformer}) => {
-        const result: any = {};
-        result.value = transformer
-          ? transformer(item[prop])
-          : item[prop];
-
-        if (link) {
-          result.url = link(item);
-        }
-        row.push(result);
-      });
-      return row;
-    });
   }
 
 }
@@ -137,12 +141,14 @@ function defaultIndex() {
 }
 
 function romanize(num) {
-  let lookup = {M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1};
+  const lookup = {M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1};
   let roman = '';
   for (const i in lookup ) {
-    while ( num >= lookup[i] ) {
-      roman += i;
-      num -= lookup[i];
+    if (Object.prototype.hasOwnProperty.apply(lookup, i)) {
+      while ( num >= lookup[i] ) {
+        roman += i;
+        num -= lookup[i];
+      }
     }
   }
   return roman;
