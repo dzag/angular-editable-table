@@ -17,6 +17,12 @@ const name2Mapper = {
   3: 'Huyện 3',
 };
 
+const name3Mapper = {
+  1: 'Xã 1',
+  2: 'Xã 2',
+  3: 'Xã 3',
+};
+
 @Component({
   selector: 'app-sheet-example',
   templateUrl: './sheet-example.component.html',
@@ -42,6 +48,7 @@ export class SheetExampleComponent implements OnInit {
 
     const id = random(1, 5);
     const subId = random(1, 3);
+    const subId2 = random(1, 3);
 
     return {
       total: 0,
@@ -49,6 +56,8 @@ export class SheetExampleComponent implements OnInit {
       name: nameMapper[id],
       sameId: subId,
       name2: name2Mapper[subId],
+      sameId2: subId2,
+      name3: name3Mapper[subId2],
       col1: random(100000000, 1000000000),
       col2: random(100000000, 1000000000),
       col3: random(100000000, 1000000000),
@@ -190,6 +199,11 @@ export class SheetExampleComponent implements OnInit {
       },
       {
         groupBy: 'sameId',
+        name: (firstRowData) => firstRowData.name2, // Optional
+        indexPattern: (currentIndex, parentIndex?) => {}, // Optional,
+      },
+      {
+        groupBy: 'sameId2',
         name: (firstRowData) => firstRowData.name2, // Optional
         indexPattern: (currentIndex, parentIndex?) => {}, // Optional,
       }
