@@ -13,7 +13,9 @@ export interface CellData {
 
 export class TableData {
 
-  public readonly data: CellData[][] = [];
+  public data: CellData[][] = [];
+  private groupData: any;
+
   public rowGroups;
   public readonly descriptors;
 
@@ -25,28 +27,39 @@ export class TableData {
     this.descriptors = configs.states.columns;
     this.initialData = cloneDeep(initialData);
     this.internalData = cloneDeep(initialData);
-    this.data = this.buildRows(this.internalData, this.descriptors, this.configs.states.rowGroups);
+    this.buildRows(this.internalData, this.descriptors, this.configs.states.rowGroups);
   }
 
-  getCell(row, col) {
+  getCell(row, col, group?) {
+    if (group) {
+      return this.rowGroups[group]['data'][row][col];
+    }
     return this.data[row][col];
   }
 
-  getCellValue(row, col) {
-    return this.getCell(row, col).value;
+  getCellValue(row, col, group?) {
+    return this.getCell(row, col, group).value;
   }
 
-  setCell(row, col, cell: CellData) {
-    this.data[row][col] = cell;
-    this.patchInitialData(row, col, cell.value);
+  setCell(row, col, group, cell: CellData) {
+    if (group) {
+      this.rowGroups[group]['data'][row][col] = cell;
+    } else {
+      this.data[row][col] = cell;
+    }
+    this.patchInitialData(row, col, group, cell.value);
   }
 
-  setCellValue(row, col, value: any) {
-    this.setCell(row, col, {value});
+  setCellValue(row, col, group, value: any) {
+    this.setCell(row, col, group, {value});
   }
 
-  private patchInitialData(row, col, newValue) {
-    this.initialData[row][this.getProp(col)] = newValue;
+  private patchInitialData(row, col, group, newValue) {
+    if (group) {
+      this.groupData[group][row][this.getProp(col)] = newValue;
+    } else {
+      this.initialData[row][this.getProp(col)] = newValue;
+    }
   }
 
   private getProp(column: number) {
@@ -58,9 +71,10 @@ export class TableData {
       return;
     }
 
-    if (rowGroups) {
+    if (rowGroups && rowGroups.length > 0) {
       const group = rowGroups[0];
       const grouped = groupBy(data, group.groupBy);
+      this.groupData = grouped;
       const groups = {};
       const getIndexFunc = () => {
         if (group.indexPattern) {
@@ -71,7 +85,7 @@ export class TableData {
           return romanize;
         }
         return (i => i + 1);
-      }
+      };
 
       Object.entries(grouped).forEach(([key, value], index) => {
         groups[key] = {
@@ -96,14 +110,10 @@ export class TableData {
         };
       });
       this.rowGroups = groups;
-      // const flattedData = flatMap(Object.values(grouped));
-      // console.log(flattedData);
-      // flattedData.forEach(d => {
-      //   d['$$groupIndex'] = 0;
-      // });
+      return;
     }
 
-    return data.map(item => {
+    this.data = data.map(item => {
       const row = [];
       descriptors.forEach(({prop, link, transformer}) => {
         const result: any = {};

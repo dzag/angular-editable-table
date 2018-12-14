@@ -45,17 +45,17 @@ export class TableDataService {
     this._formulaParser = value;
   }
 
-  setValue (row, col, value, options?: ValueSetterOptions) {
+  setValue (row, col, group, value, options?: ValueSetterOptions) {
     options = merge({...defaultValueSetterOptions}, options);
-    const prevValue = this._tableData.getCell(row, col).value;
-    this._tableData.setCell(row, col, {value});
+    const prevValue = this._tableData.getCell(row, col, group).value;
+    this._tableData.setCell(row, col, group, {value});
 
     if (options.detect) {
       this._cellManager.detectChanges({row, column: col});
     }
 
     if (options.emitEvent) {
-      this._changes$.next({row, col, value, prevValue});
+      this._changes$.next({row, col, group, value, prevValue});
     }
 
     if (options.formulaCheck) {
@@ -81,17 +81,18 @@ export class TableDataService {
     }
   }
 
-  getValue (row, col) {
-    return this._tableData.getCellValue(row, col);
+  getValue (row, col, group?) {
+    return this._tableData.getCellValue(row, col, group);
   }
 
-  getCell (row, col) {
-    return this._tableData.getCell(row, col);
+  getCell (row, col, group?) {
+    return this._tableData.getCell(row, col, group);
   }
 
-  changes (row, col) {
+  changes (row, col, group) {
     return this._changesObs.pipe(
-      filter(({row: changedRow, col: changedCol}) => changedRow === row && changedCol === col),
+      filter(({row: changedRow, col: changedCol, group: changedGroup}) =>
+        changedRow === row && changedCol === col && (group ? changedGroup === group : true)),
       map(({value, prevValue}) => ({value, old: prevValue}))
     );
   }

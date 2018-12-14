@@ -18,8 +18,8 @@ export class CellService {
       .pipe(
         withLatestFrom(this.active$.pipe(filter(active => !!active)))
       ).subscribe(([formValue, activeCell]: [any, TableCellComponent]) => {
-        const { row, column } = activeCell;
-        this.dataService.setValue(row, column, formValue, { detect: false });
+        const { row, column, group } = activeCell;
+        this.dataService.setValue(row, column, group, formValue, { detect: false });
     });
   }
 
@@ -28,7 +28,7 @@ export class CellService {
     this.formControl.reset(null, {emitEvent: false});
     if (cell) {
       Promise.resolve().then(() => {
-        this.formControl.setValue(this.dataService.getValue(cell.row, cell.column), { emitEvent: false });
+        this.formControl.setValue(this.dataService.getValue(cell.row, cell.column, cell.group), { emitEvent: false });
       });
     }
   }

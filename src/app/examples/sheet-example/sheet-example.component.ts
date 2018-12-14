@@ -184,9 +184,9 @@ export class SheetExampleComponent implements OnInit {
         groupBy: 'belongsTo',
         name: (firstRowData) => firstRowData.name, // Optional
         indexType: 'romanNumeral',
-        // indexPattern: (currentIndex, parentIndex?) => {
-        //   return `1.${currentIndex}`;
-        // },
+        indexPattern: (currentIndex, parentIndex?) => {
+          return `1.${currentIndex}`;
+        },
       },
       {
         groupBy: 'sameId',
