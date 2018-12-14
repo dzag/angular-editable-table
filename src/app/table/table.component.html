@@ -19,8 +19,10 @@
     <ng-container *ngIf="tableData.rowGroups">
         <ng-container *ngFor="let groups of tableData.rowGroups | keyvalue:keyDescOrder">
             <tr>
-               <td colspan="9999">
-                   {{ groups.value.groupName }}
+               <td *ngFor="let firstRow of groups.value.data[0]; let colIndex = index">
+                   <ng-container *ngIf="colIndex === 0">
+                       {{ groups.value.groupName }}
+                   </ng-container>
                </td>
             </tr>
             <tr *ngFor="let row of groups.value.data; let rowIndex = index; trackBy: trackByIndex">
