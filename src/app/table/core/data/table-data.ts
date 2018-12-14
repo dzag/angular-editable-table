@@ -62,9 +62,21 @@ export class TableData {
       const group = rowGroups[0];
       const grouped = groupBy(data, group.groupBy);
       const groups = {};
+      const getIndexFunc = () => {
+        if (group.indexPattern) {
+          return group.indexPattern;
+        }
+
+        if (group.indexType === 'romanNumeral') {
+          return romanize;
+        }
+        return (i => i + 1);
+      }
+
       Object.entries(grouped).forEach(([key, value], index) => {
         groups[key] = {
           $$index: index,
+          $$indexFunc: getIndexFunc(),
           groupName: group.name(value[0]),
           data: value.map(item => {
             const row = [];
@@ -108,4 +120,20 @@ export class TableData {
     });
   }
 
+}
+
+function defaultIndex() {
+
+}
+
+function romanize(num) {
+  let lookup = {M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1};
+  let roman = '';
+  for (const i in lookup ) {
+    while ( num >= lookup[i] ) {
+      roman += i;
+      num -= lookup[i];
+    }
+  }
+  return roman;
 }

@@ -17,8 +17,9 @@
         </tr>
     </ng-container>
     <ng-container *ngIf="tableData.rowGroups">
-        <ng-container *ngFor="let groups of tableData.rowGroups | keyvalue:keyDescOrder">
+        <ng-container *ngFor="let groups of tableData.rowGroups | keyvalue:keyDescOrder; let groupIndex = index">
             <tr>
+               <td>{{ groups.value.$$indexFunc(groupIndex + 1) }}</td>
                <td *ngFor="let firstRow of groups.value.data[0]; let colIndex = index">
                    <ng-container *ngIf="colIndex === 0">
                        {{ groups.value.groupName }}
@@ -26,16 +27,18 @@
                </td>
             </tr>
             <tr *ngFor="let row of groups.value.data; let rowIndex = index; trackBy: trackByIndex">
-                <td *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex"
-                    table-cell
-                    #cell
-                    [rowSpan]="cell['rowspan']"
-                    [column]="colIndex"
-                    [row]="rowIndex"
-                    [columnWord]="words[colIndex]"
-                    [wordAddress]="words[colIndex] + '.' + rowIndex"
-                    [descriptor]="configurations.states.columns[colIndex]">
-                </td>
+                <td></td>
+                <ng-container *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex">
+                  <td table-cell
+                      #cell
+                      [rowSpan]="cell['rowspan']"
+                      [column]="colIndex"
+                      [row]="rowIndex"
+                      [columnWord]="words[colIndex]"
+                      [wordAddress]="words[colIndex] + '.' + rowIndex"
+                      [descriptor]="configurations.states.columns[colIndex]">
+                  </td>
+                </ng-container>
             </tr>
         </ng-container>
     </ng-container>
