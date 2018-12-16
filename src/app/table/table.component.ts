@@ -4,7 +4,7 @@ import { TableData } from './core/data/table-data';
 import { TableDataService } from './core/data/table-data.service';
 import { CellManager } from './core/table-cell/cell-manager.service';
 import { CellService } from './core/table-cell/cell.service';
-
+import { KeyValue } from '@angular/common';
 
 @Component({
   selector: 'ng-table',
@@ -40,7 +40,7 @@ export class TableComponent implements OnInit, OnDestroy {
   ngOnInit () {
     this.patchConfigs();
 
-    this.tableData = new TableData(this.configurations.states.columns, this.data);
+    this.tableData = new TableData(this.configurations, this.data);
     this.dataService.tableData = this.tableData;
   }
 
@@ -50,7 +50,11 @@ export class TableComponent implements OnInit, OnDestroy {
     return index;
   }
 
-  private patchConfigs() {
+  keyDescOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
+    return a.key > b.key ? -1 : (b.key > a.key ? 1 : 0);
+  };
+
+  private patchConfigs () {
     const configs: any = this.configurations;
     configs.cd = this.detectorRef;
   }

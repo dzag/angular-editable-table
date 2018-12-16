@@ -1,17 +1,28 @@
 import { ChangeDetectorRef } from '@angular/core';
-import { set, cloneDeep } from 'lodash';
+import { set, cloneDeep, merge } from 'lodash';
 import { Subject } from 'rxjs';
 
 interface ConfigSetterOptions {
   detect?: boolean;
+  emmitEvent?: boolean;
 }
 
 const defaultSetterOptions: ConfigSetterOptions = {
-  detect: true
+  detect: true,
+  emmitEvent: true,
 };
 
+export interface Anything {
+  [p: string]: any;
+}
+
+export interface Configs extends Anything {
+  columns: any;
+  columnGroups?: any;
+}
+
 export class TableConfigurations {
-  public readonly states: any;
+  public readonly states: Configs;
 
   private _cd: ChangeDetectorRef;
   private _headerCd: ChangeDetectorRef;
@@ -19,7 +30,7 @@ export class TableConfigurations {
   private changes = new Subject();
   private changeObs =  this.changes.asObservable();
 
-  constructor (private initialConfigs) { // TODO: Add type to this
+  constructor (private initialConfigs: Configs) { // TODO: Add type to this
     this.states = cloneDeep(this.initialConfigs);
   }
 
@@ -27,11 +38,16 @@ export class TableConfigurations {
     this.set(`columns[${columnIndex}].colName`, newName);
   }
 
-  private set(path: string, value, options: ConfigSetterOptions = defaultSetterOptions) {
+  private set(path: string, value, options?: ConfigSetterOptions) {
+    options = merge({...defaultSetterOptions}, options);
     set(this.states, path, value);
 
     if (options.detect) {
       this.detectChanges();
+    }
+
+    if (options.emmitEvent) {
+      this.changes.next();
     }
   }
 
@@ -41,13 +57,11 @@ export class TableConfigurations {
       : undefined;
 
     if (detector) {
-      this.changes.next();
       return detector.detectChanges();
     }
 
     Promise.resolve().then(() => {
       if (detector) {
-        this.changes.next();
         detector.detectChanges();
       }
     });

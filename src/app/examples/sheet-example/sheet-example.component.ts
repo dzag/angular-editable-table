@@ -3,6 +3,26 @@ import { random } from 'lodash';
 import { ColumnDescriptor } from '../../table';
 import { TableConfigurations } from '../../table/core/table-configurations';
 
+const nameMapper = {
+  1: 'Tỉnh 1',
+  2: 'Tỉnh 2',
+  3: 'Tỉnh 3',
+  4: 'Tỉnh 4',
+  5: 'Tỉnh 5',
+};
+
+const name2Mapper = {
+  1: 'Huyện 1',
+  2: 'Huyện 2',
+  3: 'Huyện 3',
+};
+
+const name3Mapper = {
+  1: 'Xã 1',
+  2: 'Xã 2',
+  3: 'Xã 3',
+};
+
 @Component({
   selector: 'app-sheet-example',
   templateUrl: './sheet-example.component.html',
@@ -11,23 +31,33 @@ import { TableConfigurations } from '../../table/core/table-configurations';
 export class SheetExampleComponent implements OnInit {
 
   data = Array(50).fill(null).map((value, index) => (() => {
-    if (index === 0) {
-      return {
-        total: 0,
-        col1: 0,
-        col2: 0,
-        col3: 0,
-        col4: 0,
-        col5: 0,
-        col6: 0,
-        col7: 0,
-        col8: 0,
-        col9: 0,
-      };
-    }
+    // if (index === 0) {
+    //   return {
+    //     total: 0,
+    //     col1: 0,
+    //     col2: 0,
+    //     col3: 0,
+    //     col4: 0,
+    //     col5: 0,
+    //     col6: 0,
+    //     col7: 0,
+    //     col8: 0,
+    //     col9: 0,
+    //   };
+    // }
+
+    const id = random(1, 5);
+    const subId = random(1, 3);
+    const subId2 = random(1, 3);
 
     return {
       total: 0,
+      belongsTo: id,
+      name: nameMapper[id],
+      sameId: subId,
+      name2: name2Mapper[subId],
+      sameId2: subId2,
+      name3: name3Mapper[subId2],
       col1: random(100000000, 1000000000),
       col2: random(100000000, 1000000000),
       col3: random(100000000, 1000000000),
@@ -158,11 +188,32 @@ export class SheetExampleComponent implements OnInit {
         type: 'currency'
       },
     ],
+    rowGroups: [
+      {
+        groupBy: 'belongsTo',
+        name: (firstRowData) => firstRowData.name, // Optional
+        indexType: 'romanNumeral',
+        indexPattern: (currentIndex, parentIndex?) => {
+          return `1.${currentIndex}`;
+        },
+      },
+      {
+        groupBy: 'sameId',
+        name: (firstRowData) => firstRowData.name2, // Optional
+        indexPattern: (currentIndex, parentIndex?) => {}, // Optional,
+      },
+      {
+        groupBy: 'sameId2',
+        name: (firstRowData) => firstRowData.name2, // Optional
+        indexPattern: (currentIndex, parentIndex?) => {}, // Optional,
+      }
+    ],
   });
 
   constructor () { }
 
   ngOnInit () {
+    console.log(this.data);
     this.configs.renameColumn(0, 'hello');
   }
 

@@ -19,6 +19,7 @@ export class TableCellComponent implements OnInit, OnDestroy {
 
   @Input() row: number;
   @Input() column: number;
+  @Input() group: string;
 
   @Input() columnWord: string;
   @Input() wordAddress: string;
@@ -66,15 +67,15 @@ export class TableCellComponent implements OnInit, OnDestroy {
   }
 
   get dataChanges() {
-    return this._dataService.changes(this.row, this.column);
+    return this._dataService.changes(this.row, this.column, this.group);
   }
 
   get data () {
-    return this._dataService.getValue(this.row, this.column);
+    return this._dataService.getValue(this.row, this.column, this.group);
   }
 
   get cell() {
-    return this._dataService.getCell(this.row, this.column);
+    return this._dataService.getCell(this.row, this.column, this.group);
   }
 
 }
