@@ -4,8 +4,7 @@
     <th *ngIf="col.length > 0"
         [class]="col[1]"
         [attr.rowspan]="col[2]"
-        [attr.colspan]="col[3]">
-      {{ col[0] }}
+        [attr.colspan]="col[3]" [innerHTML]="col[0]">
     </th>
   </ng-container>
 </tr>

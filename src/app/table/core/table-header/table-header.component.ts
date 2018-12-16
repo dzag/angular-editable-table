@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { buildPropToPathMap, depth as getDepth, emptyArrays, getPath, insertAt, pushEmptyArrays, totalSubGroupProps } from '../table.utils';
 import { get, last } from 'lodash';
 import { TableConfigurations } from '../table-configurations';
+import { DomSanitizer } from '@angular/platform-browser';
 
 type RowSpan = number;
 type ColSpan = number;
@@ -30,7 +31,7 @@ export class TableHeaderComponent implements OnInit {
 
   public headers;
 
-  constructor() { }
+  constructor(public domSanitizer: DomSanitizer) { }
 
   ngOnInit() {
     this.headers = this.buildHeaders();
@@ -47,7 +48,7 @@ export class TableHeaderComponent implements OnInit {
     const isValidColGroupsInput = (colGroups || []).length !== 0;
     if (!isValidColGroupsInput) {
       const headers = descriptors
-        .map(descriptor => ([descriptor.colName, descriptor.colClass, 1, 1]));
+        .map(descriptor => ([this.domSanitizer.bypassSecurityTrustHtml(descriptor.colName), descriptor.colClass, 1, 1]));
 
       if (this.withIndex) {
         headers.unshift([this.indexName, this.indexClass, 1, 1]);
@@ -141,7 +142,7 @@ export class TableHeaderComponent implements OnInit {
         const isObject = !Array.isArray(group);
         if (isObject) {
           if (typeof group !== 'string') {
-            groupTuple[deepLevel].push([group.name, group.class, depth - deepLevel, 1]);
+            groupTuple[deepLevel].push([this.domSanitizer.bypassSecurityTrustHtml(group.name), group.class, depth - deepLevel, 1]);
             for (let i = 1; i < depth - deepLevel; i++) {
               groupTuple[deepLevel + i].push([]);
             }
