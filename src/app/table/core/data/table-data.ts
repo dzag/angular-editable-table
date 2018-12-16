@@ -1,4 +1,5 @@
-import { cloneDeep, groupBy, flatMap, isNil, get, mapValues } from 'lodash';
+import { cloneDeep, groupBy, flatMap, isNil, get, mapValues, set, repeat } from 'lodash';
+import * as deepMerge from 'deepmerge';
 import { TableConfigurations } from '../table-configurations';
 
 // const nest = function (seq, keys) {
@@ -79,8 +80,9 @@ export class TableData {
       return;
     }
     const isGroup = rowGroups && rowGroups.length > 0;
+    const isSimple = !isGroup;
 
-    if (!isGroup) {
+    if (isSimple) {
       this.data = data.map(item => {
         const row = [];
         descriptors.forEach(({ prop, link, transformer }) => {
@@ -110,26 +112,40 @@ export class TableData {
       };
 
       const nestedData = nest(data, rowGroups.map(g => g.groupBy));
+      console.log('nestedData', nestedData);
 
       const path = [];
+      const indexes = [];
       let depth = 0;
+      const rs = {};
       const traverse = (obj) => {
-        Object.keys(obj).forEach((key, index) => {
+        Object.entries(obj).forEach(([key, value], index) => {
           path.push(key);
-          if (typeof obj[key] === 'object' && Array.isArray(obj[key])) {
+          indexes.push(index);
+          if (typeof value === 'object' && Array.isArray(value)) {
             const array = obj[key];
             const parentPath = path.join('.');
-          } else if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
+          } else if (typeof value === 'object' && !Array.isArray(value)) {
             depth++;
+            const subs = repeat('subGroups.', depth);
+            const subsPath = key + '.' + subs.substring(0, subs.length - 1);
+            const sub = get(rs, subsPath);
+            if (!sub) {
+              set(rs, subsPath, []);
+            } else {
+              // set(rs, subsPath, sub.concat(value));
+            }
+            console.log(subs.substring(0, subs.length - 1));
             traverse(obj[key]);
             depth--;
           }
           path.pop();
+          indexes.pop();
         });
       };
 
-      console.log(nestedData);
       traverse(nestedData);
+      console.log(rs);
 
       const group = rowGroups[0];
       const grouped = groupBy(data, group.groupBy);

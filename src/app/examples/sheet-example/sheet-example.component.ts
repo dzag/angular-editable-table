@@ -30,7 +30,7 @@ const name3Mapper = {
 })
 export class SheetExampleComponent implements OnInit {
 
-  data = Array(50).fill(null).map((value, index) => (() => {
+  data = Array(20).fill(null).map((value, index) => (() => {
     // if (index === 0) {
     //   return {
     //     total: 0,
@@ -204,7 +204,7 @@ export class SheetExampleComponent implements OnInit {
       },
       {
         groupBy: 'sameId2',
-        name: (firstRowData) => firstRowData.name2, // Optional
+        name: (firstRowData) => firstRowData.name3, // Optional
         indexPattern: (currentIndex, parentIndex?) => {}, // Optional,
       }
     ],
@@ -214,7 +214,7 @@ export class SheetExampleComponent implements OnInit {
 
   ngOnInit () {
     console.log(this.data);
-    this.configs.renameColumn(0, 'hello');
+    this.configs.renameColumn(0, `hello <span style="color: red">2</span>`);
   }
 
 }
