@@ -32,7 +32,6 @@ export class TableData {
     this.initialData = cloneDeep(initialData);
     this.internalData = cloneDeep(initialData);
     this.buildRows(this.internalData, this.descriptors, this.configs.states.rowGroups);
-    this.buildGroupedRows(this.internalData, this.descriptors, this.configs.states.rowGroups);
 
     console.log(this);
   }

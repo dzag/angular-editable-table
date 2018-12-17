@@ -29,6 +29,7 @@ export interface TableColumnConfigurations extends Anything {
 
 export interface Configs extends Anything {
   columns: TableColumnConfigurations[];
+  rowGroups?: any;
   columnGroups?: any;
   rowIndexType?: any;
   rowIndexPattern?: any;
