@@ -117,25 +117,25 @@ export class SheetExampleComponent implements OnInit {
         dataType: 'date'
       },
     ],
-    rowGroups: [
-      {
-        groupBy: 'belongsTo',
-        name: (firstRowData) => firstRowData.name, // Optional
-        indexType: 'romanNumeral',
-      },
-      {
-        groupBy: 'sameId',
-        name: (firstRowData) => firstRowData.name2, // Optional
-        // indexPattern: (currentIndex, {parentIndex, parentText}) => {}, // Optional,
-      },
-      {
-        groupBy: 'sameId2',
-        name: (firstRowData) => firstRowData.name3, // Optional
-        indexPattern: (currentIndex, {parentIndex, parentText}) => {
-          return parentText + `.${currentIndex + 1}`;
-        }
-      }
-    ],
+    // rowGroups: [
+    //   {
+    //     groupBy: 'belongsTo',
+    //     name: (firstRowData) => firstRowData.name, // Optional
+    //     indexType: 'romanNumeral',
+    //   },
+    //   {
+    //     groupBy: 'sameId',
+    //     name: (firstRowData) => firstRowData.name2, // Optional
+    //     // indexPattern: (currentIndex, {parentIndex, parentText}) => {}, // Optional,
+    //   },
+    //   {
+    //     groupBy: 'sameId2',
+    //     name: (firstRowData) => firstRowData.name3, // Optional
+    //     indexPattern: (currentIndex, {parentIndex, parentText}) => {
+    //       return parentText + `.${currentIndex + 1}`;
+    //     }
+    //   }
+    // ],
     index: {
       show: true,
       // rowIndexPattern: (currentIndex, {parentIndex, parentText}) => {
@@ -157,7 +157,6 @@ export class SheetExampleComponent implements OnInit {
           }
         },
         actionsOnRow: (row, actionTypes) => {
-          console.log(row);
           return ['edit', 'download'];
         },
         clicked: ({type, row}) => {
@@ -178,7 +177,6 @@ export class SheetExampleComponent implements OnInit {
           }
         },
         actionsOnRow: (row, actionTypes) => {
-          console.log(row);
           return ['edit', 'download'];
         },
         clicked: ({type, row}) => {

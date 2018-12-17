@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { TableConfigurations } from './core/table-configurations';
-import { TableData } from './core/data/table-data';
+import { TableDataInternal } from './core/data/table-data-internal';
 import { TableDataService } from './core/data/table-data.service';
 import { CellManager } from './core/table-cell/cell-manager.service';
 import { CellService } from './core/table-cell/cell.service';
@@ -31,9 +31,9 @@ export class TableComponent implements OnInit, OnDestroy {
   public readonly words = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
     'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
-  public tableData: TableData;
+  public tableDataInternal: TableDataInternal;
 
-  constructor (private detectorRef: ChangeDetectorRef,
+  constructor (private _cd: ChangeDetectorRef,
                private _dataService: TableDataService,
                private _cellService: CellService,
                private cellManager: CellManager,
@@ -42,8 +42,8 @@ export class TableComponent implements OnInit, OnDestroy {
   ngOnInit () {
     this.patchConfigs();
 
-    this.tableData = new TableData(this.configurations, this.data);
-    this._dataService.tableData = this.tableData;
+    this.tableDataInternal = new TableDataInternal(this.configurations, this.data);
+    this._dataService.tableDataInternal = this.tableDataInternal;
   }
 
   ngOnDestroy (): void {}
@@ -109,7 +109,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
   private patchConfigs () {
     const configs: any = this.configurations;
-    configs.cd = this.detectorRef;
+    configs.cd = this._cd;
   }
 
   onActionClicked (index, actionType, rowIndex, group) {

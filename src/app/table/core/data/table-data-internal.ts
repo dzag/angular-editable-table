@@ -17,7 +17,7 @@ export interface CellData {
   url?: string;
 }
 
-export class TableData {
+export class TableDataInternal {
 
   public data: CellData[][] = [];
   public groupData;

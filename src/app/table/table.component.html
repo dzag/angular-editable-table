@@ -5,8 +5,8 @@
            [withIndex]="showIndex"
            [withActions]="showActions" [actionsHeader]="actionsHeader"></thead>
     <tbody>
-    <ng-container *ngIf="!tableData.groupData">
-        <tr *ngFor="let row of tableData.data; let rowIndex = index; trackBy: trackByIndex">
+    <ng-container *ngIf="!tableDataInternal.groupData">
+        <tr *ngFor="let row of tableDataInternal.data; let rowIndex = index; trackBy: trackByIndex">
           <td *ngIf="showIndex">{{ getRowIndex(rowIndex) }}</td>
           <td *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex"
               table-cell
@@ -23,8 +23,8 @@
           </ng-container>
         </tr>
     </ng-container>
-    <ng-container *ngIf="tableData.groupData">
-      <ng-container *ngTemplateOutlet="groupTemplate; context: { rowGroups: tableData.groupData }"></ng-container>
+    <ng-container *ngIf="tableDataInternal.groupData">
+      <ng-container *ngTemplateOutlet="groupTemplate; context: { rowGroups: tableDataInternal.groupData }"></ng-container>
     </ng-container>
     </tbody>
   </table>

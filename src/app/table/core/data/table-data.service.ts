@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Injectable } from '@angular/core';
-import { TableData } from './table-data';
+import { TableDataInternal } from './table-data-internal';
 import { Subject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import * as math from 'mathjs';
@@ -23,7 +23,7 @@ const getColumnFromSymbol = (symbol: string) => parseInt(symbol.substr(1), 10);
 
 @Injectable()
 export class TableDataService {
-  private _tableData: TableData;
+  private _tableData: TableDataInternal;
   private _formulaParser: FormulaParser;
 
   private _changes$ = new Subject<any>();
@@ -33,11 +33,11 @@ export class TableDataService {
                private _cd: ChangeDetectorRef,
   ) {}
 
-  get tableData (): TableData {
+  get tableDataInternal (): TableDataInternal {
     return this._tableData;
   }
 
-  set tableData (value: TableData) {
+  set tableDataInternal (value: TableDataInternal) {
     this._tableData = value;
   }
 
@@ -86,7 +86,7 @@ export class TableDataService {
   }
 
   getRow (row, group?) {
-    return this.tableData.getRow(row, group);
+    return this.tableDataInternal.getRow(row, group);
   }
 
   getCell (row, col, group?) {
