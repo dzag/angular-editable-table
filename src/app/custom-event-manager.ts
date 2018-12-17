@@ -1,6 +1,10 @@
 import { Injectable, Inject, NgZone } from '@angular/core';
 import { EVENT_MANAGER_PLUGINS, EventManager } from '@angular/platform-browser';
 
+function initial (array: any[]) {
+  return array.slice(0, array.length - 1);
+}
+
 @Injectable()
 export class CustomEventManager extends EventManager {
   constructor (@Inject(EVENT_MANAGER_PLUGINS) plugins: any[], private zone: NgZone) {
@@ -9,7 +13,7 @@ export class CustomEventManager extends EventManager {
 
   addEventListener (element: HTMLElement, eventName: string, handler: Function): Function {
     if (eventName.endsWith('out-zone')) {
-      eventName = eventName.split('.')[0];
+      eventName = initial(eventName.split('.')).join('.');
       return this.zone.runOutsideAngular(() =>
         super.addEventListener(element, eventName, handler));
     }
