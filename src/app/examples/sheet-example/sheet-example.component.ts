@@ -30,7 +30,7 @@ const name3Mapper = {
 })
 export class SheetExampleComponent implements OnInit {
 
-  data = Array(20).fill(null).map((value, index) => (() => {
+  data = Array(50).fill(null).map((value, index) => (() => {
     // if (index === 0) {
     //   return {
     //     total: 0,

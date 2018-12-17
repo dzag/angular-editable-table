@@ -19,7 +19,7 @@ export class TableCellComponent implements OnInit, OnDestroy {
 
   @Input() row: number;
   @Input() column: number;
-  @Input() group: string;
+  @Input() group: any;
 
   @Input() columnWord: string;
   @Input() wordAddress: string;

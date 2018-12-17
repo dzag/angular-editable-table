@@ -1,4 +1,4 @@
-import { cloneDeep, forEachRight, get, repeat } from 'lodash';
+import { cloneDeep, forEachRight, get, repeat, set } from 'lodash';
 import { TableConfigurations } from '../table-configurations';
 import { doGroupFromCriteria, getCachedArray, getParentKey } from './row-grouping.utils';
 
@@ -42,7 +42,8 @@ export class TableData {
 
   getCell (row, col, group?) {
     if (group) {
-      return this.rowGroups[group]['data'][row][col];
+      const path = this.getDataRowPath(group.$$path, row);
+      return get(this.rowGroups, path)[col];
     }
     return this.data[row][col];
   }
@@ -53,7 +54,8 @@ export class TableData {
 
   setCell (row, col, group, cell: CellData) {
     if (group) {
-      this.rowGroups[group]['data'][row][col] = cell;
+      const path = this.getGroupPath(group.$$path);
+      set(this.rowGroups, path + `[${row}][${col}]`, cell);
     } else {
       this.data[row][col] = cell;
     }
@@ -66,7 +68,7 @@ export class TableData {
 
   private patchInitialData (row, col, group, newValue) {
     if (group) {
-      this.groupData[group][row][this.getProp(col)] = newValue;
+      group.$$data[row][col] = newValue;
     } else {
       this.initialData[row][this.getProp(col)] = newValue;
     }
@@ -166,13 +168,45 @@ export class TableData {
     }
     const isGroup = rowGroups && rowGroups.length > 0;
     if (isGroup) {
-      this.rowGroups = this.buildGroupedRows(data, descriptors, rowGroups);
+      const _rowGroups = this.buildGroupedRows(data, descriptors, rowGroups);
+      this.rowGroups = this.buildGroupData(_rowGroups);
       console.log('this.rowGroups', this.rowGroups);
       console.log('this.rowGroups', this.internalData);
       return;
     }
 
     this.data = this.buildSimpleRows(data, descriptors);
+  }
+
+  private buildGroupData (groupData) {
+    let _deepLevel = 0;
+    const _groupBuild = [...groupData];
+    const indexes = [];
+    const buildGroupData = (groupBuild): any => {
+      _deepLevel++;
+      const clone = [...groupBuild];
+
+      clone.forEach((data, index) => {
+        indexes.push(index);
+        data.$$path = indexes.join('.');
+        if (data.subGroups) {
+          buildGroupData(data.subGroups);
+        }
+        indexes.pop();
+      });
+      _deepLevel--;
+    };
+
+    buildGroupData(_groupBuild);
+    return _groupBuild;
+  }
+
+  private getDataRowPath(path, row) {
+    return path.split('.').map(index => `[${index}]`).join('.subGroups') + `.data[${row}]`;
+  }
+
+  private getGroupPath(path) {
+    return path.split('.').map(index => `[${index}]`).join('.subGroups') + `.data`;
   }
 
 }
