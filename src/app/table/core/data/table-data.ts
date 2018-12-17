@@ -1,15 +1,11 @@
 import { cloneDeep, forEachRight, get, repeat, set } from 'lodash';
 import { TableConfigurations } from '../table-configurations';
 import { doGroupFromCriteria, getCachedArray, getParentKey } from './row-grouping.utils';
-import { getIndexFunction, mapToTableCells, romanize } from './table-data.utils';
+import { getIndexFunction, mapToTableCells } from './table-data.utils';
 
-// const nest = function (seq, keys) {
-//   if (!keys.length) {
-//     return seq;
-//   }
-//   const [first, ...rest] = keys;
-//   return mapValues(groupBy(seq, first), value => nest(value, rest));
-// };
+export interface GroupData {
+  name: string;
+}
 
 const wordMapper = {
   A: 0, B: 1, C: 2, D: 3, E: 4, F: 5, G: 6, H: 7, I: 8, K: 9, L: 10,
@@ -24,11 +20,9 @@ export interface CellData {
 export class TableData {
 
   public data: CellData[][] = [];
+  public groupData;
 
-  public rowGroups;
   public readonly descriptors;
-
-  private groupData: any;
   private internalData;
 
   constructor (private readonly configs: TableConfigurations,
@@ -39,12 +33,14 @@ export class TableData {
     this.internalData = cloneDeep(initialData);
     this.buildRows(this.internalData, this.descriptors, this.configs.states.rowGroups);
     this.buildGroupedRows(this.internalData, this.descriptors, this.configs.states.rowGroups);
+
+    console.log(this);
   }
 
   getCell (row, col, group?) {
     if (group) {
-      const path = this.getDataRowPath(group.$$path, row);
-      return get(this.rowGroups, path)[col];
+      const path = this.getDataRowPath(group.path, row);
+      return get(this.groupData, path)[col];
     }
     return this.data[row][col];
   }
@@ -55,8 +51,8 @@ export class TableData {
 
   setCell (row, col, group, cell: CellData) {
     if (group) {
-      const path = this.getGroupPath(group.$$path);
-      set(this.rowGroups, path + `[${row}][${col}]`, cell);
+      const path = this.getGroupPath(group.path);
+      set(this.groupData, path + `[${row}][${col}]`, cell);
     } else {
       this.data[row][col] = cell;
     }
@@ -69,14 +65,33 @@ export class TableData {
 
   private patchInitialData (row, col, group, newValue) {
     if (group) {
-      group.$$data[row][col] = newValue;
-    } else {
-      this.initialData[row][this.getProp(col)] = newValue;
+      row = group.originalData[row].$$index;
+      group.originalData[row][col] = newValue;
     }
+
+    this.initialData[row][this.getProp(col)] = newValue;
   }
 
   private getProp (column: number) {
     return this.descriptors[column]['prop'];
+  }
+
+  private buildRows<T> (data: Object[], descriptors, rowGroups?: any[]) {
+    if (!data) {
+      return;
+    }
+    const isGroup = rowGroups && rowGroups.length > 0;
+    if (isGroup) {
+      const _rowGroups = this.buildGroupedRows(data, descriptors, rowGroups);
+      this.groupData = this.buildGroupData(_rowGroups);
+      return;
+    }
+
+    this.data = this.buildSimpleRows(data, descriptors);
+  }
+
+  private buildSimpleRows (data: Object[], descriptors) {
+    return data.map(item => mapToTableCells(descriptors, item));
   }
 
   private buildGroupedRows<T> (data: Object[], descriptors, rowGroups?: any[]) {
@@ -108,14 +123,14 @@ export class TableData {
     const result = [];
     let prevGroupedRowsMap = {};
     forEachRight(groupedRows, ({ dataMap, group }, index) => {
-      const $$groupIndex = index;
+      const groupIndex = index;
       if (index === groupedRows.length - 1) {
         Object.entries(dataMap).forEach(([k, v]: [string, any[]]) => {
           const parentKey = getParentKey(k);
           const toPush: any = {
-            $$indexFunc: getIndexFunction(group),
-            $$data: v,
-            $$groupIndex,
+            indexFn: getIndexFunction(group),
+            originalData: v,
+            groupIndex,
             name: group.name(v[0]),
             data: v.map(item => mapToTableCells(descriptors, item)),
           };
@@ -131,13 +146,13 @@ export class TableData {
         prevGroupedRowsMap = {};
         const subGroupsPath = repeat('.subGroups[0]', groupedRows.length - 2 - index);
         Object.entries(copiedPrevMap).forEach(([k, v]) => {
-          const _data = get(v, '[0]' + subGroupsPath + '.$$data[0]');
+          const _data = get(v, '[0]' + subGroupsPath + '.originalData[0]');
           const parentKey = getParentKey(k);
           const cacheArray = getCachedArray(prevGroupedRowsMap, parentKey);
           cacheArray.push({
-            $$indexFunc: getIndexFunction(group),
-            $$data: v,
-            $$groupIndex,
+            indexFn: getIndexFunction(group),
+            originalData: v,
+            groupIndex,
             name: group.name(_data),
             subGroups: v
           });
@@ -145,11 +160,11 @@ export class TableData {
       } else {
         const subGroupsPath = repeat('.subGroups[0]', groupedRows.length - 2);
         Object.entries(prevGroupedRowsMap).forEach(([k, v]) => {
-          const _data = get(v, '[0]' + subGroupsPath + '.$$data[0]');
+          const _data = get(v, '[0]' + subGroupsPath + '.originalData[0]');
           result.push({
-            $$indexFunc: getIndexFunction(group),
-            $$data: v,
-            $$groupIndex,
+            indexFn: getIndexFunction(group),
+            originalData: v,
+            groupIndex,
             name: group.name(_data),
             subGroups: v,
           });
@@ -159,43 +174,20 @@ export class TableData {
     return result;
   }
 
-  private buildSimpleRows (data: Object[], descriptors) {
-    return data.map(item => mapToTableCells(descriptors, item));
-  }
-
-  private buildRows<T> (data: Object[], descriptors, rowGroups?: any[]) {
-    if (!data) {
-      return;
-    }
-    const isGroup = rowGroups && rowGroups.length > 0;
-    if (isGroup) {
-      const _rowGroups = this.buildGroupedRows(data, descriptors, rowGroups);
-      this.rowGroups = this.buildGroupData(_rowGroups);
-      console.log('this.rowGroups', this.rowGroups);
-      console.log('this.rowGroups', this.internalData);
-      return;
-    }
-
-    this.data = this.buildSimpleRows(data, descriptors);
-  }
-
   private buildGroupData (groupData) {
-    let _deepLevel = 0;
     const _groupBuild = [...groupData];
     const indexes = [];
     const buildGroupData = (groupBuild): any => {
-      _deepLevel++;
       const clone = [...groupBuild];
 
       clone.forEach((data, index) => {
         indexes.push(index);
-        data.$$path = indexes.join('.');
+        data['path'] = indexes.join('.');
         if (data.subGroups) {
           buildGroupData(data.subGroups);
         }
         indexes.pop();
       });
-      _deepLevel--;
     };
 
     buildGroupData(_groupBuild);
