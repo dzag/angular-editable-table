@@ -56,6 +56,10 @@ export class TableCellComponent implements OnInit, OnDestroy {
 
   @HostListener('click')
   onClicked() {
+    if (this.readonly) {
+      return;
+    }
+
     if (!this.columnConfigs.editable) {
       this._cellService.setActive(null);
       return;

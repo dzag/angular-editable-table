@@ -64,12 +64,13 @@ export class TableData {
   }
 
   private patchInitialData (row, col, group, newValue) {
+    const initialDataIndex = group ? group.originalData[row].$$index : row;
+
     if (group) {
-      row = group.originalData[row].$$index;
       group.originalData[row][col] = newValue;
     }
 
-    this.initialData[row][this.getProp(col)] = newValue;
+    this.initialData[initialDataIndex][this.getProp(col)] = newValue;
   }
 
   private getProp (column: number) {
