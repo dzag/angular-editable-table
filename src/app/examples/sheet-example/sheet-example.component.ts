@@ -193,19 +193,18 @@ export class SheetExampleComponent implements OnInit {
         groupBy: 'belongsTo',
         name: (firstRowData) => firstRowData.name, // Optional
         indexType: 'romanNumeral',
-        indexPattern: (currentIndex, parentIndex?) => {
-          return `1.${currentIndex}`;
-        },
       },
       {
         groupBy: 'sameId',
         name: (firstRowData) => firstRowData.name2, // Optional
-        indexPattern: (currentIndex, parentIndex?) => {}, // Optional,
+        // indexPattern: (currentIndex, {parentIndex, parentText}) => {}, // Optional,
       },
       {
         groupBy: 'sameId2',
         name: (firstRowData) => firstRowData.name3, // Optional
-        indexPattern: (currentIndex, parentIndex?) => {}, // Optional,
+        indexPattern: (currentIndex, {parentIndex, parentText}) => {
+          return parentText + `.${currentIndex + 1}`;
+        }
       }
     ],
   });

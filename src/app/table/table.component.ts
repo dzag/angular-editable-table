@@ -5,7 +5,6 @@ import { TableDataService } from './core/data/table-data.service';
 import { CellManager } from './core/table-cell/cell-manager.service';
 import { CellService } from './core/table-cell/cell.service';
 import { KeyValue } from '@angular/common';
-import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'ng-table',

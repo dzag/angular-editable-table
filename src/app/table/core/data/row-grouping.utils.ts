@@ -15,6 +15,7 @@ export function doGroupFromCriteria (_data, _criteria, parentPath?) {
       cachedArray = [];
       _dataMap[value] = cachedArray;
     }
+    d.$$index = dataIndex;
     cachedArray.push(d);
   });
   return _dataMap;

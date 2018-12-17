@@ -17,32 +17,66 @@
         </tr>
     </ng-container>
     <ng-container *ngIf="tableData.rowGroups">
-        <ng-container *ngFor="let group of tableData.rowGroups | keyvalue:keyDescOrder; let groupIndex = index">
-            <tr>
-               <td>{{ group.value.$$indexFunc(groupIndex + 1) }}</td>
-               <td *ngFor="let firstRow of group.value.data[0]; let colIndex = index">
-                   <ng-container *ngIf="colIndex === 0">
-                       {{ group.value.groupName }}
-                   </ng-container>
-               </td>
-            </tr>
-            <tr *ngFor="let row of group.value.data; let rowIndex = index; trackBy: trackByIndex">
-                <td></td>
-                <ng-container *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex">
-                  <td table-cell
-                      #cell
-                      [rowSpan]="cell['rowspan']"
-                      [column]="colIndex"
-                      [row]="rowIndex"
-                      [group]="group.key"
-                      [columnWord]="words[colIndex]"
-                      [wordAddress]="words[colIndex] + '.' + rowIndex"
-                      [descriptor]="configurations.states.columns[colIndex]">
-                  </td>
-                </ng-container>
-            </tr>
-        </ng-container>
+      <ng-container *ngTemplateOutlet="groupTemplate; context: { rowGroups: tableData.rowGroups }"></ng-container>
+        <!--<ng-container *ngFor="let group of tableData.rowGroups | keyvalue:keyDescOrder; let groupIndex = index">-->
+            <!--<tr>-->
+               <!--<td>{{ group.value.$$indexFunc(groupIndex + 1) }}</td>-->
+               <!--<td *ngFor="let firstRow of group.value.data[0]; let colIndex = index">-->
+                   <!--<ng-container *ngIf="colIndex === 0">-->
+                       <!--{{ group.value.groupName }}-->
+                   <!--</ng-container>-->
+               <!--</td>-->
+            <!--</tr>-->
+            <!--<tr *ngFor="let row of group.value.data; let rowIndex = index; trackBy: trackByIndex">-->
+                <!--<td></td>-->
+                <!--<ng-container *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex">-->
+                  <!--<td table-cell-->
+                      <!--#cell-->
+                      <!--[rowSpan]="cell['rowspan']"-->
+                      <!--[column]="colIndex"-->
+                      <!--[row]="rowIndex"-->
+                      <!--[group]="group.key"-->
+                      <!--[columnWord]="words[colIndex]"-->
+                      <!--[wordAddress]="words[colIndex] + '.' + rowIndex"-->
+                      <!--[descriptor]="configurations.states.columns[colIndex]">-->
+                  <!--</td>-->
+                <!--</ng-container>-->
+            <!--</tr>-->
+        <!--</ng-container>-->
     </ng-container>
     </tbody>
   </table>
 </div>
+
+<ng-template #groupTemplate let-rowGroups="rowGroups" let-parentIndex="parentIndex" let-parentText="parentText">
+  <ng-container *ngFor="let group of rowGroups; let groupIndex = index">
+    <tr>
+      <td>{{ group.$$indexFunc(groupIndex, { parentIndex: parentIndex, parentText: parentText }) }}</td>
+      <td>{{ group.name }}</td>
+    </tr>
+    <ng-container *ngIf="group.data">
+      <tr *ngFor="let row of group.data; let rowIndex = index; trackBy: trackByIndex">
+        <td>Index</td>
+        <td *ngFor="let data of row">
+          {{ data.value }}
+        </td>
+        <!--<td *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex"-->
+            <!--table-cell-->
+            <!--#cell-->
+            <!--[rowSpan]="cell['rowspan']"-->
+            <!--[column]="colIndex"-->
+            <!--[row]="rowIndex"-->
+            <!--[columnWord]="words[colIndex]"-->
+            <!--[wordAddress]="words[colIndex] + '.' + rowIndex"-->
+            <!--[descriptor]="configurations.states.columns[colIndex]">-->
+        <!--</td>-->
+      </tr>
+    </ng-container>
+    <ng-container *ngIf="group.subGroups">
+      <ng-container *ngTemplateOutlet="groupTemplate; context: {
+          rowGroups: group.subGroups,
+          parentIndex: groupIndex,
+          parentText: group.$$indexFunc(groupIndex, { parentIndex: parentIndex, parentText: parentText }) }"></ng-container>
+    </ng-container>
+  </ng-container>
+</ng-template>

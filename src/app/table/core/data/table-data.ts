@@ -105,12 +105,14 @@ export class TableData {
     const result = [];
     let prevGroupedRowsMap = {};
     forEachRight(groupedRows, ({ dataMap, group }, index) => {
+      const $$groupIndex = index;
       if (index === groupedRows.length - 1) {
         Object.entries(dataMap).forEach(([k, v]: [string, any[]]) => {
           const parentKey = getParentKey(k);
-          const toPush = {
+          const toPush: any = {
             $$indexFunc: getIndexFunc(group),
             $$data: v,
+            $$groupIndex,
             name: group.name(v[0]),
             data: v.map(item => mapToTableCells(descriptors, item)),
           };
@@ -132,6 +134,7 @@ export class TableData {
           cacheArray.push({
             $$indexFunc: getIndexFunc(group),
             $$data: v,
+            $$groupIndex,
             name: group.name(_data),
             subGroups: v
           });
@@ -143,6 +146,7 @@ export class TableData {
           result.push({
             $$indexFunc: getIndexFunc(group),
             $$data: v,
+            $$groupIndex,
             name: group.name(_data),
             subGroups: v,
           });
@@ -164,6 +168,7 @@ export class TableData {
     if (isGroup) {
       this.rowGroups = this.buildGroupedRows(data, descriptors, rowGroups);
       console.log('this.rowGroups', this.rowGroups);
+      console.log('this.rowGroups', this.internalData);
       return;
     }
 
@@ -198,23 +203,23 @@ const getIndexFunc = (group) => {
   if (group.indexType === 'romanNumeral') {
     return romanize;
   }
-  return (i => i + 1);
+
+  return i => i + 1;
 };
 
 function defaultIndex () {
 
 }
 
-function romanize (num) {
+function romanize (index) {
+  let num = index + 1;
   const lookup = {M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1};
   let roman = '';
-  for (const i in lookup) {
-    if (Object.prototype.hasOwnProperty.apply(lookup, i)) {
-      while (num >= lookup[i]) {
-        roman += i;
-        num -= lookup[i];
-      }
+  Object.entries(lookup).forEach(([k, value]) => {
+    while (num >= value) {
+      roman += k;
+      num -= value;
     }
-  }
+  });
   return roman;
 }
