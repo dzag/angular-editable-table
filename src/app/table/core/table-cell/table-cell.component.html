@@ -1,6 +1,6 @@
 <div *ngIf="active">
   <common-input [formControl]="formControl"
-                [type]="columnConfigs['type']"
+                [type]="columnConfigs.dataType"
                 [data]="{ 'options': columnConfigs.options }"
                 (keyup.enter)="onEnter($event)"
                 stopPropagation
