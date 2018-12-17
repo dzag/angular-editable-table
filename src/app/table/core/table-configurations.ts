@@ -16,8 +16,19 @@ export interface Anything {
   [p: string]: any;
 }
 
+export interface TableColumnConfigurations extends Anything {
+  prop?: string;
+  name?: string;
+  dataType: string;
+  editable?: boolean;
+  headerClass?: string;
+  options?: any[]; // for select dataType
+  link?: any; // for link dataType
+  useRouter?: boolean; // for link dataType
+}
+
 export interface Configs extends Anything {
-  columns: any;
+  columns: TableColumnConfigurations[];
   columnGroups?: any;
   rowIndexType?: any;
   rowIndexPattern?: any;

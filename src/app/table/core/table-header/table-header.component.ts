@@ -43,12 +43,12 @@ export class TableHeaderComponent implements OnInit {
    */
   private buildHeaders () {
     const colGroups = this.configurations.states.columnGroups;
-    const descriptors = this.configurations.states.columns;
+    const columnConfigs = this.configurations.states.columns;
 
     const isValidColGroupsInput = (colGroups || []).length !== 0;
     if (!isValidColGroupsInput) {
-      const headers = descriptors
-        .map(descriptor => ([this.domSanitizer.bypassSecurityTrustHtml(descriptor.colName), descriptor.colClass, 1, 1]));
+      const headers = columnConfigs
+        .map(column => ([this.domSanitizer.bypassSecurityTrustHtml(column.name), column.headerClass, 1, 1]));
 
       if (this.withIndex) {
         headers.unshift([this.indexName, this.indexClass, 1, 1]);
@@ -74,9 +74,9 @@ export class TableHeaderComponent implements OnInit {
     const mainGroupArrayCache = {};
     const simpleCache = {};
 
-    for (const descriptor of descriptors) {
+    for (const descriptor of columnConfigs) {
       const hasDescriptorsProp = propToGroupIndexMap.hasOwnProperty(descriptor.prop);
-      const objectToAdd = {name: descriptor.colName || '', class: descriptor.colClass};
+      const objectToAdd = {name: descriptor.name || '', class: descriptor.headerClass};
       if (hasDescriptorsProp) {
         const simplePath = propToGroupIndexMap[descriptor.prop];
         const isSubgroup = simplePath.indexOf('.') >= 0;

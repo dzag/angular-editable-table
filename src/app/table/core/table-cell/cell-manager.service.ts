@@ -3,6 +3,8 @@ import { Observable } from 'rxjs';
 import { createAddress, getLocation, getLocationFromStringLocator } from './cell-manager.utils';
 import { TableCellComponent } from './table-cell.component';
 
+const log = (...message) => console.log('CellManager', ...message);
+
 export const returnOutside = (fn): Observable<any> => {
   return new Observable(observer => {
     Promise.resolve().then(() => { // this is a trick to push the code to the event loop
@@ -22,8 +24,6 @@ export class CellManager {
 
   private _addressCellMap = new Map<string, TableCellComponent>();
   private _cellAddressMap = new Map<TableCellComponent, string>();
-
-  constructor () {}
 
   register (cell: TableCellComponent) {
     const address = createAddress(cell.row, cell.column);

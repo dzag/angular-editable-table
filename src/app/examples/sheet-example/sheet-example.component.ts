@@ -31,24 +31,11 @@ const name3Mapper = {
 export class SheetExampleComponent implements OnInit {
 
   data = Array(50).fill(null).map((value, index) => (() => {
-    // if (index === 0) {
-    //   return {
-    //     total: 0,
-    //     col1: 0,
-    //     col2: 0,
-    //     col3: 0,
-    //     col4: 0,
-    //     col5: 0,
-    //     col6: 0,
-    //     col7: 0,
-    //     col8: 0,
-    //     col9: 0,
-    //   };
-    // }
-
     const id = random(1, 5);
     const subId = random(1, 3);
     const subId2 = random(1, 3);
+
+    const randomDate = () => new Date(random(2000, 2018), random(0, 11), random(1, 29));
 
     return {
       total: 0,
@@ -65,65 +52,9 @@ export class SheetExampleComponent implements OnInit {
       col5: random(100000000, 1000000000),
       col6: random(100000000, 1000000000),
       col7: random(100000000, 1000000000),
-      col8: random(100000000, 1000000000),
-      col9: random(100000000, 1000000000),
+      col8: randomDate()
     };
   })());
-
-  descriptors: ColumnDescriptor<any>[] = [
-    {
-      prop: 'total',
-      colName: 'Total',
-      type: 'currency',
-      subHeader: '(1)',
-
-    },
-    {
-      prop: 'col1',
-      colName: 'Col 1',
-      type: 'currency'
-    },
-    {
-      prop: 'col2',
-      colName: 'Col 2',
-      type: 'currency'
-    },
-    {
-      prop: 'col3',
-      colName: 'Col 3',
-      type: 'currency'
-    },
-    {
-      prop: 'col4',
-      colName: 'Col 4',
-      type: 'currency'
-    },
-    {
-      prop: 'col5',
-      colName: 'Col 5',
-      type: 'currency'
-    },
-    {
-      prop: 'col6',
-      colName: 'Col 6',
-      type: 'currency'
-    },
-    {
-      prop: 'col7',
-      colName: 'Col 7',
-      type: 'currency'
-    },
-    {
-      prop: 'col8',
-      colName: 'Col 8',
-      type: 'currency'
-    },
-    {
-      prop: 'col9',
-      colName: 'Col 9',
-      type: 'currency'
-    },
-  ];
 
   formulas = {
     all: [
@@ -138,54 +69,51 @@ export class SheetExampleComponent implements OnInit {
     columns: [
       {
         prop: 'total',
-        colName: 'Total',
-        type: 'currency',
+        name: 'Total',
+        dataType: 'currency',
         subHeader: '(1)',
       },
       {
         prop: 'col1',
-        colName: 'Col 1',
-        type: 'currency'
+        name: 'Col 1',
+        editable: true,
+        dataType: 'currency'
       },
       {
         prop: 'col2',
-        colName: 'Col 2',
-        type: 'currency'
+        name: 'Col 2',
+        editable: true,
+        dataType: 'currency'
       },
       {
         prop: 'col3',
-        colName: 'Col 3',
-        type: 'currency'
+        name: 'Col 3',
+        dataType: 'currency'
       },
       {
         prop: 'col4',
-        colName: 'Col 4',
-        type: 'currency'
+        name: 'Col 4',
+        dataType: 'currency'
       },
       {
         prop: 'col5',
-        colName: 'Col 5',
-        type: 'currency'
+        name: 'Col 5',
+        dataType: 'currency'
       },
       {
         prop: 'col6',
-        colName: 'Col 6',
-        type: 'currency'
+        name: 'Col 6',
+        dataType: 'currency'
       },
       {
         prop: 'col7',
-        colName: 'Col 7',
-        type: 'currency'
+        name: 'Col 7',
+        dataType: 'currency'
       },
       {
         prop: 'col8',
-        colName: 'Col 8',
-        type: 'currency'
-      },
-      {
-        prop: 'col9',
-        colName: 'Col 9',
-        type: 'currency'
+        name: 'Col 8',
+        dataType: 'date'
       },
     ],
     rowGroups: [

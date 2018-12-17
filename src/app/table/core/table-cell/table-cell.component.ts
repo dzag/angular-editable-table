@@ -6,6 +6,7 @@ import { TableDataService } from '../data/table-data.service';
 import { createAddress } from './cell-manager.utils';
 import { CellManager } from './cell-manager.service';
 import { CellService } from './cell.service';
+import { TableColumnConfigurations, TableConfigurations } from '../table-configurations';
 
 const words = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
   'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
@@ -24,7 +25,7 @@ export class TableCellComponent implements OnInit, OnDestroy {
   @Input() columnWord: string;
   @Input() wordAddress: string;
 
-  @Input() descriptor: ColumnDescriptor<any>;
+  @Input() columnConfigs: TableColumnConfigurations;
 
   public rowspan = 1;
   public prop: string;
@@ -40,7 +41,7 @@ export class TableCellComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit () {
-    this.prop = this.descriptor.prop as string;
+    this.prop = this.columnConfigs.prop as string;
 
     this._cellManager.register(this);
     this._cellService.getActive().pipe(map(active => active === this))
@@ -55,6 +56,11 @@ export class TableCellComponent implements OnInit, OnDestroy {
 
   @HostListener('click')
   onClicked() {
+    if (!this.columnConfigs.editable) {
+      this._cellService.setActive(null);
+      return;
+    }
+
     this._cellService.setActive(this);
   }
 
@@ -78,4 +84,7 @@ export class TableCellComponent implements OnInit, OnDestroy {
     return this._dataService.getCell(this.row, this.column, this.group);
   }
 
+  onEnter () {
+    this._cellService.saveEditedValue();
+  }
 }
