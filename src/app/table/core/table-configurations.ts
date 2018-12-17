@@ -19,6 +19,8 @@ export interface Anything {
 export interface Configs extends Anything {
   columns: any;
   columnGroups?: any;
+  rowIndexType?: any;
+  rowIndexPattern?: any;
 }
 
 export class TableConfigurations {

@@ -5,6 +5,7 @@ import { TableDataService } from './core/data/table-data.service';
 import { CellManager } from './core/table-cell/cell-manager.service';
 import { CellService } from './core/table-cell/cell.service';
 import { KeyValue } from '@angular/common';
+import { romanize } from './core/data/table-data.utils';
 
 @Component({
   selector: 'ng-table',
@@ -53,6 +54,18 @@ export class TableComponent implements OnInit, OnDestroy {
   keyDescOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
     return a.key > b.key ? -1 : (b.key > a.key ? 1 : 0);
   };
+
+  getRowIndex(currentIndex, parent: any = {}) {
+    if (this.configurations.states.rowIndexPattern) {
+      return this.configurations.states.rowIndexPattern(currentIndex, parent);
+    }
+
+    if (this.configurations.states.rowIndexType === 'romanNumeral') {
+      return romanize(currentIndex);
+    }
+
+    return currentIndex + 1;
+  }
 
   private patchConfigs () {
     const configs: any = this.configurations;

@@ -33,7 +33,7 @@
     </tr>
     <ng-container *ngIf="group.data">
       <tr *ngFor="let row of group.data; let rowIndex = index; trackBy: trackByIndex">
-        <td>Index</td>
+        <td>{{ getRowIndex(rowIndex, { parentIndex: groupIndex, parentText: parentText }) }}</td>
         <td *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex"
             table-cell
             #cell
