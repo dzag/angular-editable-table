@@ -102,6 +102,11 @@ export class TableComponent implements OnInit, OnDestroy {
     return this.configurations.states.actions.map(a => a.name);
   }
 
+  get groupColumns() {
+    const totalLength = this.configs.columns.length + this.configs.actions.length;
+    return Array(totalLength).fill(null);
+  }
+
   private patchConfigs () {
     const configs: any = this.configurations;
     configs.cd = this.detectorRef;

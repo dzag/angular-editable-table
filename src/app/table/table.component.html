@@ -34,7 +34,7 @@
   <ng-container *ngFor="let group of rowGroups; let groupIndex = index">
     <tr>
       <td>{{ group.indexFn(groupIndex, { parentIndex: parentIndex, parentText: parentText }) }}</td>
-      <ng-container *ngFor="let col of configurations.states.columns; let colIndex = index">
+      <ng-container *ngFor="let col of groupColumns; let colIndex = index">
         <td>{{ colIndex === 0 ? group.name : '' }}</td>
       </ng-container>
     </tr>
