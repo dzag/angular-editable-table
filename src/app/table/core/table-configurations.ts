@@ -25,6 +25,8 @@ export interface TableColumnConfigurations extends Anything {
   options?: any[]; // for select dataType
   link?: any; // for link dataType
   useRouter?: boolean; // for link dataType
+  map?: Function;
+  reverseMap?: Function;
 }
 
 export interface Configs extends Anything {

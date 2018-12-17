@@ -1,5 +1,5 @@
 import { cloneDeep, forEachRight, get, repeat, set } from 'lodash';
-import { TableConfigurations } from '../table-configurations';
+import { TableColumnConfigurations, TableConfigurations } from '../table-configurations';
 import { doGroupFromCriteria, getCachedArray, getParentKey } from './row-grouping.utils';
 import { getIndexFunction, mapToTableCells } from './table-data.utils';
 
@@ -22,18 +22,16 @@ export class TableData {
   public data: CellData[][] = [];
   public groupData;
 
-  public readonly descriptors;
+  public readonly columnConfigs: TableColumnConfigurations[];
   private internalData;
 
   constructor (private readonly configs: TableConfigurations,
                public readonly initialData,
   ) {
-    this.descriptors = configs.states.columns;
+    this.columnConfigs = configs.states.columns;
     this.initialData = cloneDeep(initialData);
     this.internalData = cloneDeep(initialData);
-    this.buildRows(this.internalData, this.descriptors, this.configs.states.rowGroups);
-
-    console.log(this);
+    this.buildRows(this.internalData, this.columnConfigs, this.configs.states.rowGroups);
   }
 
   getCell (row, col, group?) {
@@ -74,28 +72,28 @@ export class TableData {
   }
 
   private getProp (column: number) {
-    return this.descriptors[column]['prop'];
+    return this.columnConfigs[column]['prop'];
   }
 
-  private buildRows<T> (data: Object[], descriptors, rowGroups?: any[]) {
+  private buildRows<T> (data: Object[], columnConfigs: TableColumnConfigurations[], rowGroups?: any[]) {
     if (!data) {
       return;
     }
     const isGroup = rowGroups && rowGroups.length > 0;
     if (isGroup) {
-      const _rowGroups = this.buildGroupedRows(data, descriptors, rowGroups);
+      const _rowGroups = this.buildGroupedRows(data, columnConfigs, rowGroups);
       this.groupData = this.buildGroupData(_rowGroups);
       return;
     }
 
-    this.data = this.buildSimpleRows(data, descriptors);
+    this.data = this.buildSimpleRows(data, columnConfigs);
   }
 
-  private buildSimpleRows (data: Object[], descriptors) {
-    return data.map(item => mapToTableCells(descriptors, item));
+  private buildSimpleRows (data: Object[], columnsConfigs: TableColumnConfigurations[]) {
+    return data.map(item => mapToTableCells(columnsConfigs, item));
   }
 
-  private buildGroupedRows<T> (data: Object[], descriptors, rowGroups?: any[]) {
+  private buildGroupedRows<T> (data: Object[], columnConfigs: TableColumnConfigurations[], rowGroups?: any[]) {
     const groupedRows = [];
     rowGroups.forEach((group, groupIndex) => {
       const criteria = group.groupBy;
@@ -133,7 +131,7 @@ export class TableData {
             originalData: v,
             groupIndex,
             name: group.name(v[0]),
-            data: v.map(item => mapToTableCells(descriptors, item)),
+            data: v.map(item => mapToTableCells(columnConfigs, item)),
           };
           if (!parentKey) {
             result.push(toPush);

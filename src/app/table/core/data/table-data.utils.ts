@@ -1,3 +1,5 @@
+import { TableColumnConfigurations } from '../table-configurations';
+
 const romanNumeralLookup = {
   M: 1000, CM: 900, D: 500, CD: 400,
   C: 100, XC: 90, L: 50, XL: 40,
@@ -28,12 +30,13 @@ export function getIndexFunction (group) {
   return i => i + 1;
 }
 
-export function mapToTableCells (descriptors, item) {
+export function mapToTableCells (columnConfigs: TableColumnConfigurations[], item) {
   const row = [];
-  descriptors.forEach(({prop, link, transformer}) => {
+
+  columnConfigs.forEach(({prop, link, map: _map}) => {
     const result: any = {};
-    result.value = transformer
-      ? transformer(item[prop])
+    result.value = _map
+      ? _map(item[prop])
       : item[prop];
 
     if (link) {
