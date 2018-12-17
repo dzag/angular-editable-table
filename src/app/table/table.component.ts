@@ -6,6 +6,7 @@ import { CellManager } from './core/table-cell/cell-manager.service';
 import { CellService } from './core/table-cell/cell.service';
 import { KeyValue } from '@angular/common';
 import { romanize } from './core/data/table-data.utils';
+import { TableCellComponent } from './core/table-cell/table-cell.component';
 
 @Component({
   selector: 'ng-table',
@@ -35,6 +36,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
   constructor (private detectorRef: ChangeDetectorRef,
                private dataService: TableDataService,
+               private _cellService: CellService,
                private cellManager: CellManager,
   ) {}
 
@@ -82,23 +84,11 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   get showIndex() {
-    const indexConfigs = this.configurations.states.index;
-
-    if (!indexConfigs) {
-      return true;
-    }
-
-    return indexConfigs.show;
+    return this.configurations.states.index.show;
   }
 
   get showActions() {
-    const actionsConfigs = this.configurations.states.actions;
-
-    if (!actionsConfigs) {
-      return false;
-    }
-
-    return actionsConfigs.show;
+    return this.configurations.states.actions.show;
   }
 
   get actionsHeader() {

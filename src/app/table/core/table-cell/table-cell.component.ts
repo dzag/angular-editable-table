@@ -1,5 +1,5 @@
 /* tslint:disable:component-selector */
-import { ChangeDetectorRef, Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { TableDataService } from '../data/table-data.service';
 import { createAddress } from './cell-manager.utils';
@@ -46,6 +46,7 @@ export class TableCellComponent implements OnInit, OnDestroy {
     this._cellService.getActive().pipe(map(active => active === this))
       .subscribe(active => {
         this.active = active;
+        this.cd.detectChanges();
       });
   }
 
@@ -53,7 +54,7 @@ export class TableCellComponent implements OnInit, OnDestroy {
     this._cellManager.unregister(this);
   }
 
-  @HostListener('click')
+  @HostListener('click.out-zone')
   onClicked() {
     if (this.readonly) {
       return;

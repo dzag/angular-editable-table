@@ -1,6 +1,7 @@
 import { ChangeDetectorRef } from '@angular/core';
 import { set, cloneDeep, merge } from 'lodash';
 import { Subject } from 'rxjs';
+import * as deepMerge from 'deepmerge';
 
 interface ConfigSetterOptions {
   detect?: boolean;
@@ -40,7 +41,26 @@ export interface Configs extends Anything {
     rowIndexType?: any;
     rowIndexPattern?: any;
   };
+  actions?: {
+    show?: boolean,
+    name?: string;
+    types?: any,
+    condition?: any,
+    clicked?: any
+  };
 }
+
+const defaultConfigs: Configs = {
+  columns: [],
+  rowGroups: [],
+  columnGroups: [],
+  index: {
+    show: true,
+  },
+  actions: {
+    show: false,
+  }
+};
 
 export class TableConfigurations {
   public readonly states: Configs;
@@ -52,7 +72,8 @@ export class TableConfigurations {
   private changeObs =  this.changes.asObservable();
 
   constructor (private initialConfigs: Configs) { // TODO: Add type to this
-    this.states = cloneDeep(this.initialConfigs);
+    const initial = cloneDeep(this.initialConfigs);
+    this.states = deepMerge({...defaultConfigs}, initial);
   }
 
   renameColumn(columnIndex: number, newName: string) {
