@@ -6,8 +6,6 @@ import { DateToStringPipe, StringToDatePipe } from './core/pipes/date-pipes';
 import { VndCurrencyPipe } from './core/pipes/vnd-currency.pipe';
 import { PrependZeroPipe } from './core/pipes/prepend-zero.pipe';
 import { TableCellComponent } from './core/table-cell/table-cell.component';
-import { SimpleTableComponent } from './impls/simple/simple-table.component';
-import { RowGroupingTableComponent } from './impls/row-grouping/row-grouping-table.component';
 import { TableMetadataComponent } from './paginator/table-metadata.component';
 import { TablePaginationComponent } from './paginator/table-pagination.component';
 import { StopPropagationDirective } from './stop-propagation.directive';
@@ -36,8 +34,6 @@ const TABLE_CORE = [
 ];
 
 const TABLE_IMPLEMENTS = [
-  SimpleTableComponent,
-  RowGroupingTableComponent,
 ];
 
 @NgModule({
