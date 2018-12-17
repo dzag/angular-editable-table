@@ -1,28 +1,30 @@
-<div *ngIf="active">
-  <common-input [formControl]="formControl"
-                [type]="columnConfigs.dataType"
-                [data]="{ 'options': columnConfigs.options }"
-                (keyup.enter)="onEnter($event)"
-                stopPropagation
-  ></common-input>
-</div>
-<div *ngIf="!active">
-  <ng-container [ngSwitch]="columnConfigs.dataType">
-    <ng-container *ngSwitchCase="'select'">
-      {{ columnConfigs['$$options'][data] }}
-    </ng-container>
-    <ng-container *ngSwitchCase="'date'">
-      {{ data | dateToString }}
-    </ng-container>
-    <ng-container *ngSwitchCase="'link'">
-      <a class="text-link" *ngIf="columnConfigs.link && columnConfigs.useRouter" [routerLink]="cell.url">{{ cell.value }}</a>
-      <a class="text-link" *ngIf="columnConfigs.link && !columnConfigs.useRouter" [href]="cell.url">{{ cell.value }}</a>
-    </ng-container>
-    <ng-container *ngSwitchCase="'currency'">
-      {{ data | vnd }}
-    </ng-container>
-    <ng-container *ngSwitchDefault>
-      {{ data }}
+<div [ngClass]="cellClass">
+  <ng-container *ngIf="active">
+    <common-input [formControl]="formControl"
+                  [type]="columnConfigs.dataType"
+                  [data]="{ 'options': columnConfigs.options }"
+                  (keyup.enter)="onEnter($event)"
+                  stopPropagation
+    ></common-input>
+  </ng-container>
+  <ng-container *ngIf="!active">
+    <ng-container [ngSwitch]="columnConfigs.dataType">
+      <ng-container *ngSwitchCase="'select'">
+        {{ columnConfigs['$$options'][data] }}
+      </ng-container>
+      <ng-container *ngSwitchCase="'date'">
+        {{ data | dateToString }}
+      </ng-container>
+      <ng-container *ngSwitchCase="'link'">
+        <a class="text-link" *ngIf="columnConfigs.link && columnConfigs.useRouter" [routerLink]="cell.url">{{ cell.value }}</a>
+        <a class="text-link" *ngIf="columnConfigs.link && !columnConfigs.useRouter" [href]="cell.url">{{ cell.value }}</a>
+      </ng-container>
+      <ng-container *ngSwitchCase="'currency'">
+        {{ data | vnd }}
+      </ng-container>
+      <ng-container *ngSwitchDefault>
+        {{ data }}
+      </ng-container>
     </ng-container>
   </ng-container>
 </div>

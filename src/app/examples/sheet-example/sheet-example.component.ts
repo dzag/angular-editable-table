@@ -71,6 +71,7 @@ export class SheetExampleComponent implements OnInit {
         prop: 'total',
         name: 'Total',
         dataType: 'currency',
+        dataClass: 'hello',
         subHeader: '(1)',
       },
       {

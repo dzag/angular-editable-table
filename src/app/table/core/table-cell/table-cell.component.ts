@@ -87,6 +87,16 @@ export class TableCellComponent implements OnInit, OnDestroy {
     return this._dataService.getCell(this.row, this.column, this.group);
   }
 
+  get cellClass() {
+    if (!this.columnConfigs.dataClass) {
+      return;
+    }
+
+    return {
+      [this.columnConfigs.dataClass]: true
+    };
+  }
+
   onEnter () {
     this._cellService.saveEditedValue();
   }

@@ -22,6 +22,7 @@ export interface TableColumnConfigurations extends Anything {
   dataType: string;
   editable?: boolean;
   headerClass?: string;
+  dataClass?: string;
   options?: any[]; // for select dataType
   link?: any; // for link dataType
   useRouter?: boolean; // for link dataType
