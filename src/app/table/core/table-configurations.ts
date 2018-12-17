@@ -45,7 +45,7 @@ export interface Configs extends Anything {
     show?: boolean,
     name?: string;
     types?: any,
-    condition?: any,
+    actionsOnRow?: any,
     clicked?: any
   };
 }
@@ -76,9 +76,12 @@ export class TableConfigurations {
     this.states = deepMerge({...defaultConfigs}, initial);
   }
 
+  // -- columns configs
   renameColumn(columnIndex: number, newName: string) {
     this.set(`columns[${columnIndex}].name`, newName);
   }
+
+  // -- actions configs
 
   private set(path: string, value, options?: ConfigSetterOptions) {
     options = merge({...defaultSetterOptions}, options);

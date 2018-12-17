@@ -98,7 +98,9 @@ export class TableCellComponent implements OnInit, OnDestroy {
     };
   }
 
-  onEnter () {
-    this._cellService.saveEditedValue();
+  onEnter ({keyCode}: KeyboardEvent) {
+    if (keyCode === 13) {
+      this._cellService.saveEditedValue();
+    }
   }
 }

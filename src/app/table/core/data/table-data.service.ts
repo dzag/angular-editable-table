@@ -86,7 +86,7 @@ export class TableDataService {
   }
 
   getRow (row, group?) {
-
+    return this.tableData.getRow(row, group);
   }
 
   getCell (row, col, group?) {

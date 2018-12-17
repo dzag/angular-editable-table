@@ -6,7 +6,6 @@ import { CellManager } from './core/table-cell/cell-manager.service';
 import { CellService } from './core/table-cell/cell.service';
 import { KeyValue } from '@angular/common';
 import { romanize } from './core/data/table-data.utils';
-import { TableCellComponent } from './core/table-cell/table-cell.component';
 
 @Component({
   selector: 'ng-table',
@@ -35,7 +34,7 @@ export class TableComponent implements OnInit, OnDestroy {
   public tableData: TableData;
 
   constructor (private detectorRef: ChangeDetectorRef,
-               private dataService: TableDataService,
+               private _dataService: TableDataService,
                private _cellService: CellService,
                private cellManager: CellManager,
   ) {}
@@ -44,7 +43,7 @@ export class TableComponent implements OnInit, OnDestroy {
     this.patchConfigs();
 
     this.tableData = new TableData(this.configurations, this.data);
-    this.dataService.tableData = this.tableData;
+    this._dataService.tableData = this.tableData;
   }
 
   ngOnDestroy (): void {}
@@ -74,13 +73,17 @@ export class TableComponent implements OnInit, OnDestroy {
   getActions(rowIndex, group?) {
     const actionConfigs = this.configurations.states.actions;
 
-    if (actionConfigs.condition) {
-      const rowData = this.tableData.getRow(rowIndex, group);
-      return actionConfigs.condition(rowData);
+    if (actionConfigs.actionsOnRow) {
+      const rowData = this._dataService.getRow(rowIndex, group);
+      return actionConfigs.actionsOnRow(rowData, actionConfigs.types);
     }
 
     // TODO: implement this
     return [];
+  }
+
+  get configs() {
+    return this.configurations.states;
   }
 
   get showIndex() {
@@ -110,4 +113,10 @@ export class TableComponent implements OnInit, OnDestroy {
     configs.cd = this.detectorRef;
   }
 
+  onActionClicked (actionType, rowIndex, group) {
+    this.configs.actions.clicked({
+      type: actionType,
+      row: this._dataService.getRow(rowIndex, group),
+    });
+  }
 }

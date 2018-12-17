@@ -155,11 +155,13 @@ export class SheetExampleComponent implements OnInit {
           name: 'Download',
         }
       },
-      condition: (row) => {
+      actionsOnRow: (row, actionTypes) => {
         console.log(row);
-        return ['edit'];
+        return ['edit', 'download'];
       },
-      clicked: (type) => {}
+      clicked: ({type, row}) => {
+        console.log(type, row);
+      }
     }
   });
 

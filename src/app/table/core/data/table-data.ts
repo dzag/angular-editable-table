@@ -37,10 +37,10 @@ export class TableData {
   getRow (row, group?) {
     if (group) {
       const index = this.internalData.findIndex(i => i === group.originalData[row]);
-      return this.internalData[index];
+      return this.initialData[index];
     }
 
-    return this.internalData[row];
+    return this.initialData[row];
   }
 
   getCell (row, col, group?) {
