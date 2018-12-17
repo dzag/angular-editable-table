@@ -1,6 +1,7 @@
 import { cloneDeep, forEachRight, get, repeat, set } from 'lodash';
 import { TableConfigurations } from '../table-configurations';
 import { doGroupFromCriteria, getCachedArray, getParentKey } from './row-grouping.utils';
+import { getIndexFunction, mapToTableCells, romanize } from './table-data.utils';
 
 // const nest = function (seq, keys) {
 //   if (!keys.length) {
@@ -112,7 +113,7 @@ export class TableData {
         Object.entries(dataMap).forEach(([k, v]: [string, any[]]) => {
           const parentKey = getParentKey(k);
           const toPush: any = {
-            $$indexFunc: getIndexFunc(group),
+            $$indexFunc: getIndexFunction(group),
             $$data: v,
             $$groupIndex,
             name: group.name(v[0]),
@@ -134,7 +135,7 @@ export class TableData {
           const parentKey = getParentKey(k);
           const cacheArray = getCachedArray(prevGroupedRowsMap, parentKey);
           cacheArray.push({
-            $$indexFunc: getIndexFunc(group),
+            $$indexFunc: getIndexFunction(group),
             $$data: v,
             $$groupIndex,
             name: group.name(_data),
@@ -146,7 +147,7 @@ export class TableData {
         Object.entries(prevGroupedRowsMap).forEach(([k, v]) => {
           const _data = get(v, '[0]' + subGroupsPath + '.$$data[0]');
           result.push({
-            $$indexFunc: getIndexFunc(group),
+            $$indexFunc: getIndexFunction(group),
             $$data: v,
             $$groupIndex,
             name: group.name(_data),
@@ -209,51 +210,4 @@ export class TableData {
     return path.split('.').map(index => `[${index}]`).join('.subGroups') + `.data`;
   }
 
-}
-
-function mapToTableCells (descriptors, item) {
-  const row = [];
-  descriptors.forEach(({prop, link, transformer}) => {
-    const result: any = {};
-    result.value = transformer
-      ? transformer(item[prop])
-      : item[prop];
-
-    if (link) {
-      result.url = link(item);
-    }
-    row.push(result);
-  });
-  return row;
-}
-
-const wrapSquare = word => `[${word}]`;
-
-const getIndexFunc = (group) => {
-  if (group.indexPattern) {
-    return group.indexPattern;
-  }
-
-  if (group.indexType === 'romanNumeral') {
-    return romanize;
-  }
-
-  return i => i + 1;
-};
-
-function defaultIndex () {
-
-}
-
-function romanize (index) {
-  let num = index + 1;
-  const lookup = {M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1};
-  let roman = '';
-  Object.entries(lookup).forEach(([k, value]) => {
-    while (num >= value) {
-      roman += k;
-      num -= value;
-    }
-  });
-  return roman;
 }
