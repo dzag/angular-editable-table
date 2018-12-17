@@ -56,15 +56,27 @@ export class TableComponent implements OnInit, OnDestroy {
   };
 
   getRowIndex(currentIndex, parent: any = {}) {
-    if (this.configurations.states.rowIndexPattern) {
-      return this.configurations.states.rowIndexPattern(currentIndex, parent);
+    const indexConfigs = this.configurations.states.index;
+
+    if (indexConfigs && indexConfigs.rowIndexPattern ) {
+      return indexConfigs.rowIndexPattern(currentIndex, parent);
     }
 
-    if (this.configurations.states.rowIndexType === 'romanNumeral') {
+    if (indexConfigs && indexConfigs.rowIndexType === 'romanNumeral') {
       return romanize(currentIndex);
     }
 
     return currentIndex + 1;
+  }
+
+  get showIndex() {
+    const indexConfigs = this.configurations.states.index;
+
+    if (!indexConfigs) {
+      return true;
+    }
+
+    return indexConfigs.show;
   }
 
   private patchConfigs () {

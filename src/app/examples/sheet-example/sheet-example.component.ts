@@ -135,9 +135,12 @@ export class SheetExampleComponent implements OnInit {
     //     }
     //   }
     // ],
-    // rowIndexPattern: (currentIndex, {parentIndex, parentText}) => {
-    //   return parentText + `.${currentIndex + 1}`;
-    // }
+    index: {
+      show: true,
+      // rowIndexPattern: (currentIndex, {parentIndex, parentText}) => {
+      //   return parentText + `.${currentIndex + 1}`;
+      // },
+    }
   });
 
   constructor () { }

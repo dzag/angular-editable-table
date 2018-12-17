@@ -1,5 +1,4 @@
 <tr class="text-center font-weight-bold" *ngFor="let header of headers">
-  <th>Index</th>
   <ng-container *ngFor="let col of header">
     <th *ngIf="col.length > 0"
         [class]="col[1]"

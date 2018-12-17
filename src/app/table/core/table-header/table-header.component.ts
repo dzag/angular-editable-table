@@ -24,7 +24,6 @@ export class TableHeaderComponent implements OnInit {
   @Input() withIndex;
   @Input() class;
   @Input() prop;
-  @Input() indexName;
   @Input() indexClass;
 
   @Input() configurations: TableConfigurations;
@@ -36,6 +35,11 @@ export class TableHeaderComponent implements OnInit {
   ngOnInit() {
     this.headers = this.buildHeaders();
     this.watchConfigsChanges();
+  }
+
+  get indexName() {
+    const indexConfigs = this.configurations.states.index;
+    return indexConfigs ? indexConfigs.name || 'STT' : 'STT';
   }
 
   /**

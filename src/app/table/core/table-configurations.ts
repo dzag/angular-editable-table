@@ -31,8 +31,12 @@ export interface Configs extends Anything {
   columns: TableColumnConfigurations[];
   rowGroups?: any;
   columnGroups?: any;
-  rowIndexType?: any;
-  rowIndexPattern?: any;
+  index?: {
+    name?: string;
+    show?: boolean; // default: true
+    rowIndexType?: any;
+    rowIndexPattern?: any;
+  };
 }
 
 export class TableConfigurations {

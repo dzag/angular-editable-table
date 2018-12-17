@@ -1,10 +1,10 @@
 <div>
   <table class="table-responsive table-bordered">
-    <thead table-header [configurations]="configurations"></thead>
+    <thead table-header [configurations]="configurations" [withIndex]="showIndex"></thead>
     <tbody>
     <ng-container *ngIf="!tableData.groupData">
         <tr *ngFor="let row of tableData.data; let rowIndex = index; trackBy: trackByIndex">
-          <td>{{ getRowIndex(rowIndex) }}</td>
+          <td *ngIf="showIndex">{{ getRowIndex(rowIndex) }}</td>
           <td *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex"
               table-cell
               #cell
@@ -34,7 +34,7 @@
     </tr>
     <ng-container *ngIf="group.data">
       <tr *ngFor="let row of group.data; let rowIndex = index; trackBy: trackByIndex">
-        <td>
+        <td *ngIf="showIndex">
           {{ getRowIndex(rowIndex, {
               parentIndex: groupIndex,
               parentText: group.indexFn(groupIndex, { parentIndex: parentIndex, parentText: parentText })
