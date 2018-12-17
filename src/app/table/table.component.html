@@ -18,31 +18,6 @@
     </ng-container>
     <ng-container *ngIf="tableData.groupData">
       <ng-container *ngTemplateOutlet="groupTemplate; context: { rowGroups: tableData.groupData }"></ng-container>
-        <!--<ng-container *ngFor="let group of tableData.rowGroups | keyvalue:keyDescOrder; let groupIndex = index">-->
-            <!--<tr>-->
-               <!--<td>{{ group.value.$$indexFunc(groupIndex + 1) }}</td>-->
-               <!--<td *ngFor="let firstRow of group.value.data[0]; let colIndex = index">-->
-                   <!--<ng-container *ngIf="colIndex === 0">-->
-                       <!--{{ group.value.groupName }}-->
-                   <!--</ng-container>-->
-               <!--</td>-->
-            <!--</tr>-->
-            <!--<tr *ngFor="let row of group.value.data; let rowIndex = index; trackBy: trackByIndex">-->
-                <!--<td></td>-->
-                <!--<ng-container *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex">-->
-                  <!--<td table-cell-->
-                      <!--#cell-->
-                      <!--[rowSpan]="cell['rowspan']"-->
-                      <!--[column]="colIndex"-->
-                      <!--[row]="rowIndex"-->
-                      <!--[group]="group.key"-->
-                      <!--[columnWord]="words[colIndex]"-->
-                      <!--[wordAddress]="words[colIndex] + '.' + rowIndex"-->
-                      <!--[descriptor]="configurations.states.columns[colIndex]">-->
-                  <!--</td>-->
-                <!--</ng-container>-->
-            <!--</tr>-->
-        <!--</ng-container>-->
     </ng-container>
     </tbody>
   </table>
@@ -52,7 +27,9 @@
   <ng-container *ngFor="let group of rowGroups; let groupIndex = index">
     <tr>
       <td>{{ group.indexFn(groupIndex, { parentIndex: parentIndex, parentText: parentText }) }}</td>
-      <td>{{ group.name }}</td>
+      <ng-container *ngFor="let col of configurations.states.columns; let colIndex = index">
+        <td>{{ colIndex === 0 ? group.name : '' }}</td>
+      </ng-container>
     </tr>
     <ng-container *ngIf="group.data">
       <tr *ngFor="let row of group.data; let rowIndex = index; trackBy: trackByIndex">
@@ -71,9 +48,10 @@
     </ng-container>
     <ng-container *ngIf="group.subGroups">
       <ng-container *ngTemplateOutlet="groupTemplate; context: {
-          rowGroups: group.subGroups,
-          parentIndex: groupIndex,
-          parentText: group.indexFn(groupIndex, { parentIndex: parentIndex, parentText: parentText }) }"></ng-container>
+        rowGroups: group.subGroups,
+        parentIndex: groupIndex,
+        parentText: group.indexFn(groupIndex, { parentIndex: parentIndex, parentText: parentText })
+      }"></ng-container>
     </ng-container>
   </ng-container>
 </ng-template>
