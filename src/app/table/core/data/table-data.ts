@@ -1,6 +1,6 @@
-import { cloneDeep, groupBy, flatMap, isNil, get, mapValues, set, repeat, forEachRight } from 'lodash';
-import * as deepMerge from 'deepmerge';
+import { cloneDeep, forEachRight, get, repeat } from 'lodash';
 import { TableConfigurations } from '../table-configurations';
+import { doGroupFromCriteria, getCachedArray, getParentKey } from './row-grouping.utils';
 
 // const nest = function (seq, keys) {
 //   if (!keys.length) {
@@ -77,11 +77,6 @@ export class TableData {
   }
 
   private buildGroupedRows<T> (data: Object[], descriptors, rowGroups?: any[]) {
-    if (!data) {
-      return;
-    }
-
-    console.time('abc');
     const groupedRows = [];
     rowGroups.forEach((group, groupIndex) => {
       const criteria = group.groupBy;
@@ -107,78 +102,58 @@ export class TableData {
       }
     });
 
-    let res = [];
-    let prevMap = {};
+    const result = [];
+    let prevGroupedRowsMap = {};
     forEachRight(groupedRows, ({ dataMap, group }, index) => {
       if (index === groupedRows.length - 1) {
-        Object.entries(dataMap).forEach(([k, v]) => {
+        Object.entries(dataMap).forEach(([k, v]: [string, any[]]) => {
           const parentKey = getParentKey(k);
-          const cachedArray = getCachedArray(prevMap, parentKey);
-          cachedArray.push({
+          const toPush = {
+            $$indexFunc: getIndexFunc(group),
+            $$data: v,
             name: group.name(v[0]),
-            data: v,
-          });
-        });
-      } else if (index > 0) {
-        const copiedPrevMap = {...prevMap};
-        console.log('copiedPrevMap', copiedPrevMap);
-        prevMap = {};
-        const isDirectParent = index === groupedRows.length - 2;
-        Object.entries(copiedPrevMap).forEach(([k, v]) => {
-          const parentKey = getParentKey(k);
-          const cacheArray = getCachedArray(prevMap, parentKey);
-          if (isDirectParent) {
-            cacheArray.push({
-              name: group.name(v[0].data[0]),
-              subGroups: v
-            });
+            data: v.map(item => mapToTableCells(descriptors, item)),
+          };
+          if (!parentKey) {
+            result.push(toPush);
           } else {
-            // TODO: do this last!!
+            const cachedArray = getCachedArray(prevGroupedRowsMap, parentKey);
+            cachedArray.push(toPush);
           }
         });
+      } else if (index > 0) {
+        const copiedPrevMap = {...prevGroupedRowsMap};
+        prevGroupedRowsMap = {};
+        const subGroupsPath = repeat('.subGroups[0]', groupedRows.length - 2 - index);
+        Object.entries(copiedPrevMap).forEach(([k, v]) => {
+          const _data = get(v, '[0]' + subGroupsPath + '.$$data[0]');
+          const parentKey = getParentKey(k);
+          const cacheArray = getCachedArray(prevGroupedRowsMap, parentKey);
+          cacheArray.push({
+            $$indexFunc: getIndexFunc(group),
+            $$data: v,
+            name: group.name(_data),
+            subGroups: v
+          });
+        });
       } else {
-        const subGroups = repeat('.subGroups[0]', groupedRows.length - 2);
-        Object.entries(prevMap).forEach(([k, v]) => {
-          const _data = get(v, '[0]' + subGroups + '.data[0]');
-          res.push({
+        const subGroupsPath = repeat('.subGroups[0]', groupedRows.length - 2);
+        Object.entries(prevGroupedRowsMap).forEach(([k, v]) => {
+          const _data = get(v, '[0]' + subGroupsPath + '.$$data[0]');
+          result.push({
+            $$indexFunc: getIndexFunc(group),
+            $$data: v,
             name: group.name(_data),
             subGroups: v,
           });
         });
       }
     });
-    console.timeEnd('abc');
+    return result;
+  }
 
-    console.log('groupedRows', groupedRows);
-    console.log('prevMap', prevMap);
-    console.log('res', res);
-
-    function getCachedArray (object, key) {
-      let cachedArray = object[key];
-      if (!cachedArray) {
-        object[key] = cachedArray = [];
-      }
-      return cachedArray;
-    }
-
-    function doGroupFromCriteria (_data, _criteria, parentPath?) {
-      const _dataMap = {};
-      _data.forEach((d, dataIndex) => {
-        const value = !parentPath ? d[_criteria] : parentPath + d[_criteria];
-        let cachedArray = _dataMap[value];
-        if (!cachedArray) {
-          cachedArray = [];
-          _dataMap[value] = cachedArray;
-        }
-        cachedArray.push(d);
-      });
-      return _dataMap;
-    }
-
-    function getParentKey (childKey: string) {
-      const lastDot = childKey.lastIndexOf('.');
-      return lastDot ? childKey.substr(0, lastDot) : childKey;
-    }
+  private buildSimpleRows (data: Object[], descriptors) {
+    return data.map(item => mapToTableCells(descriptors, item));
   }
 
   private buildRows<T> (data: Object[], descriptors, rowGroups?: any[]) {
@@ -186,62 +161,31 @@ export class TableData {
       return;
     }
     const isGroup = rowGroups && rowGroups.length > 0;
-    const isSimple = !isGroup;
-
-    if (isSimple) {
-      this.data = data.map(item => {
-        const row = [];
-        descriptors.forEach(({prop, link, transformer}) => {
-          const result: any = {};
-          result.value = transformer
-            ? transformer(item[prop])
-            : item[prop];
-
-          if (link) {
-            result.url = link(item);
-          }
-          row.push(result);
-        });
-        return row;
-      });
-      return;
-    }
-
     if (isGroup) {
-
-      const group = rowGroups[0];
-      const grouped = groupBy(data, group.groupBy);
-      this.groupData = grouped;
-
-      const groups = {};
-      Object.entries(grouped).forEach(([key, value], index) => {
-        groups[key] = {
-          $$index: index,
-          $$indexFunc: getIndexFunc(group),
-          groupName: group.name(value[0]),
-          data: value.map(item => {
-            const row = [];
-            descriptors.forEach(({prop, link, transformer}) => {
-              const result: any = {};
-              result.value = transformer
-                ? transformer(item[prop])
-                : item[prop];
-
-              if (link) {
-                result.url = link(item);
-              }
-              row.push(result);
-            });
-            return row;
-          })
-        };
-      });
-      this.rowGroups = groups;
+      this.rowGroups = this.buildGroupedRows(data, descriptors, rowGroups);
       console.log('this.rowGroups', this.rowGroups);
       return;
     }
+
+    this.data = this.buildSimpleRows(data, descriptors);
   }
 
+}
+
+function mapToTableCells (descriptors, item) {
+  const row = [];
+  descriptors.forEach(({prop, link, transformer}) => {
+    const result: any = {};
+    result.value = transformer
+      ? transformer(item[prop])
+      : item[prop];
+
+    if (link) {
+      result.url = link(item);
+    }
+    row.push(result);
+  });
+  return row;
 }
 
 const wrapSquare = word => `[${word}]`;
