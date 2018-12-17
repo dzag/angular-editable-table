@@ -18,7 +18,9 @@
               [wordAddress]="words[colIndex] + '.' + rowIndex"
               [columnConfigs]="configurations.states.columns[colIndex]">
           </td>
-          <ng-container *ngTemplateOutlet="actionsTemplate; context: { rowIndex: rowIndex }"></ng-container>
+          <ng-container *ngFor="let action of configs.actions; let actionIndex = index">
+            <ng-container *ngTemplateOutlet="actionsTemplate; context: { rowIndex: rowIndex, index: actionIndex }"></ng-container>
+          </ng-container>
         </tr>
     </ng-container>
     <ng-container *ngIf="tableData.groupData">
@@ -55,7 +57,9 @@
             [wordAddress]="words[colIndex] + '.' + rowIndex"
             [columnConfigs]="configurations.states.columns[colIndex]">
         </td>
-        <ng-container *ngTemplateOutlet="actionsTemplate; context: { rowIndex: rowIndex, group: group }"></ng-container>
+        <ng-container *ngFor="let action of configs.actions; let actionIndex = index">
+          <ng-container *ngTemplateOutlet="actionsTemplate; context: { rowIndex: rowIndex, group: group, index: actionIndex }"></ng-container>
+        </ng-container>
       </tr>
     </ng-container>
     <ng-container *ngIf="group.subGroups">
@@ -68,11 +72,11 @@
   </ng-container>
 </ng-template>
 
-<ng-template #actionsTemplate let-rowIndex="rowIndex" let-group="group">
+<ng-template #actionsTemplate let-rowIndex="rowIndex" let-group="group" let-index="index">
   <td *ngIf="showActions">
-    <ng-container *ngFor="let action of getActions(rowIndex, group)">
-      <span (click.out-zone)="onActionClicked(action, rowIndex, group)">
-        {{ configs.actions.types[action].name }}
+    <ng-container *ngFor="let action of getActions(index, rowIndex, group)">
+      <span (click.out-zone)="onActionClicked(index, action, rowIndex, group)">
+        {{ configs.actions[index].types[action].name }}
       </span>
     </ng-container>
   </td>

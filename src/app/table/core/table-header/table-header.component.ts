@@ -24,7 +24,7 @@ export class TableHeaderComponent implements OnInit {
   @Input() withIndex;
 
   @Input() withActions;
-  @Input() actionsHeader;
+  @Input() actionsHeader: string[] = [];
 
   @Input() class;
   @Input() prop;
@@ -62,8 +62,10 @@ export class TableHeaderComponent implements OnInit {
         headers.unshift([this.indexName, this.indexClass, 1, 1]);
       }
 
-      if (this.withActions) {
-        headers.push([this.actionsHeader, '', 1, 1]);
+      if (this.withActions && this.actionsHeader.length > 0) {
+        this.actionsHeader.forEach(h => {
+          headers.push([h, '', 1, 1]);
+        });
       }
 
       return [headers];
@@ -177,12 +179,16 @@ export class TableHeaderComponent implements OnInit {
       });
     }
 
-    if (this.actionsHeader) {
+    if (this.withActions && this.actionsHeader.length > 0) {
       groupTuple.forEach((group, index) => {
-        const toPrepend = index === 0
-          ? [this.actionsHeader, '', depth, 1]
-          : [];
-        group.push(toPrepend);
+        const toPrepend = this.actionsHeader.map(h => {
+           if (index === 0) {
+             return [h, '', depth, 1];
+           }
+           return [];
+         }
+        );
+        group.push(...toPrepend);
       });
     }
 

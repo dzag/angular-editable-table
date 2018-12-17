@@ -142,27 +142,50 @@ export class SheetExampleComponent implements OnInit {
       //   return parentText + `.${currentIndex + 1}`;
       // },
     },
-    actions: {
-      show: true,
-      name: 'Actions',
-      types: {
-        edit: {
-          icon: '',
-          name: 'Edit',
+    actions: [
+      {
+        show: true,
+        name: 'Actions',
+        types: {
+          edit: {
+            icon: '',
+            name: 'Edit',
+          },
+          download: {
+            icon: '',
+            name: 'Download',
+          }
         },
-        download: {
-          icon: '',
-          name: 'Download',
+        actionsOnRow: (row, actionTypes) => {
+          console.log(row);
+          return ['edit', 'download'];
+        },
+        clicked: ({type, row}) => {
+          console.log(type, row);
         }
       },
-      actionsOnRow: (row, actionTypes) => {
-        console.log(row);
-        return ['edit', 'download'];
+      {
+        show: true,
+        name: 'Actions2',
+        types: {
+          edit: {
+            icon: '',
+            name: 'Edit',
+          },
+          download: {
+            icon: '',
+            name: 'Download',
+          }
+        },
+        actionsOnRow: (row, actionTypes) => {
+          console.log(row);
+          return ['edit', 'download'];
+        },
+        clicked: ({type, row}) => {
+          console.log(type, row);
+        }
       },
-      clicked: ({type, row}) => {
-        console.log(type, row);
-      }
-    }
+    ]
   });
 
   constructor () { }

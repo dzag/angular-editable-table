@@ -47,7 +47,7 @@ export interface Configs extends Anything {
     types?: any,
     actionsOnRow?: any,
     clicked?: any
-  };
+  }[];
 }
 
 const defaultConfigs: Configs = {
@@ -57,9 +57,7 @@ const defaultConfigs: Configs = {
   index: {
     show: true,
   },
-  actions: {
-    show: false,
-  }
+  actions: [],
 };
 
 export class TableConfigurations {

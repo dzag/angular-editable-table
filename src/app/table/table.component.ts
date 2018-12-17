@@ -70,8 +70,8 @@ export class TableComponent implements OnInit, OnDestroy {
     return currentIndex + 1;
   }
 
-  getActions(rowIndex, group?) {
-    const actionConfigs = this.configurations.states.actions;
+  getActions(index, rowIndex, group?) {
+    const actionConfigs = this.configurations.states.actions[index];
 
     if (actionConfigs.actionsOnRow) {
       const rowData = this._dataService.getRow(rowIndex, group);
@@ -91,21 +91,15 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   get showActions() {
-    return this.configurations.states.actions.show;
+    return this.configurations.states.actions.length > 0;
   }
 
   get actionsHeader() {
-    return this.configurations.states.actions.name || '';
-  }
-
-  get actionTypes() {
-    const actionConfigs = this.configurations.states.actions;
-
-    if (!actionConfigs.types) {
+    if (!this.showActions) {
       return [];
     }
 
-    return actionConfigs.types;
+    return this.configurations.states.actions.map(a => a.name);
   }
 
   private patchConfigs () {
@@ -113,8 +107,8 @@ export class TableComponent implements OnInit, OnDestroy {
     configs.cd = this.detectorRef;
   }
 
-  onActionClicked (actionType, rowIndex, group) {
-    this.configs.actions.clicked({
+  onActionClicked (index, actionType, rowIndex, group) {
+    this.configs.actions[index].clicked({
       type: actionType,
       row: this._dataService.getRow(rowIndex, group),
     });
