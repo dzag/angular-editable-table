@@ -1,12 +1,11 @@
 /* tslint:disable:component-selector */
 import { ChangeDetectorRef, Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { map } from 'rxjs/operators';
-import { ColumnDescriptor } from '../table.models';
 import { TableDataService } from '../data/table-data.service';
 import { createAddress } from './cell-manager.utils';
 import { CellManager } from './cell-manager.service';
 import { CellService } from './cell.service';
-import { TableColumnConfigurations, TableConfigurations } from '../table-configurations';
+import { TableColumnConfigurations } from '../table-configurations';
 
 const words = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
   'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
