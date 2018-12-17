@@ -56,7 +56,7 @@ export class TableConfigurations {
   }
 
   renameColumn(columnIndex: number, newName: string) {
-    this.set(`columns[${columnIndex}].colName`, newName);
+    this.set(`columns[${columnIndex}].name`, newName);
   }
 
   private set(path: string, value, options?: ConfigSetterOptions) {
