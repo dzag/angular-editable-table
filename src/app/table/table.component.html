@@ -1,6 +1,9 @@
 <div>
   <table class="table-responsive table-bordered">
-    <thead table-header [configurations]="configurations" [withIndex]="showIndex"></thead>
+    <thead table-header
+           [configurations]="configurations"
+           [withIndex]="showIndex"
+           [withActions]="showActions" [actionsHeader]="actionsHeader"></thead>
     <tbody>
     <ng-container *ngIf="!tableData.groupData">
         <tr *ngFor="let row of tableData.data; let rowIndex = index; trackBy: trackByIndex">
@@ -15,6 +18,7 @@
               [wordAddress]="words[colIndex] + '.' + rowIndex"
               [columnConfigs]="configurations.states.columns[colIndex]">
           </td>
+          <ng-container *ngTemplateOutlet="actionsTemplate; context: { rowIndex: rowIndex }"></ng-container>
         </tr>
     </ng-container>
     <ng-container *ngIf="tableData.groupData">
@@ -51,6 +55,7 @@
             [wordAddress]="words[colIndex] + '.' + rowIndex"
             [columnConfigs]="configurations.states.columns[colIndex]">
         </td>
+        <ng-container *ngTemplateOutlet="actionsTemplate; context: { rowIndex: rowIndex, group: group }"></ng-container>
       </tr>
     </ng-container>
     <ng-container *ngIf="group.subGroups">
@@ -61,4 +66,10 @@
       }"></ng-container>
     </ng-container>
   </ng-container>
+</ng-template>
+
+<ng-template #actionsTemplate let-rowIndex="rowIndex" let-group="group">
+  <td *ngIf="showActions">
+    {{ getActions(rowIndex, group) }}
+  </td>
 </ng-template>

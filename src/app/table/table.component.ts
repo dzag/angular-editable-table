@@ -69,6 +69,18 @@ export class TableComponent implements OnInit, OnDestroy {
     return currentIndex + 1;
   }
 
+  getActions(rowIndex, group?) {
+    const actionConfigs = this.configurations.states.actions;
+
+    if (actionConfigs.condition) {
+      const rowData = this.tableData.getRow(rowIndex, group);
+      return actionConfigs.condition(rowData);
+    }
+
+    // TODO: implement this
+    return [];
+  }
+
   get showIndex() {
     const indexConfigs = this.configurations.states.index;
 
@@ -77,6 +89,30 @@ export class TableComponent implements OnInit, OnDestroy {
     }
 
     return indexConfigs.show;
+  }
+
+  get showActions() {
+    const actionsConfigs = this.configurations.states.actions;
+
+    if (!actionsConfigs) {
+      return false;
+    }
+
+    return actionsConfigs.show;
+  }
+
+  get actionsHeader() {
+    return this.configurations.states.actions.name || '';
+  }
+
+  get actionTypes() {
+    const actionConfigs = this.configurations.states.actions;
+
+    if (!actionConfigs.types) {
+      return [];
+    }
+
+    return actionConfigs.types;
   }
 
   private patchConfigs () {

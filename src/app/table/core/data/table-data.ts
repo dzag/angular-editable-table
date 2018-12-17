@@ -34,6 +34,15 @@ export class TableData {
     this.buildRows(this.internalData, this.columnConfigs, this.configs.states.rowGroups);
   }
 
+  getRow (row, group?) {
+    if (group) {
+      const index = this.internalData.findIndex(i => i === group.originalData[row]);
+      return this.internalData[index];
+    }
+
+    return this.internalData[row];
+  }
+
   getCell (row, col, group?) {
     if (group) {
       const path = this.getDataRowPath(group.path, row);

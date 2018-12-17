@@ -85,6 +85,10 @@ export class TableDataService {
     return this._tableData.getCellValue(row, col, group);
   }
 
+  getRow (row, group?) {
+
+  }
+
   getCell (row, col, group?) {
     return this._tableData.getCell(row, col, group);
   }

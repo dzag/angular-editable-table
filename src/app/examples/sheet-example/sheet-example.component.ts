@@ -141,6 +141,25 @@ export class SheetExampleComponent implements OnInit {
       // rowIndexPattern: (currentIndex, {parentIndex, parentText}) => {
       //   return parentText + `.${currentIndex + 1}`;
       // },
+    },
+    actions: {
+      show: true,
+      name: 'Actions',
+      types: {
+        edit: {
+          icon: '',
+          name: 'Edit',
+        },
+        download: {
+          icon: '',
+          name: 'Download',
+        }
+      },
+      condition: (row) => {
+        console.log(row);
+        return ['edit'];
+      },
+      clicked: (type) => {}
     }
   });
 

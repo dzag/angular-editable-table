@@ -22,6 +22,10 @@ type Group = {
 export class TableHeaderComponent implements OnInit {
   @Input() subHeaders;
   @Input() withIndex;
+
+  @Input() withActions;
+  @Input() actionsHeader;
+
   @Input() class;
   @Input() prop;
   @Input() indexClass;
@@ -56,6 +60,10 @@ export class TableHeaderComponent implements OnInit {
 
       if (this.withIndex) {
         headers.unshift([this.indexName, this.indexClass, 1, 1]);
+      }
+
+      if (this.withActions) {
+        headers.push([this.actionsHeader, '', 1, 1]);
       }
 
       return [headers];
@@ -166,6 +174,15 @@ export class TableHeaderComponent implements OnInit {
           ? [this.indexName, this.indexClass, depth, 1]
           : [];
         group.unshift(toPrepend);
+      });
+    }
+
+    if (this.actionsHeader) {
+      groupTuple.forEach((group, index) => {
+        const toPrepend = index === 0
+          ? [this.actionsHeader, '', depth, 1]
+          : [];
+        group.push(toPrepend);
       });
     }
 
