@@ -36,34 +36,39 @@ export class TableDataInternal {
     this.columnConfigs = configs.states.columns;
     this.initialData = cloneDeep(tableData.initialData);
     this.internalData = cloneDeep(tableData.initialData);
-    this.buildRows(this.internalData, this.columnConfigs, this.configs.states.rowGroups);
+    this.buildRows(this.initialData, this.columnConfigs, this.configs.states.rowGroups);
   }
 
   getRow (row, group?) {
     if (group) {
-      const index = this.internalData.findIndex(i => i === group.originalData[row]);
-      return this.initialData[index];
+      const index = this.initialData.findIndex(i => i === group.originalData[row]);
+      return this.internalData[index];
     }
 
-    return this.initialData[row];
+    return this.internalData[row];
   }
 
   deleteRow (row, group?) {
-    console.log(row, group);
     if (group) {
       const index = this.initialData.findIndex(i => i === group.originalData[row]);
       group.data.splice(row, 1);
-      this.deleted.push(this.initialData.splice(index, 1)[0]);
+      group.originalData.splice(row, 1);
+
+      this.initialData.splice(index, 1);
+      this.deleted.push(this.internalData.splice(index, 1)[0]);
       return;
     }
     this.data.splice(row, 1);
-    this.deleted.push(this.initialData.splice(row, 1)[0]);
+
+    this.initialData.splice(row, 1);
+    this.deleted.push(this.internalData.splice(row, 1)[0]);
   }
 
   getCell (row, col, group?) {
     if (group) {
       const path = this.getDataRowPath(group.path, row);
-      return get(this.groupData, path)[col];
+      const data = get(this.groupData, path);
+      return data[col];
     }
     return this.data[row][col];
   }
@@ -87,13 +92,17 @@ export class TableDataInternal {
   }
 
   private patchInitialData (row, col, group, newValue) {
+    const colProp = this.getProp(col);
+
     if (group) {
       const rowData = group.originalData[row];
       rowData[col] = newValue;
-      const initialDataIndex = this.internalData.findIndex(i => i === rowData);
-      this.initialData[initialDataIndex][this.getProp(col)] = newValue;
+      const initialDataIndex = this.initialData.findIndex(i => i === rowData);
+      this.initialData[initialDataIndex][colProp] = newValue;
+      this.internalData[initialDataIndex][colProp] = newValue;
     } else {
-      this.initialData[row][this.getProp(col)] = newValue;
+      this.initialData[row][colProp] = newValue;
+      this.internalData[row][colProp] = newValue;
     }
   }
 

@@ -6,6 +6,7 @@ import { createAddress } from './cell-manager.utils';
 import { CellManager } from './cell-manager.service';
 import { CellService } from './cell.service';
 import { TableColumnConfigurations } from '../table-configurations';
+import { Subject, Subscription } from 'rxjs';
 
 const words = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
   'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
@@ -32,18 +33,21 @@ export class TableCellComponent implements OnInit, OnDestroy {
   public active = false;
   public readonly = false;
 
+  private subscription: Subscription;
+
   constructor (private _cellService: CellService,
                private _cellManager: CellManager,
                private _dataService: TableDataService,
                public cd: ChangeDetectorRef,
   ) {
+    (this._dataService as any)['_cellService'] = _cellService; // this is a hack for circular dependency
   }
 
   ngOnInit () {
     this.prop = this.columnConfigs.prop as string;
 
     this._cellManager.register(this);
-    this._cellService.getActive().pipe(map(active => active === this))
+    this.subscription = this._cellService.getActive().pipe(map(active => active === this))
       .subscribe(active => {
         this.active = active;
         this.cd.detectChanges();
@@ -52,6 +56,7 @@ export class TableCellComponent implements OnInit, OnDestroy {
 
   ngOnDestroy (): void {
     this._cellManager.unregister(this);
+    this.subscription.unsubscribe();
   }
 
   @HostListener('click.out-zone')

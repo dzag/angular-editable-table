@@ -60,6 +60,8 @@
         <ng-container *ngFor="let action of configs.actions; let actionIndex = index">
           <ng-container *ngTemplateOutlet="actionsTemplate; context: { rowIndex: rowIndex, group: group, index: actionIndex }"></ng-container>
         </ng-container>
+        <td>
+        </td>
       </tr>
     </ng-container>
     <ng-container *ngIf="group.subGroups">

@@ -6,6 +6,7 @@ import * as math from 'mathjs';
 import { merge } from 'lodash';
 import { CellManager } from '../table-cell/cell-manager.service';
 import { FormulaParser } from '../formula/formula-parser';
+import { CellService } from '../table-cell/cell.service';
 
 interface ValueSetterOptions {
   detect?: boolean;
@@ -28,6 +29,8 @@ export class TableDataService {
 
   private _changes$ = new Subject<any>();
   private _changesObs = this._changes$.asObservable();
+
+  private _cellService: CellService;
 
   constructor (private _cellManager: CellManager,
                private _cd: ChangeDetectorRef,
@@ -90,6 +93,7 @@ export class TableDataService {
   }
 
   deleteRow (row, group?) {
+    this._cellService.setActive(null);
     this.tableDataInternal.deleteRow(row, group);
     this._cd.detectChanges();
   }
