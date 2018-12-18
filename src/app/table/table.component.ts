@@ -26,13 +26,25 @@ import { TableData } from './core/table-data';
 export class TableComponent implements OnInit, OnDestroy {
 
   @Input() configurations: TableConfigurations;
-  @Input() data: TableData;
   @Input() groupData: any[];
+
+  @Input()
+  get data (): TableData {
+    return this._data;
+  }
+
+  set data (value: TableData) {
+    this._data = value;
+    this.tableDataInternal = new TableDataInternal(this.configurations, value);
+    this._dataService.tableDataInternal = this.tableDataInternal;
+  }
 
   public readonly words = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
     'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
   public tableDataInternal: TableDataInternal;
+
+  private _data: TableData;
 
   constructor (private _cd: ChangeDetectorRef,
                private _dataService: TableDataService,
@@ -42,10 +54,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
   ngOnInit () {
     this.patchConfigs();
-    this.data['_dataService'] = this._dataService;
-
-    this.tableDataInternal = new TableDataInternal(this.configurations, this.data);
-    this._dataService.tableDataInternal = this.tableDataInternal;
+    this._data['_dataService'] = this._dataService;
   }
 
   ngOnDestroy (): void {}
