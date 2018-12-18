@@ -6,6 +6,7 @@ import { CellManager } from './core/table-cell/cell-manager.service';
 import { CellService } from './core/table-cell/cell.service';
 import { KeyValue } from '@angular/common';
 import { romanize } from './core/data/table-data.utils';
+import { TableData } from './core/table-data';
 
 @Component({
   selector: 'ng-table',
@@ -25,7 +26,7 @@ import { romanize } from './core/data/table-data.utils';
 export class TableComponent implements OnInit, OnDestroy {
 
   @Input() configurations: TableConfigurations;
-  @Input() data: any[];
+  @Input() data: TableData;
   @Input() groupData: any[];
 
   public readonly words = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',

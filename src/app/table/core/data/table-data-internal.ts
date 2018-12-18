@@ -2,6 +2,7 @@ import { cloneDeep, forEachRight, get, repeat, set } from 'lodash';
 import { TableColumnConfigurations, TableConfigurations } from '../table-configurations';
 import { doGroupFromCriteria, getCachedArray, getParentKey } from './row-grouping.utils';
 import { getIndexFunction, mapToTableCells } from './table-data.utils';
+import { TableData } from '../table-data';
 
 export interface GroupData {
   name: string;
@@ -25,12 +26,15 @@ export class TableDataInternal {
   public readonly columnConfigs: TableColumnConfigurations[];
   private internalData;
 
+  public readonly initialData;
+
   constructor (private readonly configs: TableConfigurations,
-               public readonly initialData,
+               private readonly tableData: TableData,
   ) {
+    this.tableData['_internalData'] = this;
     this.columnConfigs = configs.states.columns;
-    this.initialData = cloneDeep(initialData);
-    this.internalData = cloneDeep(initialData);
+    this.initialData = cloneDeep(tableData.initialData);
+    this.internalData = cloneDeep(tableData.initialData);
     this.buildRows(this.internalData, this.columnConfigs, this.configs.states.rowGroups);
   }
 

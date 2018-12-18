@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { random } from 'lodash';
-import { ColumnDescriptor } from '../../table';
+import { ColumnDescriptor, TableData } from '../../table';
 import { TableConfigurations } from '../../table/core/table-configurations';
 
 const nameMapper = {
@@ -30,31 +30,33 @@ const name3Mapper = {
 })
 export class SheetExampleComponent implements OnInit {
 
-  data = Array(50).fill(null).map((value, index) => (() => {
-    const id = random(1, 5);
-    const subId = random(1, 3);
-    const subId2 = random(1, 3);
+  data = new TableData(
+    Array(50).fill(null).map((value, index) => (() => {
+      const id = random(1, 5);
+      const subId = random(1, 3);
+      const subId2 = random(1, 3);
 
-    const randomDate = () => new Date(random(2000, 2018), random(0, 11), random(1, 29));
+      const randomDate = () => new Date(random(2000, 2018), random(0, 11), random(1, 29));
 
-    return {
-      total: 0,
-      belongsTo: id,
-      name: nameMapper[id],
-      sameId: subId,
-      name2: name2Mapper[subId],
-      sameId2: subId2,
-      name3: name3Mapper[subId2],
-      col1: random(100000000, 1000000000),
-      col2: random(100000000, 1000000000),
-      col3: random(100000000, 1000000000),
-      col4: random(100000000, 1000000000),
-      col5: random(100000000, 1000000000),
-      col6: random(100000000, 1000000000),
-      col7: random(100000000, 1000000000),
-      col8: randomDate()
-    };
-  })());
+      return {
+        total: 0,
+        belongsTo: id,
+        name: nameMapper[id],
+        sameId: subId,
+        name2: name2Mapper[subId],
+        sameId2: subId2,
+        name3: name3Mapper[subId2],
+        col1: random(100000000, 1000000000),
+        col2: random(100000000, 1000000000),
+        col3: random(100000000, 1000000000),
+        col4: random(100000000, 1000000000),
+        col5: random(100000000, 1000000000),
+        col6: random(100000000, 1000000000),
+        col7: random(100000000, 1000000000),
+        col8: randomDate()
+      };
+    })())
+  );
 
   formulas = {
     all: [
