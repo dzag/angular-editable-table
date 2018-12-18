@@ -89,6 +89,11 @@ export class TableDataService {
     return this.tableDataInternal.getRow(row, group);
   }
 
+  deleteRow (row, group?) {
+    this.tableDataInternal.deleteRow(row, group);
+    this._cd.detectChanges();
+  }
+
   getCell (row, col, group?) {
     return this._tableData.getCell(row, col, group);
   }

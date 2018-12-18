@@ -119,25 +119,25 @@ export class SheetExampleComponent implements OnInit {
         dataType: 'date'
       },
     ],
-    // rowGroups: [
-    //   {
-    //     groupBy: 'belongsTo',
-    //     name: (firstRowData) => firstRowData.name, // Optional
-    //     indexType: 'romanNumeral',
-    //   },
-    //   {
-    //     groupBy: 'sameId',
-    //     name: (firstRowData) => firstRowData.name2, // Optional
-    //     // indexPattern: (currentIndex, {parentIndex, parentText}) => {}, // Optional,
-    //   },
-    //   {
-    //     groupBy: 'sameId2',
-    //     name: (firstRowData) => firstRowData.name3, // Optional
-    //     indexPattern: (currentIndex, {parentIndex, parentText}) => {
-    //       return parentText + `.${currentIndex + 1}`;
-    //     }
-    //   }
-    // ],
+    rowGroups: [
+      {
+        groupBy: 'belongsTo',
+        name: (firstRowData) => firstRowData.name, // Optional
+        indexType: 'romanNumeral',
+      },
+      {
+        groupBy: 'sameId',
+        name: (firstRowData) => firstRowData.name2, // Optional
+        // indexPattern: (currentIndex, {parentIndex, parentText}) => {}, // Optional,
+      },
+      {
+        groupBy: 'sameId2',
+        name: (firstRowData) => firstRowData.name3, // Optional
+        indexPattern: (currentIndex, {parentIndex, parentText}) => {
+          return parentText + `.${currentIndex + 1}`;
+        }
+      }
+    ],
     index: {
       show: true,
       // rowIndexPattern: (currentIndex, {parentIndex, parentText}) => {
@@ -161,8 +161,10 @@ export class SheetExampleComponent implements OnInit {
         actionsOnRow: (row, actionTypes) => {
           return ['edit', 'download'];
         },
-        clicked: ({type, row}) => {
-          console.log(type, row);
+        clicked: ({type, row, rowIndex, group}) => {
+          console.log(type, row, rowIndex);
+          this.data.delete(rowIndex, group);
+          console.log(this.data.deleted);
         }
       },
       {
@@ -185,7 +187,7 @@ export class SheetExampleComponent implements OnInit {
           console.log(type, row);
         }
       },
-    ]
+    ],
   });
 
   constructor () { }

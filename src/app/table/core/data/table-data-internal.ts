@@ -26,12 +26,13 @@ export class TableDataInternal {
   public readonly columnConfigs: TableColumnConfigurations[];
   private internalData;
 
-  public readonly initialData;
+  public readonly initialData: any[];
+
+  public readonly deleted = [];
 
   constructor (private readonly configs: TableConfigurations,
                private readonly tableData: TableData,
   ) {
-    (this.tableData as any)['_internalData'] = this;
     this.columnConfigs = configs.states.columns;
     this.initialData = cloneDeep(tableData.initialData);
     this.internalData = cloneDeep(tableData.initialData);
@@ -45,6 +46,18 @@ export class TableDataInternal {
     }
 
     return this.initialData[row];
+  }
+
+  deleteRow (row, group?) {
+    console.log(row, group);
+    if (group) {
+      const index = this.initialData.findIndex(i => i === group.originalData[row]);
+      group.data.splice(row, 1);
+      this.deleted.push(this.initialData.splice(index, 1)[0]);
+      return;
+    }
+    this.data.splice(row, 1);
+    this.deleted.push(this.initialData.splice(row, 1)[0]);
   }
 
   getCell (row, col, group?) {

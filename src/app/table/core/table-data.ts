@@ -1,18 +1,26 @@
-import { TableDataInternal } from './data/table-data-internal';
 import { returnOutside } from './table-cell/cell-manager.service';
 import { Observable } from 'rxjs';
+import { TableDataService } from './data/table-data.service';
 
 export class TableData {
 
-  private _internalData: TableDataInternal;
+  private _dataService: TableDataService;
 
   constructor (public readonly initialData) {
   }
 
   getDataSnapshot(): Observable<any[]> {
     return returnOutside(() => {
-      return this._internalData.initialData;
+      return this._dataService.tableDataInternal.initialData;
     });
+  }
+
+  delete(index, group?) {
+    this._dataService.deleteRow(index, group);
+  }
+
+  get deleted() {
+    return this._dataService.tableDataInternal.deleted;
   }
 
 }

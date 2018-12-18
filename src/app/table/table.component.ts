@@ -42,6 +42,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
   ngOnInit () {
     this.patchConfigs();
+    this.data['_dataService'] = this._dataService;
 
     this.tableDataInternal = new TableDataInternal(this.configurations, this.data);
     this._dataService.tableDataInternal = this.tableDataInternal;
@@ -117,6 +118,8 @@ export class TableComponent implements OnInit, OnDestroy {
     this.configs.actions[index].clicked({
       type: actionType,
       row: this._dataService.getRow(rowIndex, group),
+      rowIndex: rowIndex,
+      group,
     });
   }
 }
