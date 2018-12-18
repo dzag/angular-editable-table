@@ -31,7 +31,7 @@ export class TableDataInternal {
   constructor (private readonly configs: TableConfigurations,
                private readonly tableData: TableData,
   ) {
-    this.tableData['_internalData'] = this;
+    (this.tableData as any)['_internalData'] = this;
     this.columnConfigs = configs.states.columns;
     this.initialData = cloneDeep(tableData.initialData);
     this.internalData = cloneDeep(tableData.initialData);
