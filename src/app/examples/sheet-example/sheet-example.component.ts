@@ -196,7 +196,7 @@ export class SheetExampleComponent implements OnInit {
           col8: randomDate()
         };
       })()));
-    }, 1000);
+    }, 0);
 
     setTimeout(() => {
       this.configs.renameGroup('[0].groupName', 'What this <span style="color: red">123</span>?');

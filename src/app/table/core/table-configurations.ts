@@ -55,28 +55,26 @@ export interface TableIndexConfiguration extends Anything {
   rowIndexPattern?: any;
 }
 
+export interface TableRowGroupsConfiguration extends Anything {
+  groupBy?: string;
+  name?: any;
+  indexType?: string;
+  indexPattern?: any;
+}
+
+export interface TableColumnGroupsConfiguration extends Anything {
+  groupName: string;
+  props: string[];
+  subGroups?: TableColumnGroupsConfiguration[];
+}
+
 export interface Configs extends Anything {
   columns: TableColumnConfigurations[];
-  rowGroups?: {
-    groupBy?: string,
-    name?: any,
-    indexType?: string,
-    indexPattern?: any,
-  }[];
-  columnGroups?: any;
+  rowGroups?: TableRowGroupsConfiguration[];
+  columnGroups?: TableColumnGroupsConfiguration[];
   index?: TableIndexConfiguration;
   actions?: TableActionConfiguration[];
 }
-
-const defaultConfigs: Configs = {
-  columns: [],
-  rowGroups: [],
-  columnGroups: [],
-  index: {
-    show: true,
-  },
-  actions: [],
-};
 
 export class TableConfigurations {
   public readonly states: Configs;
@@ -138,24 +136,26 @@ export class TableConfigurations {
   private mergeDefaultConfigs(initialConfig: Configs): Configs {
     const mergedConfigs: Configs | any = {};
 
-    mergedConfigs.columns = initialConfig.columns.map(col => {
+    mergedConfigs.columns = (initialConfig.columns || []).map(col => {
       if (col.subHeader) {
         this.hasSubHeader = true;
       }
       return Object.assign({...DEFAULT_CONFIGS.column}, col);
     });
 
-    mergedConfigs.columnGroups = initialConfig.columnGroups;
-
-    mergedConfigs.rowGroups = initialConfig.rowGroups;
-
-    mergedConfigs.index = Object.assign({...DEFAULT_CONFIGS.index}, initialConfig.index);
-
-    if (initialConfig.actions) {
-      mergedConfigs.actions = initialConfig.actions.map(action => {
-        return Object.assign({...DEFAULT_CONFIGS.action}, action);
-      });
+    if (initialConfig.columnGroups) {
+      mergedConfigs.columnGroups = initialConfig.columnGroups;
     }
+
+    if (initialConfig.rowGroups) {
+      mergedConfigs.rowGroups = initialConfig.rowGroups;
+    }
+
+    mergedConfigs.index = Object.assign({...DEFAULT_CONFIGS.index}, initialConfig.index || {});
+
+    mergedConfigs.actions = (initialConfig.actions || []).map(action => {
+      return Object.assign({...DEFAULT_CONFIGS.action}, action);
+    });
 
     return mergedConfigs;
   }
