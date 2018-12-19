@@ -81,6 +81,7 @@ export class TableComponent implements OnInit, OnDestroy {
   getActions(index, rowIndex, group?) {
     const actionConfigs = this.configurations.states.actions[index];
     const actionsOnRow = actionConfigs.actionsOnRow;
+    const hiddenActions = this.configurations.hiddenActions.get(actionConfigs) || [];
 
     if (actionsOnRow && typeof actionsOnRow === 'function') {
       const rowData = this._dataService.getRow(rowIndex, group);
@@ -89,11 +90,11 @@ export class TableComponent implements OnInit, OnDestroy {
         types: actionConfigs.types,
       });
 
-      return difference(actions, this.configurations.hiddenActions.get(actionConfigs) || []);
+      return difference(actions, hiddenActions);
     }
 
     // TODO: implement this
-    return [];
+    return difference(actionConfigs.static, hiddenActions);
   }
 
   get tableDataInternal() {

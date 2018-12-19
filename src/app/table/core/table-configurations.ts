@@ -42,8 +42,8 @@ export interface TableActionConfiguration extends Anything {
   class?: string;
   types?: any;
   static?: string[];
-  actionsOnRow?: any;
   clicked?: (actionEvent: ActionEvent) => void;
+  actionsOnRow?: (event: {row: any, types: any}) => string[];
 }
 
 export interface TableIndexConfiguration extends Anything {

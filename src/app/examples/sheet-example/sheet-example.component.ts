@@ -154,13 +154,13 @@ export class SheetExampleComponent implements OnInit {
           }
         },
         static: ['edit', 'download'],
-        actionsOnRow: ({row, types}) => {
-          if (row.sameId > 1) {
-            return ['edit', 'download'];
-          }
-
-          return ['download'];
-        },
+        // actionsOnRow({row, types}) {
+        //   if (row.sameId > 1) {
+        //     return ['edit', 'download'];
+        //   }
+        //
+        //   return ['download'];
+        // },
         clicked: this.onTableButtonsClicked.bind(this)
       },
     ],
