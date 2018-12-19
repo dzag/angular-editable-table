@@ -67,6 +67,8 @@ const defaultConfigs: Configs = {
 export class TableConfigurations {
   public readonly states: Configs;
 
+  public readonly hiddenActions = new Map();
+
   private _cd: ChangeDetectorRef;
   private _headerCd: ChangeDetectorRef;
 
@@ -93,6 +95,30 @@ export class TableConfigurations {
   }
 
   // -- actions configs
+  hideActionType(actionIndex: number, typeToHide: string) {
+    const array = this.getHiddenArray(actionIndex);
+    const foundTypeToHide = array.find(i => i === typeToHide);
+
+    if (foundTypeToHide) {
+      return false;
+    }
+
+    array.push(typeToHide);
+    this.detectChanges();
+    return true;
+  }
+
+  showActionType(actionIndex: number, typeToShow: string) {
+    const array: string[] = this.getHiddenArray(actionIndex);
+    const foundTypeToShowIndex = array.findIndex(i => i === typeToShow);
+    if (foundTypeToShowIndex < 0) {
+      return false;
+    }
+
+    array.splice(foundTypeToShowIndex, 1);
+    this.detectChanges();
+    return true;
+  }
 
   private set(path: string, value, options?: ConfigSetterOptions) {
     options = merge({...defaultSetterOptions}, options);
@@ -122,6 +148,11 @@ export class TableConfigurations {
         detector.detectChanges();
       }
     });
+  }
+
+  private getHiddenArray(actionIndex): string[] {
+    const action = this.states.actions[actionIndex];
+    return this.hiddenActions.get(action) || this.hiddenActions.set(action, []).get(action);
   }
 
 }

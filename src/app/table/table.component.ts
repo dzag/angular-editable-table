@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { TableConfigurations } from './core/table-configurations';
-import { TableDataInternal } from './core/data/table-data-internal';
 import { TableDataService } from './core/data/table-data.service';
 import { CellManager } from './core/table-cell/cell-manager.service';
 import { CellService } from './core/table-cell/cell.service';
 import { KeyValue } from '@angular/common';
 import { romanize } from './core/data/table-data.utils';
 import { TableData } from './core/table-data';
+import { difference } from 'lodash';
 
 @Component({
   selector: 'ng-table',
@@ -80,10 +80,16 @@ export class TableComponent implements OnInit, OnDestroy {
 
   getActions(index, rowIndex, group?) {
     const actionConfigs = this.configurations.states.actions[index];
+    const actionsOnRow = actionConfigs.actionsOnRow;
 
-    if (actionConfigs.actionsOnRow) {
+    if (actionsOnRow && typeof actionsOnRow === 'function') {
       const rowData = this._dataService.getRow(rowIndex, group);
-      return actionConfigs.actionsOnRow(rowData, actionConfigs.types);
+      const actions = actionsOnRow({
+        row: rowData,
+        types: actionConfigs.types,
+      });
+
+      return difference(actions, this.configurations.hiddenActions.get(actionConfigs) || []);
     }
 
     // TODO: implement this

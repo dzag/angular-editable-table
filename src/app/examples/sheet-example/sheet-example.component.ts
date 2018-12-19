@@ -139,25 +139,6 @@ export class SheetExampleComponent implements OnInit {
     actions: [
       {
         show: true,
-        name: 'Actions2',
-        class: 'class-actions-2',
-        types: {
-          edit: {
-            icon: '',
-            name: 'Edit',
-          },
-          download: {
-            icon: '',
-            name: 'Download',
-          }
-        },
-        actionsOnRow: (row, actionTypes) => {
-          return ['edit', 'download'];
-        },
-        clicked: this.onTableButtonsClicked.bind(this),
-      },
-      {
-        show: true,
         name: 'Actions',
         types: {
           edit: {
@@ -169,8 +150,12 @@ export class SheetExampleComponent implements OnInit {
             name: 'Download',
           }
         },
-        actionsOnRow: (row, actionTypes) => {
-          return ['edit', 'download'];
+        actionsOnRow: ({row, types}) => {
+          if (row.sameId > 1) {
+            return ['edit', 'download'];
+          }
+
+          return ['download'];
         },
         clicked: this.onTableButtonsClicked.bind(this)
       },
@@ -180,6 +165,7 @@ export class SheetExampleComponent implements OnInit {
   constructor () { }
 
   ngOnInit () {
+    this.configs.hideActionType(0, 'edit');
     setTimeout(() => {
       this.data = new TableData(Array(50).fill(null).map((value, index) => (() => {
         const id = random(1, 5);
@@ -213,6 +199,7 @@ export class SheetExampleComponent implements OnInit {
     }, 2000);
 
     setTimeout(() => {
+      this.configs.showActionType(0, 'edit');
       this.configs.renameColumn(0, 'What this <span style="color: red">123</span>?');
     }, 3000);
   }
