@@ -169,7 +169,7 @@ export class SheetExampleComponent implements OnInit {
   constructor () { }
 
   ngOnInit () {
-    this.configs.hideActionType(0, 'edit');
+    this.configs.hideActionType('edit');
     setTimeout(() => {
       this.data = new TableData(Array(50).fill(null).map((value, index) => (() => {
         const id = random(1, 5);
@@ -203,7 +203,7 @@ export class SheetExampleComponent implements OnInit {
     }, 2000);
 
     setTimeout(() => {
-      this.configs.showActionType(0, 'edit');
+      this.configs.showActionType('edit');
       this.configs.renameColumn(0, 'What this <span style="color: red">123</span>?');
     }, 3000);
   }

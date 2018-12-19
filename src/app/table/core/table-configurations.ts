@@ -108,7 +108,11 @@ export class TableConfigurations {
   }
 
   // -- actions configs
-  hideActionType(actionIndex: number, typeToHide: string) {
+  hideActionType(typeToHide: string, actionIndex: number = 0) {
+    if (!this.states.actions[actionIndex]) {
+      return false;
+    }
+
     const array = this.getHiddenArray(actionIndex);
     const foundTypeToHide = array.find(i => i === typeToHide);
 
@@ -121,7 +125,11 @@ export class TableConfigurations {
     return true;
   }
 
-  showActionType(actionIndex: number, typeToShow: string) {
+  showActionType(typeToShow: string, actionIndex: number = 0) {
+    if (!this.states.actions[actionIndex]) {
+      return false;
+    }
+
     const array: string[] = this.getHiddenArray(actionIndex);
     const foundTypeToShowIndex = array.findIndex(i => i === typeToShow);
     if (foundTypeToShowIndex < 0) {
