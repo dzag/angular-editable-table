@@ -1,8 +1,8 @@
 import { ChangeDetectorRef } from '@angular/core';
 import { set, cloneDeep, merge } from 'lodash';
 import { Subject } from 'rxjs';
-import * as deepMerge from 'deepmerge';
 import { ActionEvent } from './table.models';
+import { DEFAULT_CONFIGS } from './default-configs';
 
 interface ConfigSetterOptions {
   detect?: boolean;
@@ -34,6 +34,16 @@ export interface TableColumnConfigurations extends Anything {
   reverseMap?: Function;
 }
 
+export interface TableActionConfiguration extends Anything {
+  show?: boolean; // default: false
+  name?: string;
+  class?: string;
+  types?: any;
+  static?: string[];
+  actionsOnRow?: any;
+  clicked?: (actionEvent: ActionEvent) => void;
+}
+
 export interface Configs extends Anything {
   columns: TableColumnConfigurations[];
   rowGroups?: any;
@@ -44,14 +54,7 @@ export interface Configs extends Anything {
     rowIndexType?: any;
     rowIndexPattern?: any;
   };
-  actions?: {
-    show?: boolean, // default: false
-    name?: string;
-    class?: string;
-    types?: any,
-    actionsOnRow?: any,
-    clicked?: (actionEvent: ActionEvent) => void
-  }[];
+  actions?: TableActionConfiguration[];
 }
 
 const defaultConfigs: Configs = {
@@ -77,7 +80,7 @@ export class TableConfigurations {
 
   constructor (private initialConfigs: Configs) { // TODO: Add type to this
     const initial = cloneDeep(this.initialConfigs);
-    this.states = deepMerge({...defaultConfigs}, initial);
+    this.states = this.mergeDefaultConfigs(initial);
   }
 
   // -- columns configs
@@ -118,6 +121,28 @@ export class TableConfigurations {
     array.splice(foundTypeToShowIndex, 1);
     this.detectChanges();
     return true;
+  }
+
+  private mergeDefaultConfigs(initialConfig: Configs): Configs {
+    const mergedConfigs: Configs | any = {};
+
+    mergedConfigs.columns = initialConfig.columns.map(col => {
+      return Object.assign({...DEFAULT_CONFIGS.column}, col);
+    });
+
+    mergedConfigs.columnGroups = initialConfig.columnGroups;
+
+    mergedConfigs.rowGroups = initialConfig.rowGroups;
+
+    mergedConfigs.index = Object.assign({...DEFAULT_CONFIGS.index}, initialConfig.index);
+
+    if (initialConfig.actions) {
+      mergedConfigs.actions = initialConfig.actions.map(action => {
+        return Object.assign({...DEFAULT_CONFIGS.action}, action);
+      });
+    }
+
+    return mergedConfigs;
   }
 
   private set(path: string, value, options?: ConfigSetterOptions) {

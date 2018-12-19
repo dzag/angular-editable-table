@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, EventEmitter, Input, OnDestroy, OnInit } from '@angular/core';
 import { ColumnDescriptor, ColumnGroup } from './table.models';
-import { tableButtons } from './table-buttons';
+import { tableActions } from './table-actions';
 import { map, skip } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { untilDestroyed } from 'ngx-take-until-destroy';
@@ -79,7 +79,7 @@ export class BaseTableComponent implements OnInit, OnDestroy {
 
   subHeaders: string[] = [];
 
-  buttons = tableButtons;
+  buttons = tableActions;
 
   currentOffset$: Observable<number>;
 

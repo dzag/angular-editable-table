@@ -150,6 +150,7 @@ export class SheetExampleComponent implements OnInit {
             name: 'Download',
           }
         },
+        static: ['edit', 'download'],
         actionsOnRow: ({row, types}) => {
           if (row.sameId > 1) {
             return ['edit', 'download'];
