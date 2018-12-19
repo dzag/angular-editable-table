@@ -71,6 +71,11 @@ export class TableCellComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.columnConfigs.editableWhen && this.columnConfigs.editableWhen(this.entireRow)) {
+      this._cellService.setActive(this);
+      return;
+    }
+
     this._cellService.setActive(this);
   }
 

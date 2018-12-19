@@ -70,10 +70,10 @@ export class SheetExampleComponent implements OnInit {
         dataType: 'select',
         editable: true,
         options: [
-          {id: 1, value: 'hello 1'},
-          {id: 2, value: 'hello 2'},
-          {id: 3, value: 'hello 3'},
-          {id: 4, value: 'hello 4'},
+          {id: 1, value: 'col 3-1'},
+          {id: 2, value: 'col 3-2'},
+          {id: 3, value: 'col 3-3'},
+          {id: 4, value: 'col 3-4'},
         ],
         partialOptions(row) {
           if (row.belongsTo < 3) {
@@ -95,7 +95,25 @@ export class SheetExampleComponent implements OnInit {
       {
         prop: 'col5',
         name: 'Col 5',
-        dataType: 'currency'
+        dataType: 'select',
+        editable: true,
+        editableWhen(row) {
+          return !row.col3;
+        },
+        options: [
+          {id: 1, value: 'hello 4'},
+          {id: 2, value: 'hello 5'},
+          {id: 3, value: 'hello 6'},
+          {id: 4, value: 'hello 7'}
+        ],
+        partialOptions(row) {
+          console.log(row);
+          if (parseInt(row.col3, 10) < 3) {
+            return [1, 2];
+          }
+
+          return [3, 4];
+        }
       },
       {
         prop: 'col6',
@@ -188,6 +206,7 @@ export class SheetExampleComponent implements OnInit {
 
   ngOnInit () {
     this.configs.hideActionType('edit');
+
     setTimeout(() => {
       this.data = new TableData(Array(100).fill(null).map((value, index) => (() => {
         const id = random(1, 5);
@@ -208,7 +227,7 @@ export class SheetExampleComponent implements OnInit {
           col2: random(100000000, 1000000000),
           col3: id < 3 ? random(1, 2) : random(3, 4),
           col4: random(100000000, 1000000000),
-          col5: random(100000000, 1000000000),
+          col5: random(1, 4),
           col6: random(100000000, 1000000000),
           col7: random(100000000, 1000000000),
           col8: randomDate()

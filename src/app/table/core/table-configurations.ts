@@ -101,6 +101,14 @@ export class TableConfigurations {
     });
   }
 
+  setOptions(columnIndex: number, newOptions: any[]) {
+    const column = this.states.columns[columnIndex];
+    column.options = newOptions;
+    column['$$options'] = this.doCacheOptions(newOptions);
+
+    this.detectChanges();
+  }
+
   // -- columns groups
   renameGroup(path: string, newName: string, upLevel = 1) {
     this.set('columnGroups' + path, newName, {
