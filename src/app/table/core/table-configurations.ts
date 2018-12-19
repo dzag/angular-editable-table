@@ -27,6 +27,8 @@ export interface TableColumnConfigurations extends Anything {
   editable?: boolean;
   headerClass?: string;
   dataClass?: string;
+  subHeader?: string;
+  subHeaderClass?: string;
   options?: any[]; // for select dataType
   link?: any; // for link dataType
   useRouter?: boolean; // for link dataType
@@ -44,16 +46,25 @@ export interface TableActionConfiguration extends Anything {
   clicked?: (actionEvent: ActionEvent) => void;
 }
 
+export interface TableIndexConfiguration extends Anything {
+  show?: boolean; // default: true
+  name?: string;
+  subHeader?: string;
+  subHeaderClass?: string;
+  rowIndexType?: any;
+  rowIndexPattern?: any;
+}
+
 export interface Configs extends Anything {
   columns: TableColumnConfigurations[];
-  rowGroups?: any;
+  rowGroups?: {
+    groupBy?: string,
+    name?: any,
+    indexType?: string,
+    indexPattern?: any,
+  }[];
   columnGroups?: any;
-  index?: {
-    name?: string;
-    show?: boolean; // default: true
-    rowIndexType?: any;
-    rowIndexPattern?: any;
-  };
+  index?: TableIndexConfiguration;
   actions?: TableActionConfiguration[];
 }
 
@@ -71,6 +82,7 @@ export class TableConfigurations {
   public readonly states: Configs;
 
   public readonly hiddenActions = new Map();
+  public hasSubHeader = false;
 
   private _cd: ChangeDetectorRef;
   private _headerCd: ChangeDetectorRef;
@@ -127,6 +139,9 @@ export class TableConfigurations {
     const mergedConfigs: Configs | any = {};
 
     mergedConfigs.columns = initialConfig.columns.map(col => {
+      if (col.subHeader) {
+        this.hasSubHeader = true;
+      }
       return Object.assign({...DEFAULT_CONFIGS.column}, col);
     });
 

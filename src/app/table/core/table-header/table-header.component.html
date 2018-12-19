@@ -8,9 +8,12 @@
   </ng-container>
 </tr>
 
-<tr *ngIf="subHeaders">
-  <td *ngIf="withIndex">1</td>
-  <td [class]="class" *ngFor="let sub of subHeaders; let i = index">
-    <div [id]="'subheader-' + prop ">{{ sub }}</div>
-  </td>
+<tr *ngIf="configurations.hasSubHeader">
+  <th *ngIf="withIndex" [class]="configurations.states.index.subHeaderClass">
+    {{ configurations.states.index.subHeader }}
+  </th>
+  <th *ngFor="let sub of subHeaders; let i = index"
+      [class]="sub.class">
+    <div>{{ sub.name }}</div>
+  </th>
 </tr>

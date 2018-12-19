@@ -21,24 +21,29 @@ type Group = {
   styleUrls: ['./table-header.component.scss']
 })
 export class TableHeaderComponent implements OnInit {
-  @Input() subHeaders;
   @Input() withIndex;
-
   @Input() withActions;
-  @Input() actions: any[];
 
+  @Input() actions: any[];
   @Input() class;
+
   @Input() prop;
   @Input() indexClass;
-
   @Input() configurations: TableConfigurations;
 
   public headers;
+  public subHeaders;
+
 
   constructor(public domSanitizer: DomSanitizer) { }
 
   ngOnInit() {
     this.headers = this.buildHeaders();
+
+    if (this.configurations.hasSubHeader) {
+      this.subHeaders = this.buildSubHeaders();
+    }
+
     this.watchConfigsChanges();
   }
 
@@ -199,7 +204,16 @@ export class TableHeaderComponent implements OnInit {
 
   private buildSubHeaders () {
     const descriptors = this.configurations.states.columns;
-    return descriptors.map(descriptor => descriptor.subHeader || '');
+    let subHeaders = descriptors.map(descriptor => ({
+      name: descriptor.subHeader || '',
+      class: descriptor.subHeaderClass || ''
+    }));
+
+    if (this.withActions) {
+      subHeaders = subHeaders.concat(this.actions.map(() => ({name: '', class: ''})));
+    }
+
+    return subHeaders;
   }
 
   private watchConfigsChanges() {

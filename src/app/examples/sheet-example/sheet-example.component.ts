@@ -50,6 +50,7 @@ export class SheetExampleComponent implements OnInit {
         headerClass: 'hello2',
         dataClass: 'hello',
         subHeader: '(1)',
+        subHeaderClass: 'subHeaderClass',
       },
       {
         prop: 'col1',
@@ -94,25 +95,25 @@ export class SheetExampleComponent implements OnInit {
         dataType: 'date'
       },
     ],
-    // rowGroups: [
-    //   {
-    //     groupBy: 'belongsTo',
-    //     name: (firstRowData) => firstRowData.name, // Optional
-    //     indexType: 'romanNumeral',
-    //   },
-    //   {
-    //     groupBy: 'sameId',
-    //     name: (firstRowData) => firstRowData.name2, // Optional
-    //     // indexPattern: (currentIndex, {parentIndex, parentText}) => {}, // Optional,
-    //   },
-    //   {
-    //     groupBy: 'sameId2',
-    //     name: (firstRowData) => firstRowData.name3, // Optional
-    //     indexPattern: (currentIndex, {parentIndex, parentText}) => {
-    //       return parentText + `.${currentIndex + 1}`;
-    //     }
-    //   }
-    // ],
+    rowGroups: [
+      {
+        groupBy: 'belongsTo',
+        name: (firstRowData) => firstRowData.name, // Optional
+        indexType: 'romanNumeral',
+      },
+      {
+        groupBy: 'sameId',
+        name: (firstRowData) => firstRowData.name2, // Optional
+        // indexPattern: (currentIndex, {parentIndex, parentText}) => {}, // Optional,
+      },
+      {
+        groupBy: 'sameId2',
+        name: (firstRowData) => firstRowData.name3, // Optional
+        indexPattern: (currentIndex, {parentIndex, parentText}) => {
+          return parentText + `.${currentIndex + 1}`;
+        }
+      }
+    ],
     columnGroups: [
       {
         groupName: 'Hello world',
@@ -131,7 +132,9 @@ export class SheetExampleComponent implements OnInit {
       }
     ],
     index: {
-      show: false,
+      show: true,
+      subHeader: 'indexSubheader',
+      subHeaderClass: 'indexSubheaderClass',
       // rowIndexPattern: (currentIndex, {parentIndex, parentText}) => {
       //   return parentText + `.${currentIndex + 1}`;
       // },
