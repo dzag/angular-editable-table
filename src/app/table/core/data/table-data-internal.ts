@@ -19,20 +19,23 @@ export interface CellData {
 }
 
 export class TableDataInternal {
+  public isGroup = false;
+  public isSimple = false;
 
   public data: CellData[][] = [];
   public groupData;
 
   public readonly columnConfigs: TableColumnConfigurations[];
-  private internalData;
-
   public readonly initialData: any[];
-
   public readonly deleted = [];
+
+  private internalData;
 
   constructor (private readonly configs: TableConfigurations,
                private readonly tableData: TableData,
   ) {
+    this.isGroup = this.configs.states.rowGroups && this.configs.states.rowGroups.length > 0;
+    this.isSimple = !this.isGroup;
     this.columnConfigs = configs.states.columns;
     this.initialData = cloneDeep(tableData.initialData);
     this.internalData = cloneDeep(tableData.initialData);
@@ -114,8 +117,8 @@ export class TableDataInternal {
     if (!data) {
       return;
     }
-    const isGroup = rowGroups && rowGroups.length > 0;
-    if (isGroup) {
+
+    if (this.isGroup) {
       const _rowGroups = this.buildGroupedRows(data, columnConfigs, rowGroups);
       this.groupData = this.buildGroupData(_rowGroups);
       return;

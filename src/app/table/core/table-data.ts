@@ -6,12 +6,7 @@ export class TableData {
 
   private _dataService: TableDataService;
 
-  constructor (public initialData) {
-  }
-
-  setData(data) {
-    this.initialData = data;
-  }
+  constructor (public initialData = []) {}
 
   getDataSnapshot(): Observable<any[]> {
     return returnOutside(() => {

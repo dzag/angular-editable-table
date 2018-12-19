@@ -34,15 +34,13 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   set data (value: TableData) {
-    this._data = value;
-    this.tableDataInternal = new TableDataInternal(this.configurations, value);
-    this._dataService.tableDataInternal = this.tableDataInternal;
+    this._data = value || new TableData();
+    this.patchTableData(this._data);
+    this._dataService.setTableData(this.configurations, this._data);
   }
 
   public readonly words = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
     'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-
-  public tableDataInternal: TableDataInternal;
 
   private _data: TableData;
 
@@ -54,7 +52,6 @@ export class TableComponent implements OnInit, OnDestroy {
 
   ngOnInit () {
     this.patchConfigs();
-    this._data['_dataService'] = this._dataService;
   }
 
   ngOnDestroy (): void {}
@@ -70,11 +67,11 @@ export class TableComponent implements OnInit, OnDestroy {
   getRowIndex(currentIndex, parent: any = {}) {
     const indexConfigs = this.configurations.states.index;
 
-    if (indexConfigs && indexConfigs.rowIndexPattern ) {
+    if (indexConfigs.rowIndexPattern) {
       return indexConfigs.rowIndexPattern(currentIndex, parent);
     }
 
-    if (indexConfigs && indexConfigs.rowIndexType === 'romanNumeral') {
+    if (indexConfigs.rowIndexType === 'romanNumeral') {
       return romanize(currentIndex);
     }
 
@@ -91,6 +88,10 @@ export class TableComponent implements OnInit, OnDestroy {
 
     // TODO: implement this
     return [];
+  }
+
+  get tableDataInternal() {
+    return this._dataService.tableDataInternal;
   }
 
   get configs() {
@@ -118,11 +119,6 @@ export class TableComponent implements OnInit, OnDestroy {
     return Array(totalLength).fill(null);
   }
 
-  private patchConfigs () {
-    const configs: any = this.configurations;
-    configs.cd = this._cd;
-  }
-
   onActionClicked (index, actionType, rowIndex, group) {
     this.configs.actions[index].clicked({
       type: actionType,
@@ -130,5 +126,14 @@ export class TableComponent implements OnInit, OnDestroy {
       rowIndex: rowIndex,
       group,
     });
+  }
+
+  private patchConfigs () {
+    const configs: any = this.configurations;
+    configs['_cd'] = this._cd;
+  }
+
+  private patchTableData(data: TableData) {
+    data['_dataService'] = this._dataService;
   }
 }

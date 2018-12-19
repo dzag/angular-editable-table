@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { random } from 'lodash';
-import { ColumnDescriptor, TableData } from '../../table';
+import { TableData } from '../../table';
 import { TableConfigurations } from '../../table/core/table-configurations';
 
 const nameMapper = {
@@ -30,7 +30,7 @@ const name3Mapper = {
 })
 export class SheetExampleComponent implements OnInit {
 
-  data;
+  data = new TableData();
 
   formulas = {
     all: [
@@ -93,25 +93,25 @@ export class SheetExampleComponent implements OnInit {
         dataType: 'date'
       },
     ],
-    rowGroups: [
-      {
-        groupBy: 'belongsTo',
-        name: (firstRowData) => firstRowData.name, // Optional
-        indexType: 'romanNumeral',
-      },
-      {
-        groupBy: 'sameId',
-        name: (firstRowData) => firstRowData.name2, // Optional
-        // indexPattern: (currentIndex, {parentIndex, parentText}) => {}, // Optional,
-      },
-      {
-        groupBy: 'sameId2',
-        name: (firstRowData) => firstRowData.name3, // Optional
-        indexPattern: (currentIndex, {parentIndex, parentText}) => {
-          return parentText + `.${currentIndex + 1}`;
-        }
-      }
-    ],
+    // rowGroups: [
+    //   {
+    //     groupBy: 'belongsTo',
+    //     name: (firstRowData) => firstRowData.name, // Optional
+    //     indexType: 'romanNumeral',
+    //   },
+    //   {
+    //     groupBy: 'sameId',
+    //     name: (firstRowData) => firstRowData.name2, // Optional
+    //     // indexPattern: (currentIndex, {parentIndex, parentText}) => {}, // Optional,
+    //   },
+    //   {
+    //     groupBy: 'sameId2',
+    //     name: (firstRowData) => firstRowData.name3, // Optional
+    //     indexPattern: (currentIndex, {parentIndex, parentText}) => {
+    //       return parentText + `.${currentIndex + 1}`;
+    //     }
+    //   }
+    // ],
     index: {
       show: true,
       // rowIndexPattern: (currentIndex, {parentIndex, parentText}) => {
@@ -119,6 +119,26 @@ export class SheetExampleComponent implements OnInit {
       // },
     },
     actions: [
+      {
+        show: true,
+        name: 'Actions2',
+        types: {
+          edit: {
+            icon: '',
+            name: 'Edit',
+          },
+          download: {
+            icon: '',
+            name: 'Download',
+          }
+        },
+        actionsOnRow: (row, actionTypes) => {
+          return ['edit', 'download'];
+        },
+        clicked: ({type, row}) => {
+          console.log(type, row);
+        }
+      },
       {
         show: true,
         name: 'Actions',
@@ -141,34 +161,14 @@ export class SheetExampleComponent implements OnInit {
           console.log(this.data.deleted);
         }
       },
-      {
-        show: true,
-        name: 'Actions2',
-        types: {
-          edit: {
-            icon: '',
-            name: 'Edit',
-          },
-          download: {
-            icon: '',
-            name: 'Download',
-          }
-        },
-        actionsOnRow: (row, actionTypes) => {
-          return ['edit', 'download'];
-        },
-        clicked: ({type, row}) => {
-          console.log(type, row);
-        }
-      },
     ],
   });
 
   constructor () { }
 
   ngOnInit () {
-    this.data = new TableData(
-      Array(50).fill(null).map((value, index) => (() => {
+    setTimeout(() => {
+      this.data = new TableData(Array(50).fill(null).map((value, index) => (() => {
         const id = random(1, 5);
         const subId = random(1, 3);
         const subId2 = random(1, 3);
@@ -192,10 +192,8 @@ export class SheetExampleComponent implements OnInit {
           col7: random(100000000, 1000000000),
           col8: randomDate()
         };
-      })())
-    );
-    console.log(this.data);
-    this.configs.renameColumn(0, `hello <span style="color: red">2</span>`);
+      })()));
+    }, 1000);
   }
 
 }
