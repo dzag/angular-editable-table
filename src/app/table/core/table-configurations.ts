@@ -100,7 +100,8 @@ export class TableConfigurations {
       : undefined;
 
     if (detector) {
-      return detector.detectChanges();
+      detector.markForCheck();
+      return;
     }
 
     Promise.resolve().then(() => {
