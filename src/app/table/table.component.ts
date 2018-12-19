@@ -106,12 +106,12 @@ export class TableComponent implements OnInit, OnDestroy {
     return this.configurations.states.actions.length > 0;
   }
 
-  get actionsHeader() {
+  get actions() {
     if (!this.showActions) {
       return [];
     }
 
-    return this.configurations.states.actions.map(a => a.name);
+    return this.configs.actions || [];
   }
 
   get groupColumns() {
@@ -125,6 +125,7 @@ export class TableComponent implements OnInit, OnDestroy {
       row: this._dataService.getRow(rowIndex, group),
       rowIndex: rowIndex,
       group,
+      tableData: this.data,
     });
   }
 

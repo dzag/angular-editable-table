@@ -1,3 +1,5 @@
+import { TableData } from './table-data';
+
 export type InputType = 'text' | 'textarea' | 'select' | 'date' | 'buttons' | 'link' | 'checkbox' | 'number' | 'currency';
 
 export type TableButton = 'edit' | 'delete' | 'search' | 'download';
@@ -28,4 +30,12 @@ export interface ColumnGroup<T> {
   groupName: string;
   props: Array<keyof T>;
   subGroups?: ColumnGroup<T>[];
+}
+
+export interface ActionEvent {
+  type: string;
+  row: any;
+  rowIndex: number;
+  tableData: TableData;
+  group?: any;
 }

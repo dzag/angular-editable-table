@@ -3,7 +3,7 @@
     <thead table-header
            [configurations]="configurations"
            [withIndex]="showIndex"
-           [withActions]="showActions" [actionsHeader]="actionsHeader"></thead>
+           [withActions]="showActions" [actions]="actions"></thead>
     <tbody>
     <ng-container *ngIf="tableDataInternal.isSimple">
         <tr *ngFor="let row of tableDataInternal.data; let rowIndex = index; trackBy: trackByIndex">

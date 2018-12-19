@@ -14,8 +14,8 @@ export class TableData {
     });
   }
 
-  delete(index, group?) {
-    this._dataService.deleteRow(index, group);
+  delete(rowIndex, group?) {
+    this._dataService.deleteRow(rowIndex, group);
   }
 
   get deleted() {

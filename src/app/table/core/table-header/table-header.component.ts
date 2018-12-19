@@ -3,6 +3,7 @@ import { buildPropToPathMap, depth as getDepth, emptyArrays, getPath, insertAt, 
 import { get, last } from 'lodash';
 import { TableConfigurations } from '../table-configurations';
 import { DomSanitizer } from '@angular/platform-browser';
+import { filter } from 'rxjs/operators';
 
 type RowSpan = number;
 type ColSpan = number;
@@ -24,7 +25,7 @@ export class TableHeaderComponent implements OnInit {
   @Input() withIndex;
 
   @Input() withActions;
-  @Input() actionsHeader: string[] = [];
+  @Input() actions: any[];
 
   @Input() class;
   @Input() prop;
@@ -62,9 +63,9 @@ export class TableHeaderComponent implements OnInit {
         headers.unshift([this.indexName, this.indexClass, 1, 1]);
       }
 
-      if (this.withActions && this.actionsHeader.length > 0) {
-        this.actionsHeader.forEach(h => {
-          headers.push([h, '', 1, 1]);
+      if (this.withActions && this.actions.length > 0) {
+        this.actions.forEach(action => {
+          headers.push([action.name, action.class || [], 1, 1]);
         });
       }
 
@@ -90,7 +91,7 @@ export class TableHeaderComponent implements OnInit {
 
     for (const descriptor of columnConfigs) {
       const hasDescriptorsProp = propToGroupIndexMap.hasOwnProperty(descriptor.prop);
-      const objectToAdd = {name: descriptor.name || '', class: descriptor.headerClass};
+      const objectToAdd = {name: descriptor.name || '', class: descriptor.headerClass || ''};
       if (hasDescriptorsProp) {
         const simplePath = propToGroupIndexMap[descriptor.prop];
         const isSubgroup = simplePath.indexOf('.') >= 0;
@@ -149,7 +150,8 @@ export class TableHeaderComponent implements OnInit {
         const propsLength = theGroup.subGroups
           ? totalSubGroupProps(theGroup.subGroups) + theGroup.props.length
           : theGroup.props.length;
-        groupTuple[deepLevel - 1].push([theGroup.groupName, '', 1, propsLength]);
+        const groupName = this.domSanitizer.bypassSecurityTrustHtml(theGroup.groupName);
+        groupTuple[deepLevel - 1].push([groupName, theGroup.groupClass || '', 1, propsLength]);
         pushEmptyArrays(groupTuple[deepLevel - 1], propsLength - 1);
       }
       _groups.forEach((group) => {
@@ -179,11 +181,11 @@ export class TableHeaderComponent implements OnInit {
       });
     }
 
-    if (this.withActions && this.actionsHeader.length > 0) {
+    if (this.withActions && this.actions.length > 0) {
       groupTuple.forEach((group, index) => {
-        const toPrepend = this.actionsHeader.map(h => {
+        const toPrepend = this.actions.map(action => {
            if (index === 0) {
-             return [h, '', depth, 1];
+             return [action.name, action.class || '', depth, 1];
            }
            return [];
          }
@@ -201,7 +203,7 @@ export class TableHeaderComponent implements OnInit {
   }
 
   private watchConfigsChanges() {
-    this.configurations['changeObs'].subscribe(() => {
+    (this.configurations as any)['changeObs'].pipe(filter(t => t === 'header')).subscribe(() => {
       this.headers = this.buildHeaders();
     });
   }

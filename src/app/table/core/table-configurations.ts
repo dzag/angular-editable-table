@@ -2,15 +2,18 @@ import { ChangeDetectorRef } from '@angular/core';
 import { set, cloneDeep, merge } from 'lodash';
 import { Subject } from 'rxjs';
 import * as deepMerge from 'deepmerge';
+import { ActionEvent } from './table.models';
 
 interface ConfigSetterOptions {
   detect?: boolean;
   emmitEvent?: boolean;
+  type?: string;
 }
 
 const defaultSetterOptions: ConfigSetterOptions = {
   detect: true,
   emmitEvent: true,
+  type: 'table'
 };
 
 export interface Anything {
@@ -42,11 +45,12 @@ export interface Configs extends Anything {
     rowIndexPattern?: any;
   };
   actions?: {
-    show?: boolean,
+    show?: boolean, // default: false
     name?: string;
+    class?: string;
     types?: any,
     actionsOnRow?: any,
-    clicked?: any
+    clicked?: (actionEvent: ActionEvent) => void
   }[];
 }
 
@@ -76,7 +80,16 @@ export class TableConfigurations {
 
   // -- columns configs
   renameColumn(columnIndex: number, newName: string) {
-    this.set(`columns[${columnIndex}].name`, newName);
+    this.set(`columns[${columnIndex}].name`, newName, {
+      type: 'header'
+    });
+  }
+
+  // -- columns groups
+  renameGroup(path: string, newName: string, upLevel = 1) {
+    this.set('columnGroups' + path, newName, {
+      type: 'header'
+    });
   }
 
   // -- actions configs
@@ -90,7 +103,7 @@ export class TableConfigurations {
     }
 
     if (options.emmitEvent) {
-      this.changes.next();
+      this.changes.next(options.type);
     }
   }
 

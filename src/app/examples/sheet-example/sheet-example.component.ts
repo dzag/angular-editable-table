@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { random } from 'lodash';
-import { TableData } from '../../table';
+import { ActionEvent, TableData } from '../../table';
 import { TableConfigurations } from '../../table/core/table-configurations';
 
 const nameMapper = {
@@ -47,6 +47,7 @@ export class SheetExampleComponent implements OnInit {
         prop: 'total',
         name: 'Total',
         dataType: 'currency',
+        headerClass: 'hello2',
         dataClass: 'hello',
         subHeader: '(1)',
       },
@@ -112,8 +113,25 @@ export class SheetExampleComponent implements OnInit {
     //     }
     //   }
     // ],
+    columnGroups: [
+      {
+        groupName: 'Hello world',
+        groupClass: 'first-class',
+        props: ['col1', 'col2'],
+        subGroups: [
+          {
+            groupName: 'Subgroup 1',
+            props: ['col3', 'col4'],
+          },
+          {
+            groupName: 'Subgroup 2',
+            props: ['col5', 'col6'],
+          }
+        ]
+      }
+    ],
     index: {
-      show: true,
+      show: false,
       // rowIndexPattern: (currentIndex, {parentIndex, parentText}) => {
       //   return parentText + `.${currentIndex + 1}`;
       // },
@@ -122,6 +140,7 @@ export class SheetExampleComponent implements OnInit {
       {
         show: true,
         name: 'Actions2',
+        class: 'class-actions-2',
         types: {
           edit: {
             icon: '',
@@ -135,9 +154,7 @@ export class SheetExampleComponent implements OnInit {
         actionsOnRow: (row, actionTypes) => {
           return ['edit', 'download'];
         },
-        clicked: ({type, row}) => {
-          console.log(type, row);
-        }
+        clicked: this.onTableButtonsClicked.bind(this),
       },
       {
         show: true,
@@ -155,28 +172,8 @@ export class SheetExampleComponent implements OnInit {
         actionsOnRow: (row, actionTypes) => {
           return ['edit', 'download'];
         },
-        clicked: ({type, row, rowIndex, group}) => {
-          console.log(type, row, rowIndex);
-          this.data.delete(rowIndex, group);
-          console.log(this.data.deleted);
-        }
+        clicked: this.onTableButtonsClicked.bind(this)
       },
-    ],
-    columnGroups: [
-      {
-        groupName: 'Hello world',
-        props: ['col1', 'col2'],
-        subGroups: [
-          {
-            groupName: 'Subgroup 1',
-            props: ['col3', 'col4'],
-          },
-          {
-            groupName: 'Subgroup 2',
-            props: ['col5', 'col6'],
-          }
-        ]
-      }
     ],
   });
 
@@ -210,6 +207,18 @@ export class SheetExampleComponent implements OnInit {
         };
       })()));
     }, 1000);
+
+    setTimeout(() => {
+      this.configs.renameGroup('[0].groupName', 'What this <span style="color: red">123</span>?');
+    }, 2000);
+
+    setTimeout(() => {
+      this.configs.renameColumn(0, 'What this <span style="color: red">123</span>?');
+    }, 3000);
+  }
+
+  onTableButtonsClicked({type, row, rowIndex, group, tableData}: ActionEvent) {
+    tableData.delete(rowIndex, group);
   }
 
 }
