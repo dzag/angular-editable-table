@@ -67,7 +67,14 @@ export class SheetExampleComponent implements OnInit {
       {
         prop: 'col3',
         name: 'Col 3',
-        dataType: 'currency'
+        dataType: 'select',
+        editable: true,
+        options: [
+          {id: 1, value: 'hello 1'},
+          {id: 2, value: 'hello 2'},
+          {id: 3, value: 'hello 3'},
+          {id: 4, value: 'hello 4'},
+        ]
       },
       {
         prop: 'col4',
@@ -188,7 +195,7 @@ export class SheetExampleComponent implements OnInit {
           name3: name3Mapper[subId2],
           col1: random(100000000, 1000000000),
           col2: random(100000000, 1000000000),
-          col3: random(100000000, 1000000000),
+          col3: random(1, 4),
           col4: random(100000000, 1000000000),
           col5: random(100000000, 1000000000),
           col6: random(100000000, 1000000000),

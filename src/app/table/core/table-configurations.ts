@@ -148,7 +148,12 @@ export class TableConfigurations {
       if (col.subHeader) {
         this.hasSubHeader = true;
       }
-      return Object.assign({...DEFAULT_CONFIGS.column}, col);
+      const newCol = Object.assign({...DEFAULT_CONFIGS.column}, col);
+      if (newCol.options) {
+        newCol['$$options'] = this.doCacheOptions(newCol.options);
+      }
+
+      return newCol;
     });
 
     if (initialConfig.columnGroups) {
@@ -166,6 +171,13 @@ export class TableConfigurations {
     });
 
     return mergedConfigs;
+  }
+
+  private doCacheOptions(options) {
+    return options.reduce((prev, current) => {
+      prev[current.id] = current.value;
+      return prev;
+    }, {});
   }
 
   private set(path: string, value, options?: ConfigSetterOptions) {

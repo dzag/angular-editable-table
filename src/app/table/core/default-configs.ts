@@ -2,7 +2,10 @@ import { TableActionConfiguration, TableColumnConfigurations } from './table-con
 import { tableActions } from './table-actions';
 
 export const DEFAULT_CONFIGS = {
-  column: {} as TableColumnConfigurations,
+  column: {
+    dataType: 'text',
+    editable: false,
+  } as Partial<TableColumnConfigurations>,
   action: {
     show: true,
     types: tableActions,
