@@ -162,6 +162,22 @@ export class SheetExampleComponent implements OnInit {
         }
       },
     ],
+    columnGroups: [
+      {
+        groupName: 'Hello world',
+        props: ['col1', 'col2'],
+        subGroups: [
+          {
+            groupName: 'Subgroup 1',
+            props: ['col3', 'col4'],
+          },
+          {
+            groupName: 'Subgroup 2',
+            props: ['col5', 'col6'],
+          }
+        ]
+      }
+    ],
   });
 
   constructor () { }
