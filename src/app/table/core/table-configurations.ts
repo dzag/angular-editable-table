@@ -1,5 +1,5 @@
 import { ChangeDetectorRef } from '@angular/core';
-import { set, cloneDeep, merge } from 'lodash';
+import { set, cloneDeep, merge, isNil } from 'lodash';
 import { Subject } from 'rxjs';
 import { ActionEvent } from './table.models';
 import { DEFAULT_CONFIGS } from './default-configs';
@@ -149,8 +149,13 @@ export class TableConfigurations {
         this.hasSubHeader = true;
       }
       const newCol = Object.assign({...DEFAULT_CONFIGS.column}, col);
-      if (newCol.options) {
+
+      if (newCol.dataType === 'select' && newCol.options) {
         newCol['$$options'] = this.doCacheOptions(newCol.options);
+      }
+
+      if (newCol.dataType === 'link' && newCol.link) {
+        newCol.useRouter = isNil(col.useRouter) ? false : col.useRouter;
       }
 
       return newCol;

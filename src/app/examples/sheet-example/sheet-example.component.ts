@@ -79,7 +79,11 @@ export class SheetExampleComponent implements OnInit {
       {
         prop: 'col4',
         name: 'Col 4',
-        dataType: 'currency'
+        dataType: 'link',
+        link: (row) => {
+          return 'test' + row.belongsTo;
+        },
+        useRouter: true,
       },
       {
         prop: 'col5',
