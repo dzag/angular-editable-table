@@ -2,7 +2,7 @@
   <ng-container *ngIf="active">
     <common-input [formControl]="formControl"
                   [type]="columnConfigs.dataType"
-                  [data]="{ 'options': columnConfigs.options }"
+                  [data]="{ 'options': options }"
                   (keyup.out-zone)="onKeyUp($event)"
                   stopPropagation
     ></common-input>

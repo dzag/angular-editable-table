@@ -74,7 +74,14 @@ export class SheetExampleComponent implements OnInit {
           {id: 2, value: 'hello 2'},
           {id: 3, value: 'hello 3'},
           {id: 4, value: 'hello 4'},
-        ]
+        ],
+        partialOptions(row) {
+          if (row.belongsTo < 3) {
+            return [1, 2];
+          }
+
+          return [3, 4];
+        }
       },
       {
         prop: 'col4',
@@ -182,7 +189,7 @@ export class SheetExampleComponent implements OnInit {
   ngOnInit () {
     this.configs.hideActionType('edit');
     setTimeout(() => {
-      this.data = new TableData(Array(50).fill(null).map((value, index) => (() => {
+      this.data = new TableData(Array(100).fill(null).map((value, index) => (() => {
         const id = random(1, 5);
         const subId = random(1, 3);
         const subId2 = random(1, 3);
@@ -199,7 +206,7 @@ export class SheetExampleComponent implements OnInit {
           name3: name3Mapper[subId2],
           col1: random(100000000, 1000000000),
           col2: random(100000000, 1000000000),
-          col3: random(1, 4),
+          col3: id < 3 ? random(1, 2) : random(3, 4),
           col4: random(100000000, 1000000000),
           col5: random(100000000, 1000000000),
           col6: random(100000000, 1000000000),

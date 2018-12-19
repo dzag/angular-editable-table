@@ -30,6 +30,7 @@ export interface TableColumnConfigurations extends Anything {
   subHeader?: string;
   subHeaderClass?: string;
   options?: any[]; // for select dataType
+  partialOptions?: any;
   link?: any; // for link dataType
   useRouter?: boolean; // for link dataType
   map?: Function;
@@ -150,7 +151,7 @@ export class TableConfigurations {
       }
       const newCol = Object.assign({...DEFAULT_CONFIGS.column}, col);
 
-      if (newCol.dataType === 'select' && newCol.options) {
+      if (newCol.options) {
         newCol['$$options'] = this.doCacheOptions(newCol.options);
       }
 

@@ -1,12 +1,13 @@
 /* tslint:disable:component-selector */
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { TableDataService } from '../data/table-data.service';
 import { createAddress } from './cell-manager.utils';
 import { CellManager } from './cell-manager.service';
 import { CellService } from './cell.service';
 import { TableColumnConfigurations } from '../table-configurations';
-import { Subject, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
+import { intersectionBy } from 'lodash';
 
 const words = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
   'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
@@ -71,6 +72,20 @@ export class TableCellComponent implements OnInit, OnDestroy {
     }
 
     this._cellService.setActive(this);
+  }
+
+  get options() {
+    if (!this.columnConfigs.partialOptions) {
+      return this.columnConfigs.options;
+    }
+
+    const ids = this.columnConfigs.partialOptions(this.entireRow).map(i => ({id: i}));
+
+    return intersectionBy(this.columnConfigs.options, ids, 'id');
+  }
+
+  get entireRow() {
+    return this._dataService.getRow(this.row, this.group);
   }
 
   get address () {
