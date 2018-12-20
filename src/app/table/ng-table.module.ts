@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormContainerModule } from '../common-input/form-container.module';
-import { TableComponent } from './table.component';
+import { NgTableComponent } from './ng-table.component';
 import { DateToStringPipe, StringToDatePipe } from './core/pipes/date-pipes';
 import { VndCurrencyPipe } from './core/pipes/vnd-currency.pipe';
 import { PrependZeroPipe } from './core/pipes/prepend-zero.pipe';
@@ -38,7 +38,7 @@ const TABLE_IMPLEMENTS = [
 
 @NgModule({
   declarations: [
-    TableComponent,
+    NgTableComponent,
     ...TABLE_CORE,
     ...TABLE_IMPLEMENTS,
     ...PIPES,
@@ -51,7 +51,7 @@ const TABLE_IMPLEMENTS = [
     FormContainerModule,
   ],
   exports: [
-    TableComponent,
+    NgTableComponent,
   ]
 })
-export class TableModule {}
+export class NgTableModule {}

@@ -5,7 +5,7 @@ import { AppComponent } from './app.component';
 import { SheetExampleComponent } from './examples/sheet-example/sheet-example.component';
 import { AppRoutingModule } from './app-routing.module';
 import { FormContainerModule } from './common-input/form-container.module';
-import { TableModule } from './table';
+import { NgTableModule } from './table';
 import { CustomEventManager } from './custom-event-manager';
 
 @NgModule({
@@ -17,7 +17,7 @@ import { CustomEventManager } from './custom-event-manager';
     BrowserModule,
     AppRoutingModule,
     FormContainerModule,
-    TableModule,
+    NgTableModule,
   ],
   providers: [
     { provide: EventManager, useClass: CustomEventManager }

@@ -11,8 +11,8 @@ import { difference } from 'lodash';
 @Component({
   selector: 'ng-table',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './table.component.html',
-  styleUrls: ['./table.component.scss'],
+  templateUrl: './ng-table.component.html',
+  styleUrls: ['./ng-table.component.scss'],
   providers: [
     CellService,
     CellManager,
@@ -23,7 +23,7 @@ import { difference } from 'lodash';
     }
   ]
 })
-export class TableComponent implements OnInit, OnDestroy {
+export class NgTableComponent implements OnInit, OnDestroy {
 
   @Input() configurations: TableConfigurations;
   @Input() groupData: any[];
