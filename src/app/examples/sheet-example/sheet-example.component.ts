@@ -164,9 +164,9 @@ export class SheetExampleComponent implements OnInit {
       show: true,
       subHeader: 'indexSubheader',
       subHeaderClass: 'indexSubheaderClass',
-      // rowIndexPattern: (currentIndex, {parentIndex, parentText}) => {
-      //   return parentText + `.${currentIndex + 1}`;
-      // },
+      rowIndexPattern: (currentIndex, {parentIndex, parentText}) => {
+        return parentText + `.${currentIndex + 1}`;
+      },
     },
     actions: [
       {

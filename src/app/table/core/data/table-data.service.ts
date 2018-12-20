@@ -19,7 +19,7 @@ interface ValueSetterOptions {
 const defaultValueSetterOptions = {
   detect: true,
   emitEvent: true,
-  formulaCheck: true,
+  formulaCheck: false,
 };
 
 const getColumnFromSymbol = (symbol: string) => parseInt(symbol.substr(1), 10);
@@ -44,9 +44,7 @@ export class TableDataService {
   }
 
   setTableData (configurations: TableConfigurations, value: TableData) {
-    console.time('abc');
     this.tableDataInternal = new TableDataInternal(configurations, value);
-    console.timeEnd('abc');
   }
 
   setValue (row, col, group, value, options?: ValueSetterOptions) {
