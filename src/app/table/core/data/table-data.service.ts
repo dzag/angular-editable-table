@@ -53,7 +53,8 @@ export class TableDataService {
     this.tableDataInternal.setCell(row, col, group, {value});
 
     if (options.detect) {
-      this._cellManager.detectChanges({row, column: col});
+      // TODO: fix cell manager
+      // this._cellManager.detectChanges({row, column: col});
     }
 
     if (options.emitEvent) {
