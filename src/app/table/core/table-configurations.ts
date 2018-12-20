@@ -25,6 +25,7 @@ export interface TableColumnConfigurations extends Anything {
   name?: string;
   dataType: string;
   editable?: boolean;
+  editableWhen?: (row) => boolean;
   headerClass?: string;
   dataClass?: string;
   subHeader?: string;

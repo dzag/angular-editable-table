@@ -75,13 +75,6 @@ export class SheetExampleComponent implements OnInit {
           {id: 3, value: 'col 3-3'},
           {id: 4, value: 'col 3-4'},
         ],
-        partialOptions(row) {
-          if (row.belongsTo < 3) {
-            return [1, 2];
-          }
-
-          return [3, 4];
-        }
       },
       {
         prop: 'col4',
@@ -206,6 +199,12 @@ export class SheetExampleComponent implements OnInit {
 
   ngOnInit () {
     this.configs.hideActionType('edit');
+    this.configs.setOptions(5, [
+      {id: 1, value: 'col5 4'},
+      {id: 2, value: 'col5 5'},
+      {id: 3, value: 'col5 6'},
+      {id: 4, value: 'col5 7'}
+    ]);
 
     setTimeout(() => {
       this.data = new TableData(Array(100).fill(null).map((value, index) => (() => {
