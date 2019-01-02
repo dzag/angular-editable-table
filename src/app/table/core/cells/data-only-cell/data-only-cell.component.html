@@ -1,0 +1,18 @@
+<ng-container [ngSwitch]="columnConfigs.dataType">
+  <ng-container *ngSwitchCase="'select'">
+    {{ columnConfigs['$$options'][data] }}
+  </ng-container>
+  <ng-container *ngSwitchCase="'date'">
+    {{ data | dateToString }}
+  </ng-container>
+  <ng-container *ngSwitchCase="'link'">
+    <a class="text-link" *ngIf="columnConfigs.link && columnConfigs.useRouter" [routerLink]="cellData.url">{{ cellData.value }}</a>
+    <a class="text-link" *ngIf="columnConfigs.link && !columnConfigs.useRouter" [href]="cellData.url">{{ cellData.value }}</a>
+  </ng-container>
+  <ng-container *ngSwitchCase="'currency'">
+    {{ data | vnd }}
+  </ng-container>
+  <ng-container *ngSwitchDefault>
+    {{ data }}
+  </ng-container>
+</ng-container>

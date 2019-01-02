@@ -1,7 +1,7 @@
 import { cloneDeep, forEachRight, get, orderBy, repeat, set } from 'lodash';
 import { TableConfigurations } from '../table-configurations';
 import { TableColumnConfigurations, TableRowGroupsConfiguration } from '../table.models';
-import { extractParentKey, getCachedArray, groupByCriteria } from './row-grouping.utils';
+import { groupByCriteria, getCachedArray, extractParentKey } from './row-grouping.utils';
 import { getIndexFunction, mapToTableCells } from './table-data.utils';
 import { TableData } from '../table-data';
 
@@ -168,8 +168,10 @@ export class TableDataInternal {
     const groupedRows: { groupData: GroupData<DataWithMeta> , groupConfigs: TableRowGroupsConfiguration }[] = [];
     rowGroups.forEach((groupConfigs, groupIndex) => {
       if (groupIndex === 0) {
-        const groupData = groupByCriteria(data, groupConfigs.groupBy);
-        groupedRows.push({ groupConfigs, groupData });
+        groupedRows.push({
+          groupConfigs,
+          groupData: groupByCriteria(data, groupConfigs.groupBy)
+        });
         return;
       }
 
@@ -177,7 +179,7 @@ export class TableDataInternal {
       const parent = groupedRows[groupIndex - 1].groupData;
       Object.entries(parent)
         .map(([key, groupedParent]: [any, any]) => groupByCriteria(groupedParent, groupConfigs.groupBy, key))
-        .forEach(d => Object.assign(groupData, d)); // merge all props from object returned from doGroupFromCriteria into dataMap object
+        .forEach(d => Object.assign(groupData, d)); // merge all props from object returned from groupByCriteria into groupData object
       groupedRows.push({ groupConfigs, groupData });
     });
 

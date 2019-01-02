@@ -3,24 +3,7 @@
     <ng-container *ngTemplateOutlet="input"></ng-container>
   </ng-container>
   <ng-container *ngIf="!active">
-    <ng-container [ngSwitch]="columnConfigs.dataType">
-      <ng-container *ngSwitchCase="'select'">
-        {{ columnConfigs['$$options'][data] }}
-      </ng-container>
-      <ng-container *ngSwitchCase="'date'">
-        {{ data | dateToString }}
-      </ng-container>
-      <ng-container *ngSwitchCase="'link'">
-        <a class="text-link" *ngIf="columnConfigs.link && columnConfigs.useRouter" [routerLink]="cell.url">{{ cell.value }}</a>
-        <a class="text-link" *ngIf="columnConfigs.link && !columnConfigs.useRouter" [href]="cell.url">{{ cell.value }}</a>
-      </ng-container>
-      <ng-container *ngSwitchCase="'currency'">
-        {{ data | vnd }}
-      </ng-container>
-      <ng-container *ngSwitchDefault>
-        {{ data }}
-      </ng-container>
-    </ng-container>
+    <data-only-cell [columnConfigs]="columnConfigs" [cellData]="cell"></data-only-cell>
   </ng-container>
 </div>
 

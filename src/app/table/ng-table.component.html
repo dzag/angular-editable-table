@@ -93,23 +93,20 @@
   <!-- DATA RENDERING -->
   <ng-container *ngIf="group.data">
     <ng-container *ngFor="let row of group.data; let rowIndex = index; trackBy: trackByIndex">
-      <tr *ngIf="couldRenderRow(row)">
-        <td [class]="configs.index.class" *ngIf="showIndex">
-          {{
-          getRowIndex(rowIndex, {
-            parentIndex: groupIndex,
-            parentText: group.indexFn(groupIndex, { parentIndex: parentIndex, parentText: parentText })
-          })
-          }}
-        </td>
-        <ng-container *ngTemplateOutlet="cellTemplate; context: { row: row, rowIndex: rowIndex, group: group }">
-        </ng-container>
-        <ng-container *ngFor="let action of configs.actions; let actionIndex = index">
-          <ng-container
-              *ngTemplateOutlet="actionsTemplate; context: { rowIndex: rowIndex, group: group, index: actionIndex }">
-          </ng-container>
-        </ng-container>
-      </tr>
+      <tr table-row
+          *ngIf="couldRenderRow(row)"
+          [configs]="configurations"
+          [data]="data"
+          [isEditing]="isEditing"
+          [row]="row"
+          [rowIndex]="rowIndex"
+          [group]="group"
+          [groupIndex]="groupIndex"
+          [parentIndex]="parentIndex"
+          [parentText]="parentText"
+          [showIndex]="showIndex"
+          [showActions]="showActions"
+      ></tr>
     </ng-container>
   </ng-container>
   <!-- END DATA RENDERING -->
