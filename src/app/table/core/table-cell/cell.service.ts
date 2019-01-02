@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { FormControl } from '@angular/forms';
-import { distinctUntilChanged, filter, withLatestFrom } from 'rxjs/operators';
+import { distinctUntilChanged } from 'rxjs/operators';
 import { TableCellComponent } from './table-cell.component';
 import { TableDataService } from '../data/table-data.service';
 

@@ -1,13 +1,5 @@
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import {
-  buildPropToPathMap,
-  depth as getDepth,
-  emptyArrays,
-  getPath,
-  insertAt,
-  pushEmptyArrays,
-  totalSubGroupProps
-} from '../table.utils';
+import { buildPropToPathMap, depth as getDepth, emptyArrays, getPath, insertAt, pushEmptyArrays, totalSubGroupProps } from '../table.utils';
 import { get, last } from 'lodash';
 import { TableConfigurations } from '../table-configurations';
 import { DomSanitizer } from '@angular/platform-browser';

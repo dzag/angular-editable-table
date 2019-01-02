@@ -1,7 +1,7 @@
 import { cloneDeep, forEachRight, get, orderBy, repeat, set } from 'lodash';
 import { TableConfigurations } from '../table-configurations';
 import { TableColumnConfigurations, TableRowGroupsConfiguration } from '../table.models';
-import { groupByCriteria, getCachedArray, extractParentKey } from './row-grouping.utils';
+import { extractParentKey, getCachedArray, groupByCriteria } from './row-grouping.utils';
 import { getIndexFunction, mapToTableCells } from './table-data.utils';
 import { TableData } from '../table-data';
 

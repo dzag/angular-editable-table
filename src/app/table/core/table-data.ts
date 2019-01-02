@@ -1,5 +1,5 @@
 import { TableDataService } from './data/table-data.service';
-import { TableConfigurations } from '@app/ktnn/shared-component/ng-table/core/table-configurations';
+import { TableConfigurations } from './table-configurations';
 
 const removeMetaData = <T> (data: T[], idKey): Partial<T>[] => {
   return data.map((d: any) => {

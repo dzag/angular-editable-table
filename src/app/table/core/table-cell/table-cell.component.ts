@@ -1,14 +1,5 @@
 /* tslint:disable:component-selector */
-import {
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  HostBinding,
-  HostListener,
-  Input,
-  OnDestroy,
-  OnInit
-} from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostBinding, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { TableDataService } from '../data/table-data.service';
 import { createAddress } from './cell-manager.utils';

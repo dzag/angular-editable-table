@@ -1,10 +1,5 @@
 import { tableActions } from './table-actions';
-import {
-  TableActionConfiguration,
-  TableColumnConfigurations,
-  TableIndexConfiguration,
-  TableRowGroupsConfiguration
-} from './table.models';
+import { TableActionConfiguration, TableColumnConfigurations, TableIndexConfiguration, TableRowGroupsConfiguration } from './table.models';
 
 export const DEFAULT_CONFIGS = {
   column: {

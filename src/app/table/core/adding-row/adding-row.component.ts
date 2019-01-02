@@ -5,7 +5,6 @@ import { AddingCellService } from '../table-cell-for-adding/adding-cell.service'
 import { TableDataService } from '../data/table-data.service';
 import { TableConfigs } from '../table.models';
 import { TableData } from '../table-data';
-import { cloneDeep } from 'lodash';
 
 @Component({
   selector: '[adding-row]',

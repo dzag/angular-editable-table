@@ -22,7 +22,7 @@ import { FormMode } from '@app/core/interfaces/app/form-mode';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { distinctUntilChanged, pluck } from 'rxjs/operators';
 import { TableRowGroupActionsConfiguration, TableRowGroupsConfiguration } from './core/table.models';
-import { CellData, InternalGroupData } from './core/data/table-data-internal';
+import { CellData } from './core/data/table-data-internal';
 import { AddingCellService } from './core/table-cell-for-adding/adding-cell.service';
 import { AddingDataService } from './core/table-cell-for-adding/adding-data.service';
 
