@@ -1,86 +1,177 @@
-<div>
-  <table class="table-responsive table-bordered">
-    <thead table-header
-           [configurations]="configurations"
-           [withIndex]="showIndex"
-           [withActions]="showActions"
-           [actions]="actions"></thead>
-    <tbody>
-    <ng-container *ngIf="tableDataInternal.isSimple">
-        <tr *ngFor="let row of tableDataInternal.data; let rowIndex = index; trackBy: trackByIndex">
-          <td *ngIf="showIndex">{{ getRowIndex(rowIndex) }}</td>
-          <td *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex"
-              table-cell
-              #cell
-              [rowSpan]="cell['rowspan']"
-              [column]="colIndex"
-              [row]="rowIndex"
-              [columnWord]="words[colIndex]"
-              [wordAddress]="words[colIndex] + '.' + rowIndex"
-              [columnConfigs]="configurations.states.columns[colIndex]">
-          </td>
-          <ng-container *ngFor="let action of configs.actions; let actionIndex = index">
-            <ng-container *ngTemplateOutlet="actionsTemplate; context: { rowIndex: rowIndex, index: actionIndex }"></ng-container>
-          </ng-container>
-        </tr>
-    </ng-container>
-    <ng-container *ngIf="tableDataInternal.isGroup">
-      <ng-container *ngTemplateOutlet="groupTemplate; context: { rowGroups: tableDataInternal.groupData }"></ng-container>
-    </ng-container>
-    </tbody>
-  </table>
+<ng-template #content>
+  <div class="{{ class }} table-responsive">
+    <table class="table table-bordered">
+      <thead table-header
+             [configurations]="configurations"
+             [withIndex]="showIndex"
+             [withActions]="showActions"
+             [actions]="actions"></thead>
+      <!-- SIMPLE ROWS-->
+      <ng-container *ngIf="tableDataInternal.isSimple">
+        <tbody class="ng-table-body">
+          <tr *ngFor="let row of tableDataInternal.data; let rowIndex = index; trackBy: trackByIndex">
+            <td *ngIf="showIndex" [class]="configs.index.class">{{ getRowIndex(rowIndex) }}</td>
+            <ng-container *ngTemplateOutlet="cellTemplate; context: { row: row, rowIndex: rowIndex }">
+            </ng-container>
+            <ng-container *ngFor="let action of configs.actions; let actionIndex = index">
+              <ng-container *ngTemplateOutlet="actionsTemplate; context: { rowIndex: rowIndex, index: actionIndex }"></ng-container>
+            </ng-container>
+          </tr>
+          <tr class="ng-table-adding-row"
+              adding-row
+              [configs]="configs"
+              [data]="data"
+              *ngIf="configs.editing.enabled && configs.editing.allowAdding && isEditing">
+          </tr>
+        </tbody>
+      </ng-container>
+      <!-- END SIMPLE ROWS-->
+
+      <!-- GROUP ROWS -->
+      <ng-container *ngIf="tableDataInternal.isGroup">
+        <ng-container *ngTemplateOutlet="groupTemplate; context: { groups: tableDataInternal.groupData }"></ng-container>
+      </ng-container>
+      <!-- END GROUP ROWS -->
+    </table>
+  </div>
+</ng-template>
+
+<div *ngTemplateOutlet="wrapper, context: { content: content }">
 </div>
 
-<ng-template #groupTemplate let-rowGroups="rowGroups" let-parentIndex="parentIndex" let-parentText="parentText">
-  <ng-container *ngFor="let group of rowGroups; let groupIndex = index">
-    <tr>
-      <td>{{ group.indexFn(groupIndex, { parentIndex: parentIndex, parentText: parentText }) }}</td>
-      <ng-container *ngFor="let col of groupColumns; let colIndex = index">
-        <td>{{ colIndex === 0 ? group.name : '' }}</td>
+<!-- GROUP TEMPLATE -->
+<ng-template #groupTemplate let-groups="groups" let-parentIndex="parentIndex" let-parentText="parentText">
+  <ng-container *ngFor="let group of groups; let groupIndex = index">
+
+    <ng-container *ngIf="group.groupIndex === 0">
+      <tbody class="ng-table-body">
+      <ng-container *ngTemplateOutlet="groupContentTemplate;
+      context: { group: group, groupIndex: groupIndex, parentIndex: parentIndex, parentText: parentText }">
       </ng-container>
-    </tr>
-    <ng-container *ngIf="group.data">
-      <tr *ngFor="let row of group.data; let rowIndex = index; trackBy: trackByIndex">
-        <td *ngIf="showIndex">
-          {{ getRowIndex(rowIndex, {
-              parentIndex: groupIndex,
-              parentText: group.indexFn(groupIndex, { parentIndex: parentIndex, parentText: parentText })
-            })
-          }}
-        </td>
-        <td *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex"
-            table-cell
-            #cell
-            [column]="colIndex"
-            [row]="rowIndex"
-            [group]="group"
-            [columnWord]="words[colIndex]"
-            [wordAddress]="words[colIndex] + '.' + rowIndex"
-            [columnConfigs]="configurations.states.columns[colIndex]">
-        </td>
-        <ng-container *ngFor="let action of configs.actions; let actionIndex = index">
-          <ng-container *ngTemplateOutlet="actionsTemplate; context: { rowIndex: rowIndex, group: group, index: actionIndex }"></ng-container>
-        </ng-container>
-        <td>
-        </td>
-      </tr>
+      </tbody>
     </ng-container>
-    <ng-container *ngIf="group.subGroups">
-      <ng-container *ngTemplateOutlet="groupTemplate; context: {
-        rowGroups: group.subGroups,
-        parentIndex: groupIndex,
-        parentText: group.indexFn(groupIndex, { parentIndex: parentIndex, parentText: parentText })
-      }"></ng-container>
+
+    <ng-container *ngIf="group.groupIndex != 0">
+      <ng-container *ngTemplateOutlet="groupContentTemplate;
+      context: { group: group, groupIndex: groupIndex, parentIndex: parentIndex, parentText: parentText }">
+      </ng-container>
     </ng-container>
   </ng-container>
 </ng-template>
+<!-- END GROUP TEMPLATE -->
 
+<ng-template #groupContentTemplate
+             let-group="group"
+             let-groupIndex="groupIndex"
+             let-parentIndex="parentIndex"
+             let-parentText="parentText">
+  <!-- GROUP HEADER RENDERING -->
+  <tr class="group-level-{{ group.groupIndex + 1 }}">
+    <td class="group-index">{{ group.indexFn(groupIndex, { parentIndex: parentIndex, parentText: parentText }) }}</td>
+    <ng-container *ngFor="let col of group.columns; let colIndex = index; trackBy: trackByIndex">
+      <ng-container [ngSwitch]="col.type">
+        <ng-container *ngSwitchCase="'actions'">
+          <td class="{{ col.value.class }}">
+            <ng-container *ngFor="let action of col.value.static; let actionIndex = index">
+              <i class="{{ col.value.types[action].icon }} cursor-pointer icon icon-{{ action }} {{ actionIndex > 0 ? 'ml-2' : '' }}"
+                 (click.out-zone)="onGroupActionClicked(action, col.value, group)"
+                 data-placement="bottom"
+                 data-toggle="tooltip"
+                 stopPropagation
+                 title="{{ col.value.types[action].name }}">
+              </i>
+            </ng-container>
+          </td>
+        </ng-container>
+        <td *ngSwitchCase="'name'" [attr.colspan]="col.colspan" class="group-name">{{ col.value }}</td>
+        <td *ngSwitchDefault>{{ col.value }}</td>
+      </ng-container>
+    </ng-container>
+  </tr>
+  <!-- END GROUP HEADER RENDERING -->
+
+  <!-- DATA RENDERING -->
+  <ng-container *ngIf="group.data">
+    <ng-container *ngFor="let row of group.data; let rowIndex = index; trackBy: trackByIndex">
+      <tr *ngIf="couldRenderRow(row)">
+        <td [class]="configs.index.class" *ngIf="showIndex">
+          {{
+          getRowIndex(rowIndex, {
+            parentIndex: groupIndex,
+            parentText: group.indexFn(groupIndex, { parentIndex: parentIndex, parentText: parentText })
+          })
+          }}
+        </td>
+        <ng-container *ngTemplateOutlet="cellTemplate; context: { row: row, rowIndex: rowIndex, group: group }">
+        </ng-container>
+        <ng-container *ngFor="let action of configs.actions; let actionIndex = index">
+          <ng-container
+              *ngTemplateOutlet="actionsTemplate; context: { rowIndex: rowIndex, group: group, index: actionIndex }">
+          </ng-container>
+        </ng-container>
+      </tr>
+    </ng-container>
+  </ng-container>
+  <!-- END DATA RENDERING -->
+
+  <!-- RECURSIVE -->
+  <ng-container *ngIf="group.subGroups">
+    <ng-container *ngTemplateOutlet="groupTemplate; context: {
+        groups: group.subGroups,
+        parentIndex: groupIndex,
+        parentText: group.indexFn(groupIndex, { parentIndex: parentIndex, parentText: parentText })
+      }"></ng-container>
+  </ng-container>
+  <!-- END RECURSIVE -->
+</ng-template>
+
+<!-- ACTIONS TEMPLATE -->
 <ng-template #actionsTemplate let-rowIndex="rowIndex" let-group="group" let-index="index">
-  <td *ngIf="showActions">
-    <ng-container *ngFor="let action of getActions(index, rowIndex, group)">
-      <span (click.out-zone)="onActionClicked(index, action, rowIndex, group)">
-        {{ configs.actions[index].types[action].name }}
-      </span>
+  <td *ngIf="showActions" [class]="configs.actions[index].class">
+    <ng-container *ngFor="let action of getActions(index, rowIndex, group); let actionIndex = index">
+      <i class="{{ configs.actions[index].types[action].icon }} cursor-pointer icon icon-{{ action }} {{ actionIndex > 0 ? 'ml-2' : '' }}"
+         (click.out-zone)="onActionClicked(index, action, rowIndex, group)"
+         data-placement="bottom"
+         data-toggle="tooltip"
+         stopPropagation
+         title="{{ configs.actions[index].types[action].name }}">
+      </i>
     </ng-container>
   </td>
+</ng-template>
+<!-- END ACTIONS TEMPLATE -->
+
+<!-- CELL TEMPLATE -->
+<ng-template #cellTemplate let-row="row" let-rowIndex="rowIndex" let-group="group">
+  <td *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex"
+      table-cell
+      [readonly]="configs.editing.enabled ? !isEditing : true"
+      [column]="colIndex"
+      [row]="rowIndex"
+      [group]="group"
+      [columnWord]="words[colIndex]"
+      [wordAddress]="words[colIndex] + '.' + rowIndex"
+      [columnConfigs]="configurations.states.columns[colIndex]"
+  ></td>
+</ng-template>
+<!-- END CELL TEMPLATE -->
+
+<ng-template #wrapper let-content="content">
+  <ng-container *ngIf="configs.paging.enabled">
+    <pageable>
+      <table-metadata *ngIf="configs.paging.metadata"
+                      [totalItems]="configs.paging.totalRecords"
+                      [pageSize]="configs.paging.pageSize"
+                      (totalRecords)="onTotalRecordsChanged($event)"
+      ></table-metadata>
+
+      <ng-container [ngTemplateOutlet]="content"></ng-container>
+
+      <table-pagination (page)="onPageChanged($event)"
+                        [pageNumber]="configs.paging.pageNumber"></table-pagination>
+    </pageable>
+  </ng-container>
+  <ng-container *ngIf="!configs.paging.enabled">
+    <ng-container [ngTemplateOutlet]="content"></ng-container>
+  </ng-container>
 </ng-template>

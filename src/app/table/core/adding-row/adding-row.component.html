@@ -1,0 +1,12 @@
+<td class="text-center">
+  <i class="m-1 fa fa-plus icon icon-plus" (click)="onAddClick($event)"></i>
+</td>
+<ng-container *ngFor="let config of configs.columns; let colIndex = index; trackBy: trackByIndex">
+  <td table-cell-adding
+      #addingCell
+      [active]="isActiveCell(addingCell)"
+      [column]="colIndex"
+      [columnConfigs]="config"
+  ></td>
+</ng-container>
+<td *ngFor="let _ of configs.actions"></td>

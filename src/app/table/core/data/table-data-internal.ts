@@ -1,11 +1,32 @@
-import { cloneDeep, forEachRight, get, repeat, set } from 'lodash';
-import { TableColumnConfigurations, TableConfigurations } from '../table-configurations';
-import { doGroupFromCriteria, getCachedArray, getParentKey } from './row-grouping.utils';
+import { cloneDeep, forEachRight, get, orderBy, repeat, set } from 'lodash';
+import { TableConfigurations } from '../table-configurations';
+import { TableColumnConfigurations, TableRowGroupsConfiguration } from '../table.models';
+import { groupByCriteria, getCachedArray, extractParentKey } from './row-grouping.utils';
 import { getIndexFunction, mapToTableCells } from './table-data.utils';
 import { TableData } from '../table-data';
 
-export interface GroupData {
-  name: string;
+export interface GroupData<T> {
+  [p: string]: T[];
+}
+
+export interface DataWithMeta extends AnyKindOfData {
+  $$groupPath?: string;
+}
+
+export interface AnyKindOfData {
+  [p: string]: any;
+}
+
+export interface InternalGroupData {
+  indexFn?: Function;
+  originalData?: any[];
+  groupIndex?: number;
+  configs?: TableRowGroupsConfiguration;
+  name?: string;
+  path?: string;
+  data?: CellData[][];
+  columns?: any[];
+  subGroups?: InternalGroupData[];
 }
 
 const wordMapper = {
@@ -23,13 +44,13 @@ export class TableDataInternal {
   public isSimple = false;
 
   public data: CellData[][] = [];
-  public groupData;
+  public groupData: InternalGroupData[];
 
   public readonly columnConfigs: TableColumnConfigurations[];
   public readonly initialData: any[];
   public readonly deleted = [];
 
-  private internalData;
+  public readonly internalData: any[];
 
   constructor (private readonly configs: TableConfigurations,
                private readonly tableData: TableData,
@@ -49,6 +70,18 @@ export class TableDataInternal {
     }
 
     return this.internalData[row];
+  }
+
+  addRow(columnsConfigs: TableColumnConfigurations[], newRowData: any | any[], group?) {
+    if (group) {
+      return;
+    }
+
+    newRowData = Array.isArray(newRowData) ? newRowData : [newRowData];
+    const newRows = newRowData.map(row => mapToTableCells(columnsConfigs, row));
+    this.data = this.data.concat(newRows);
+    this.initialData.push(...newRowData);
+    this.internalData.push(...newRowData);
   }
 
   deleteRow (row, group?) {
@@ -131,83 +164,117 @@ export class TableDataInternal {
     return data.map(item => mapToTableCells(columnsConfigs, item));
   }
 
-  private buildGroupedRows<T> (data: Object[], columnConfigs: TableColumnConfigurations[], rowGroups?: any[]) {
-    const groupedRows = [];
-    rowGroups.forEach((group, groupIndex) => {
-      const criteria = group.groupBy;
+  private buildGroupedRows<T> (data: Object[], columnConfigs: TableColumnConfigurations[], rowGroups?: TableRowGroupsConfiguration[]) {
+    const groupedRows: { groupData: GroupData<DataWithMeta> , groupConfigs: TableRowGroupsConfiguration }[] = [];
+    rowGroups.forEach((groupConfigs, groupIndex) => {
       if (groupIndex === 0) {
-        const dataMap = doGroupFromCriteria(data, criteria);
-        groupedRows.push({
-          group,
-          dataMap
-        });
-      } else {
-        const parent = groupedRows[groupIndex - 1].dataMap;
-        const datas = [];
-        Object.entries(parent).forEach(([key, groupedParent]: [any, any]) => {
-          const dataMap = doGroupFromCriteria(groupedParent, criteria, key + '.');
-          datas.push(dataMap);
-        });
-        const final = {};
-        datas.forEach(d => Object.assign(final, d));
-        groupedRows.push({
-          group,
-          dataMap: final
-        });
+        const groupData = groupByCriteria(data, groupConfigs.groupBy);
+        groupedRows.push({ groupConfigs, groupData });
+        return;
       }
+
+      const groupData = {};
+      const parent = groupedRows[groupIndex - 1].groupData;
+      Object.entries(parent)
+        .map(([key, groupedParent]: [any, any]) => groupByCriteria(groupedParent, groupConfigs.groupBy, key))
+        .forEach(d => Object.assign(groupData, d)); // merge all props from object returned from doGroupFromCriteria into dataMap object
+      groupedRows.push({ groupConfigs, groupData });
     });
 
     const result = [];
     let prevGroupedRowsMap = {};
-    forEachRight(groupedRows, ({ dataMap, group }, index) => {
-      const groupIndex = index;
-      if (index === groupedRows.length - 1) {
-        Object.entries(dataMap).forEach(([k, v]: [string, any[]]) => {
-          const parentKey = getParentKey(k);
-          const toPush: any = {
-            indexFn: getIndexFunction(group),
-            originalData: v,
+    forEachRight(groupedRows, (groupRow, groupIndex) => {
+      const { groupData, groupConfigs } = groupRow;
+      if (groupIndex === groupedRows.length - 1) { // the last group
+        this.objectEntriesWithOrders(groupData, groupConfigs).forEach(([key, arrayOfData]: [string, any[]]) => {
+          const parentKey = extractParentKey(key);
+          const objectToPush: InternalGroupData = {
+            indexFn: getIndexFunction(groupConfigs),
+            originalData: arrayOfData,
             groupIndex,
-            name: group.name(v[0]),
-            data: v.map(item => mapToTableCells(columnConfigs, item)),
+            configs: groupConfigs,
+            columns: this.getGroupColumns(groupConfigs, arrayOfData[0]),
+            data: arrayOfData.map(item => mapToTableCells(columnConfigs, item)),
           };
           if (!parentKey) {
-            result.push(toPush);
+            result.push(objectToPush);
           } else {
             const cachedArray = getCachedArray(prevGroupedRowsMap, parentKey);
-            cachedArray.push(toPush);
+            cachedArray.push(objectToPush);
           }
         });
-      } else if (index > 0) {
+      } else if (groupIndex > 0) { // other group
         const copiedPrevMap = {...prevGroupedRowsMap};
         prevGroupedRowsMap = {};
-        const subGroupsPath = repeat('.subGroups[0]', groupedRows.length - 2 - index);
-        Object.entries(copiedPrevMap).forEach(([k, v]) => {
-          const _data = get(v, '[0]' + subGroupsPath + '.originalData[0]');
-          const parentKey = getParentKey(k);
+        const subGroupsPath = repeat('.subGroups[0]', groupedRows.length - 2 - groupIndex);
+        this.objectEntriesWithOrders(copiedPrevMap, groupConfigs).forEach(([key, arrayOfChildGroups]) => {
+          const _data = get(arrayOfChildGroups, '[0]' + subGroupsPath + '.originalData[0]');
+          const parentKey = extractParentKey(key);
           const cacheArray = getCachedArray(prevGroupedRowsMap, parentKey);
           cacheArray.push({
-            indexFn: getIndexFunction(group),
-            originalData: v,
+            indexFn: getIndexFunction(groupConfigs),
+            originalData: arrayOfChildGroups,
             groupIndex,
-            name: group.name(_data),
-            subGroups: v
-          });
+            configs: groupConfigs,
+            columns: this.getGroupColumns(groupConfigs, _data),
+            subGroups: arrayOfChildGroups
+          } as InternalGroupData);
         });
-      } else {
+      } else { // first group
         const subGroupsPath = repeat('.subGroups[0]', groupedRows.length - 2);
-        Object.entries(prevGroupedRowsMap).forEach(([k, v]) => {
-          const _data = get(v, '[0]' + subGroupsPath + '.originalData[0]');
+        this.objectEntriesWithOrders(prevGroupedRowsMap, groupConfigs).forEach(([key, arrayOfChildGroups]) => {
+          const firstRow = get(arrayOfChildGroups, '[0]' + subGroupsPath + '.originalData[0]');
           result.push({
-            indexFn: getIndexFunction(group),
-            originalData: v,
+            indexFn: getIndexFunction(groupConfigs),
+            originalData: arrayOfChildGroups,
             groupIndex,
-            name: group.name(_data),
-            subGroups: v,
-          });
+            configs: groupConfigs,
+            columns: this.getGroupColumns(groupConfigs, firstRow),
+            subGroups: arrayOfChildGroups,
+          } as InternalGroupData);
         });
       }
     });
+
+    return result;
+  }
+
+  getGroupColumns (groupConfigs: TableRowGroupsConfiguration, firstRow) {
+    let totalLength = this.configs.states.columns.length + this.configs.states.actions.length;
+    totalLength = groupConfigs.namespan > totalLength ? totalLength : totalLength - groupConfigs.namespan + 1;
+
+    const array = Array(totalLength).fill(undefined).map(() => ({
+      value: '',
+      type: '',
+      colspan: 1,
+    }) as any);
+
+    const nameAtIndex = 0;
+    array[nameAtIndex].value = groupConfigs.name(firstRow);
+    array[nameAtIndex].type = 'name';
+    array[nameAtIndex].colspan = !groupConfigs.summaries ? groupConfigs.namespan : 1;
+
+    const actions = groupConfigs.actions;
+    if (actions) {
+      for (let i = this.configs.states.columns.length - groupConfigs.namespan + 1, j = 0; i < array.length; i++, j++) {
+        if (actions[j]) {
+          array[i].value = actions[j];
+          array[i].type = 'actions';
+        }
+      }
+    }
+
+    return array;
+  }
+
+  private objectEntriesWithOrders (groupData: {[p: string]: any[]}, group: TableRowGroupsConfiguration) {
+    let result = orderBy(Object.entries(groupData) as any, ([key]) => key, group.orders as any);
+    if (group.dataOrders) {
+      result = result.map(([key, value]) => ([
+        key,
+        orderBy.apply(null, [value].concat(group.dataOrders))
+      ]));
+    }
     return result;
   }
 

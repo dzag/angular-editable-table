@@ -6,11 +6,12 @@ import { DateToStringPipe, StringToDatePipe } from './core/pipes/date-pipes';
 import { VndCurrencyPipe } from './core/pipes/vnd-currency.pipe';
 import { PrependZeroPipe } from './core/pipes/prepend-zero.pipe';
 import { TableCellComponent } from './core/table-cell/table-cell.component';
-import { TableMetadataComponent } from './paginator/table-metadata.component';
-import { TablePaginationComponent } from './paginator/table-pagination.component';
 import { StopPropagationDirective } from './stop-propagation.directive';
 import { RouterModule } from '@angular/router';
 import { TableHeaderComponent } from './core/table-header/table-header.component';
+import { TableCellForAddingComponent } from './core/table-cell-for-adding/table-cell-for-adding.component';
+import { AddingRowComponent } from './core/adding-row/adding-row.component';
+import { PaginatorModule } from '../paginator/paginator.module';
 
 const PIPES = [
   DateToStringPipe,
@@ -23,13 +24,10 @@ const DIRECTIVES = [
   StopPropagationDirective,
 ];
 
-const PAGINATOR = [
-  TableMetadataComponent,
-  TablePaginationComponent,
-];
-
 const TABLE_CORE = [
   TableCellComponent,
+  TableCellForAddingComponent,
+  AddingRowComponent,
   TableHeaderComponent,
 ];
 
@@ -43,12 +41,12 @@ const TABLE_IMPLEMENTS = [
     ...TABLE_IMPLEMENTS,
     ...PIPES,
     ...DIRECTIVES,
-    ...PAGINATOR
   ],
   imports: [
     CommonModule,
     RouterModule,
     FormContainerModule,
+    PaginatorModule,
   ],
   exports: [
     NgTableComponent,

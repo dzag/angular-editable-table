@@ -1,4 +1,4 @@
-import { ColumnDescriptor } from '../table.models';
+import { TableConfigs } from '../table.models';
 
 const getRange = (formula: string) => {
   formula.substring(
@@ -19,14 +19,11 @@ export class FormulaParser {
 
   // TODO: formulas should have priority so we know what will have higher order than other
   // TODO: formulas should have static formula so any static formula will have higher priority than other
-  constructor (private _descriptors: ColumnDescriptor<any>[],
-               private _formulas,
-  ) {
-    this.symbolMap = this.descriptorToSymbol(_descriptors);
+  constructor (private _configs: TableConfigs) {
+    this.symbolMap = this.descriptorToSymbol(_configs.columns);
     this.descriptorMap = this.flip(this.symbolMap);
-    this.formulasAndReplacers = this.replacePropWithSymbols(_formulas.all, this.symbolMap);
+    this.formulasAndReplacers = this.replacePropWithSymbols(_configs.formulas.all, this.symbolMap);
     this.formulas = this.formulasAndReplacers.map(r => r.formula);
-    console.log('FormulaParser', this);
   }
 
   getFormulaForColumn(column: number) {
@@ -39,9 +36,9 @@ export class FormulaParser {
     return this.formulasAndReplacers.find(item => item.formula === formula).replacers;
   }
 
-  private replacePropWithSymbols (formulas: string[], symbolMap) {
+  private replacePropWithSymbols (formulas: { expression: string }[], symbolMap) {
     return formulas.map(formula => {
-      let newFormula = formula;
+      let newFormula = formula.expression;
       const replacers = [];
       Object.entries(symbolMap).forEach(([prop, symbol]: [string, string]) => {
         const forReplace = newFormula.replace(prop, symbol);
@@ -65,7 +62,7 @@ export class FormulaParser {
     return result;
   }
 
-  private descriptorToSymbol (descriptors: ColumnDescriptor<any>[]) {
+  private descriptorToSymbol (descriptors: any[]) {
     return descriptors.reduce((prev, current, index) => {
       prev[current.prop] = 'x' + index;
       return prev;

@@ -16,13 +16,14 @@ interface ValueSetterOptions {
   formulaCheck?: boolean;
 }
 
-const defaultValueSetterOptions = {
+const defaultValueSetterOptions: any = {
   detect: true,
   emitEvent: true,
-  formulaCheck: false,
 };
 
 const getColumnFromSymbol = (symbol: string) => parseInt(symbol.substr(1), 10);
+
+let id = 0;
 
 @Injectable()
 export class TableDataService {
@@ -35,16 +36,19 @@ export class TableDataService {
 
   private _cellService: CellService;
 
+  private _configurations: TableConfigurations;
+
   constructor (private _cellManager: CellManager,
                private _cd: ChangeDetectorRef,
   ) {}
 
-  set formulaParser (value: FormulaParser) {
-    this._formulaParser = value;
-  }
-
   setTableData (configurations: TableConfigurations, value: TableData) {
     this.tableDataInternal = new TableDataInternal(configurations, value);
+    this._configurations = configurations;
+    if (configurations.states.formulas) {
+      this._formulaParser = new FormulaParser(configurations.states);
+      defaultValueSetterOptions.formulaCheck = true;
+    }
   }
 
   setValue (row, col, group, value, options?: ValueSetterOptions) {
@@ -69,13 +73,13 @@ export class TableDataService {
           const column = this._formulaParser.symbolMap[r].substr(1);
           return col !== (+column) || r !== resultSymbol;
         });
-        this._cellManager.getCellsInRow(row).subscribe(cells => {
+        this._cellManager.getCellsInRow(row, group).subscribe(cells => {
           const resultCell = cells.find(cell => cell.column === getColumnFromSymbol(resultSymbol));
           const scope = merge({}, ...cells.filter(cell => replacers.includes(cell.prop)).map(cell => ({
             ['x' + cell.column]: cell.data || 0
           })));
           const resultValue = math.eval(expression, scope);
-          this.setValue(resultCell.row, resultCell.column, resultValue, {
+          this.setValue(resultCell.row, resultCell.column, group, resultValue, {
             formulaCheck: false,
           });
         });
@@ -107,6 +111,21 @@ export class TableDataService {
         changedRow === row && changedCol === col && (group ? changedGroup === group : true)),
       map(({value, prevValue}) => ({value, old: prevValue}))
     );
+  }
+
+  addRow(data: any | any[]) {
+    const canGeneratedId = this._configurations.states.editing.generateIdentifier;
+    const idKey = this._configurations.states.rowIdentifier;
+
+    data = Array.isArray(data) ? data : [data];
+    data = data.map(d => ({
+      ...d,
+      ...canGeneratedId ? { [idKey]: `#${++id}` } : {},
+      __generated: true
+    }));
+
+    this.tableDataInternal.addRow(this._configurations.states.columns, data);
+    this._cd.markForCheck();
   }
 
 }

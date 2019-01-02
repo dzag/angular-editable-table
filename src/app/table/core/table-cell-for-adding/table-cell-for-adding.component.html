@@ -10,10 +10,6 @@
       <ng-container *ngSwitchCase="'date'">
         {{ data | dateToString }}
       </ng-container>
-      <ng-container *ngSwitchCase="'link'">
-        <a class="text-link" *ngIf="columnConfigs.link && columnConfigs.useRouter" [routerLink]="cell.url">{{ cell.value }}</a>
-        <a class="text-link" *ngIf="columnConfigs.link && !columnConfigs.useRouter" [href]="cell.url">{{ cell.value }}</a>
-      </ng-container>
       <ng-container *ngSwitchCase="'currency'">
         {{ data | vnd }}
       </ng-container>
@@ -24,14 +20,14 @@
   </ng-container>
 </div>
 
-<div *ngIf="columnConfigs.dataType === 'checkbox'">
-  <ng-container *ngIf="active">
-    <ng-container *ngTemplateOutlet="input"></ng-container>
-  </ng-container>
-  <ng-container *ngIf="!active">
-    <i class="fa fa-check" *ngIf="data"></i>
-  </ng-container>
-</div>
+<!--<div *ngIf="columnConfigs.dataType === 'checkbox'">-->
+  <!--<ng-container *ngIf="active">-->
+    <!--<ng-container *ngTemplateOutlet="input"></ng-container>-->
+  <!--</ng-container>-->
+  <!--<ng-container *ngIf="!active">-->
+    <!--<i class="fa fa-check" *ngIf="data"></i>-->
+  <!--</ng-container>-->
+<!--</div>-->
 
 <ng-template #input>
   <common-input [formControl]="formControl"

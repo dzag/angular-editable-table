@@ -1,5 +1,13 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { buildPropToPathMap, depth as getDepth, emptyArrays, getPath, insertAt, pushEmptyArrays, totalSubGroupProps } from '../table.utils';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import {
+  buildPropToPathMap,
+  depth as getDepth,
+  emptyArrays,
+  getPath,
+  insertAt,
+  pushEmptyArrays,
+  totalSubGroupProps
+} from '../table.utils';
 import { get, last } from 'lodash';
 import { TableConfigurations } from '../table-configurations';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -35,9 +43,13 @@ export class TableHeaderComponent implements OnInit {
   public subHeaders;
 
 
-  constructor(public domSanitizer: DomSanitizer) { }
+  constructor(public domSanitizer: DomSanitizer,
+              private _cd: ChangeDetectorRef,
+  ) { }
 
   ngOnInit() {
+    this.configurations['_headerCd'] = this._cd;
+
     this.headers = this.buildHeaders();
 
     if (this.configurations.hasSubHeader) {
@@ -210,14 +222,17 @@ export class TableHeaderComponent implements OnInit {
     }));
 
     if (this.withActions) {
-      subHeaders = subHeaders.concat(this.actions.map(() => ({name: '', class: ''})));
+      subHeaders = subHeaders.concat(this.actions.map(action => ({
+        name: action.subHeader || '',
+        class: action.subHeaderClass || ''
+      })));
     }
 
     return subHeaders;
   }
 
   private watchConfigsChanges() {
-    (this.configurations as any)['changeObs'].pipe(filter(t => t === 'header')).subscribe(() => {
+    (this.configurations as any)['_changeObs'].pipe(filter(t => t === 'header')).subscribe(() => {
       this.headers = this.buildHeaders();
     });
   }

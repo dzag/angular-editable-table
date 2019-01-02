@@ -1,16 +1,24 @@
 /* tslint:disable:component-selector */
-import { ChangeDetectorRef, Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostBinding,
+  HostListener,
+  Input,
+  OnDestroy,
+  OnInit
+} from '@angular/core';
 import { map } from 'rxjs/operators';
 import { TableDataService } from '../data/table-data.service';
 import { createAddress } from './cell-manager.utils';
 import { CellManager } from './cell-manager.service';
 import { CellService } from './cell.service';
-import { TableColumnConfigurations } from '../table-configurations';
 import { Subscription } from 'rxjs';
 import { intersectionBy } from 'lodash';
+import { TableColumnConfigurations } from '../table.models';
 
-const words = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-  'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+const log = (...message) => console.log('TableCellComponent', ...message);
 
 @Component({
   selector: '[table-cell]',
@@ -27,19 +35,18 @@ export class TableCellComponent implements OnInit, OnDestroy {
   @Input() wordAddress: string;
 
   @Input() columnConfigs: TableColumnConfigurations;
+  @Input() readonly = false;
 
-  public rowspan = 1;
   public prop: string;
-
   public active = false;
-  public readonly = false;
 
   private subscription: Subscription;
 
-  constructor (private _cellService: CellService,
+  constructor (public cd: ChangeDetectorRef,
+               private _cellService: CellService,
                private _cellManager: CellManager,
                private _dataService: TableDataService,
-               public cd: ChangeDetectorRef,
+               private _elementRef: ElementRef,
   ) {
     (this._dataService as any)['_cellService'] = _cellService; // this is a hack for circular dependency
   }
@@ -52,6 +59,19 @@ export class TableCellComponent implements OnInit, OnDestroy {
       .subscribe(active => {
         this.active = active;
         this.cd.detectChanges();
+        if (active) {
+          let elementToFocus;
+
+          if (this.columnConfigs.dataType === 'select') {
+            elementToFocus = this._elementRef.nativeElement.querySelector('select');
+          } else {
+            elementToFocus = this._elementRef.nativeElement.querySelector('input');
+          }
+
+          if (elementToFocus) {
+            elementToFocus.focus();
+          }
+        }
       });
   }
 
@@ -77,6 +97,22 @@ export class TableCellComponent implements OnInit, OnDestroy {
     }
 
     this._cellService.setActive(this);
+  }
+
+  onBlurred () {
+    this._cellService.setActive(null);
+  }
+
+  onKeyUp ({keyCode}: KeyboardEvent) {
+    if (keyCode === 13) { // enter key
+      this._cellService.saveEditedValue();
+    }
+  }
+
+  @HostBinding('class')
+  get cellClass() {
+    const defaultClass = this.getDefaultClassBasedOnType();
+    return (this.columnConfigs.dataClass || '') + ' ' + defaultClass;
   }
 
   get options() {
@@ -113,19 +149,16 @@ export class TableCellComponent implements OnInit, OnDestroy {
     return this._dataService.getCell(this.row, this.column, this.group);
   }
 
-  get cellClass() {
-    if (!this.columnConfigs.dataClass) {
-      return;
+  private getDefaultClassBasedOnType() {
+    const dataType = this.columnConfigs.dataType;
+    if (dataType === 'date') {
+      return 'text-center';
     }
 
-    return {
-      [this.columnConfigs.dataClass]: true
-    };
-  }
-
-  onKeyUp ({keyCode}: KeyboardEvent) {
-    if (keyCode === 13) { // enter key
-      this._cellService.saveEditedValue();
+    if (['number', 'currency'].includes(dataType)) {
+      return 'text-right';
     }
+
+    return '';
   }
 }

@@ -1,8 +1,11 @@
 import { ChangeDetectorRef } from '@angular/core';
-import { set, cloneDeep, merge, isNil } from 'lodash';
+import { cloneDeep, initial, isNil, last, merge, remove, set } from 'lodash';
 import { Subject } from 'rxjs';
-import { ActionEvent } from './table.models';
+import { TableColumnGroupsConfiguration, TableConfigs } from './table.models';
 import { DEFAULT_CONFIGS } from './default-configs';
+
+type ColumnIndex = number;
+type ColumnName = string;
 
 interface ConfigSetterOptions {
   detect?: boolean;
@@ -16,70 +19,8 @@ const defaultSetterOptions: ConfigSetterOptions = {
   type: 'table'
 };
 
-export interface Anything {
-  [p: string]: any;
-}
-
-export interface TableColumnConfigurations extends Anything {
-  prop?: string;
-  name?: string;
-  dataType: string;
-  editable?: boolean;
-  editableWhen?: (row) => boolean;
-  headerClass?: string;
-  dataClass?: string;
-  subHeader?: string;
-  subHeaderClass?: string;
-  options?: any[]; // for select dataType
-  partialOptions?: any;
-  link?: any; // for link dataType
-  useRouter?: boolean; // for link dataType
-  map?: Function;
-  reverseMap?: Function;
-}
-
-export interface TableActionConfiguration extends Anything {
-  show?: boolean; // default: false
-  name?: string;
-  class?: string;
-  types?: any;
-  static?: string[];
-  clicked?: (actionEvent: ActionEvent) => void;
-  actionsOnRow?: (event: {row: any, types: any}) => string[];
-}
-
-export interface TableIndexConfiguration extends Anything {
-  show?: boolean; // default: true
-  name?: string;
-  subHeader?: string;
-  subHeaderClass?: string;
-  rowIndexType?: any;
-  rowIndexPattern?: any;
-}
-
-export interface TableRowGroupsConfiguration extends Anything {
-  groupBy?: string;
-  name?: any;
-  indexType?: string;
-  indexPattern?: any;
-}
-
-export interface TableColumnGroupsConfiguration extends Anything {
-  groupName: string;
-  props: string[];
-  subGroups?: TableColumnGroupsConfiguration[];
-}
-
-export interface Configs extends Anything {
-  columns: TableColumnConfigurations[];
-  rowGroups?: TableRowGroupsConfiguration[];
-  columnGroups?: TableColumnGroupsConfiguration[];
-  index?: TableIndexConfiguration;
-  actions?: TableActionConfiguration[];
-}
-
 export class TableConfigurations {
-  public readonly states: Configs;
+  public readonly states: TableConfigs;
 
   public readonly hiddenActions = new Map();
   public hasSubHeader = false;
@@ -87,10 +28,10 @@ export class TableConfigurations {
   private _cd: ChangeDetectorRef;
   private _headerCd: ChangeDetectorRef;
 
-  private changes = new Subject();
-  private changeObs =  this.changes.asObservable();
+  private _changes = new Subject();
+  private _changeObs =  this._changes.asObservable();
 
-  constructor (private initialConfigs: Configs) { // TODO: Add type to this
+  constructor (private initialConfigs: TableConfigs) { // TODO: Add type to this
     const initial = cloneDeep(this.initialConfigs);
     this.states = this.mergeDefaultConfigs(initial);
   }
@@ -102,19 +43,59 @@ export class TableConfigurations {
     });
   }
 
+  renameColumns(...columns: [ColumnIndex, ColumnName][]) {
+    const batches = columns.map(([index, name]) => [`columns[${index}].name`, name]);
+    this.setBatches(batches, 'header');
+  }
+
   setOptions(columnIndex: number, newOptions: any[]) {
     const column = this.states.columns[columnIndex];
     column.options = newOptions;
-    column['$$options'] = this.doCacheOptions(newOptions);
+    column['$$options'] = this.createIdToValueMap(newOptions);
 
     this.detectChanges();
   }
 
   // -- columns groups
-  renameGroup(path: string, newName: string, upLevel = 1) {
+  /**
+   * @deprecated use renameColumnGroupById instead
+   * @param path
+   * @param newName
+   */
+  renameGroup(path: string, newName: string) {
     this.set('columnGroups' + path, newName, {
       type: 'header'
     });
+  }
+
+  /**
+   * @deprecated use renameColumnGroupsById
+   * @param groups
+   */
+  renameGroups(...groups: [string, string][]) {
+    const newGroupNames = groups.map(([path, newName]) => ['columnGroups' + path, newName]);
+    this.setBatches(newGroupNames, 'header');
+  }
+
+  renameColumnGroupById(id: any, newName: string) {
+    const foundGroup = this.findGroupById(this.states.columnGroups, id);
+    if (foundGroup) {
+      this.setRaw(foundGroup, 'groupName', newName, {
+        type: 'header'
+      });
+    }
+  }
+
+  renameColumnGroupsById(...groups: [any, string][]) {
+    const ids = groups.map(([id]) => id);
+    const batches = this.findGroupByIds(this.states.columnGroups, ids).map(([id, group]) => {
+      const [gId, gName] = groups.find(([gId]) => gId === id);
+      return [group, 'groupName', gName];
+    });
+    console.log(batches);
+    if (batches.length) {
+      this.setBatchesRaw(batches, 'header');
+    }
   }
 
   // -- actions configs
@@ -151,8 +132,41 @@ export class TableConfigurations {
     return true;
   }
 
-  private mergeDefaultConfigs(initialConfig: Configs): Configs {
-    const mergedConfigs: Configs | any = {};
+  // -- editing configs
+  setEditing(enabled: boolean) {
+    this.set('editing.enabled', enabled);
+  }
+
+  // -- paging configs
+
+  /**
+   * This method will not emit back to the onPageChanged, only reflects to the view
+   */
+  setPage({ pageNumber, pageSize }: { pageNumber?: number, pageSize?: number }) {
+    const noTrigger: ConfigSetterOptions = { detect: false, emmitEvent: false };
+
+    if (!isNil(pageSize)) {
+      this.set('paging.pageSize', pageSize, noTrigger);
+      this.set('paging.pageNumber', 1, noTrigger);
+    }
+
+    if (!isNil(pageNumber)) {
+      this.set('paging.pageNumber', pageNumber, noTrigger);
+    }
+
+    this.detectChanges();
+  }
+
+  setTotalRecords(totalRecords) {
+    if (isNil(totalRecords)) {
+      return;
+    }
+
+    this.set('paging.totalRecords', totalRecords);
+  }
+
+  private mergeDefaultConfigs(initialConfig: TableConfigs): TableConfigs {
+    const mergedConfigs: TableConfigs | any = {};
 
     mergedConfigs.columns = (initialConfig.columns || []).map(col => {
       if (col.subHeader) {
@@ -161,7 +175,7 @@ export class TableConfigurations {
       const newCol = Object.assign({...DEFAULT_CONFIGS.column}, col);
 
       if (newCol.options) {
-        newCol['$$options'] = this.doCacheOptions(newCol.options);
+        newCol['$$options'] = this.createIdToValueMap(newCol.options);
       }
 
       if (newCol.dataType === 'link' && newCol.link) {
@@ -176,36 +190,43 @@ export class TableConfigurations {
     }
 
     if (initialConfig.rowGroups) {
-      mergedConfigs.rowGroups = initialConfig.rowGroups;
+      mergedConfigs.rowGroups = initialConfig.rowGroups.map(i => {
+        const newRowGroups = Object.assign({ ...DEFAULT_CONFIGS.rowGroup }, i);
+
+        let actions;
+        if (i.actions) {
+          actions = i.actions.map(action => Object.assign({ ...DEFAULT_CONFIGS.action }, action));
+          newRowGroups.actions = actions;
+        }
+
+        return newRowGroups;
+      });
     }
 
-    mergedConfigs.index = Object.assign({...DEFAULT_CONFIGS.index}, initialConfig.index || {});
+    if (initialConfig.formulas) {
+      mergedConfigs.formulas = Object.assign({}, initialConfig.formulas);
+    }
+
+    mergedConfigs.editing = Object.assign({...DEFAULT_CONFIGS.editing}, initialConfig.editing);
+
+    mergedConfigs.rowIdentifier = initialConfig.rowIdentifier || DEFAULT_CONFIGS.rowIdentifier;
+
+    mergedConfigs.index = Object.assign({...DEFAULT_CONFIGS.index}, initialConfig.index);
 
     mergedConfigs.actions = (initialConfig.actions || []).map(action => {
       return Object.assign({...DEFAULT_CONFIGS.action}, action);
     });
 
+    mergedConfigs.paging = Object.assign({...DEFAULT_CONFIGS.paging}, initialConfig.paging);
+
     return mergedConfigs;
   }
 
-  private doCacheOptions(options) {
+  private createIdToValueMap(options) {
     return options.reduce((prev, current) => {
       prev[current.id] = current.value;
       return prev;
     }, {});
-  }
-
-  private set(path: string, value, options?: ConfigSetterOptions) {
-    options = merge({...defaultSetterOptions}, options);
-    set(this.states, path, value);
-
-    if (options.detect) {
-      this.detectChanges();
-    }
-
-    if (options.emmitEvent) {
-      this.changes.next(options.type);
-    }
   }
 
   private detectChanges(type: 'table' | 'header' = 'table') {
@@ -230,4 +251,62 @@ export class TableConfigurations {
     return this.hiddenActions.get(action) || this.hiddenActions.set(action, []).get(action);
   }
 
+  private findGroupById(groups: TableColumnGroupsConfiguration[], id) {
+    for (const group of groups) {
+      if (group.id === id) {
+        return group;
+      }
+
+      if (group.subGroups) {
+        return this.findGroupById(group.subGroups, id);
+      }
+    }
+
+    return null;
+  }
+
+  private findGroupByIds(groups: TableColumnGroupsConfiguration[], ids: any[], fresh = true) {
+    ids = [...ids];
+    const foundGroups = this.findGroupByIds['foundGroups'] = fresh ? [] : this.findGroupByIds['foundGroups'];
+    for (const group of groups) {
+      if (ids.includes(group.id)) {
+        foundGroups.push([group.id, group]);
+        remove(ids, i => i === group.id);
+      }
+
+      if (group.subGroups) {
+        this.findGroupByIds(group.subGroups, ids, false);
+      }
+    }
+    return foundGroups;
+  }
+
+  // -- setters
+
+  private set(path: string, value, options?: ConfigSetterOptions) {
+    this.setRaw(this.states, path, value, options);
+  }
+
+  private setRaw(object, path, value, options?: ConfigSetterOptions) {
+    options = merge({...defaultSetterOptions}, options);
+    set(object, path, value);
+
+    if (options.detect) {
+      this.detectChanges(options.type as any);
+    }
+
+    if (options.emmitEvent) {
+      this._changes.next(options.type);
+    }
+  }
+
+  private setBatches(batches: any[][], type = 'table') {
+    initial(batches).forEach(tx => set.apply(this, [this.states].concat(tx)));
+    this.set.apply(this, last(batches).concat({ type }));
+  }
+
+  private setBatchesRaw(batches: any[][], type = 'table') {
+    initial(batches).forEach(tx => set.apply(this, tx));
+    this.setRaw.apply(this, last(batches).concat({ type }));
+  }
 }

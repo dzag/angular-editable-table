@@ -3,11 +3,21 @@ const wordMapper = {
   M: 11, N: 12, O: 13, P: 14, Q: 15, R: 16, S: 17, T: 18, U: 19, V: 20, W: 21, X: 22, Y: 23, Z: 24
 };
 
-export const createAddress = (row, column): string => row + '_' + column;
+export const createAddress = (row, column, group?): string => group ? row + '_' + column + '_{' + group.path + '}' : row + '_' + column;
 
-export const getLocation = (address: string) => {
-  const [row, column] = address.split('_');
-  return {row: +row, column: +column};
+export const getLocation = (address: string): { row: number, column: number, groupPath?: string } => {
+  const [row, column, groupPath] = address.split('_');
+  return {
+    row: +row,
+    column: +column,
+    ...groupPath ? { groupPath: extractGroupPath(groupPath) } : {},
+  };
+};
+
+export const extractGroupPath = (str: string) => {
+  const first = str.indexOf('{');
+  const last = str.indexOf('}');
+  return str.substring(first, last);
 };
 
 export const createAddressFromStringLocator = (str: string) => {
