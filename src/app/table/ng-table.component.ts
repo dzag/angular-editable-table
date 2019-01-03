@@ -14,9 +14,7 @@ import { TableConfigurations } from './core/table-configurations';
 import { TableDataService } from './core/data/table-data.service';
 import { CellManager } from './core/table-cell/cell-manager.service';
 import { CellService } from './core/table-cell/cell.service';
-import { romanize } from './core/data/table-data.utils';
 import { TableData } from './core/table-data';
-import { difference } from 'lodash';
 import { ActivatedRoute } from '@angular/router';
 import { FormMode } from 'src/app/core/interfaces/app/form-mode';
 import { untilDestroyed } from 'ngx-take-until-destroy';
@@ -25,6 +23,7 @@ import { TableRowGroupActionsConfiguration, TableRowGroupsConfiguration } from '
 import { CellData } from './core/data/table-data-internal';
 import { AddingCellService } from './core/table-cell-for-adding/adding-cell.service';
 import { AddingDataService } from './core/table-cell-for-adding/adding-data.service';
+import { NgTableState } from '@app/table/core/ng-table-state.service';
 
 @Component({
   selector: 'ng-table',
@@ -36,6 +35,7 @@ import { AddingDataService } from './core/table-cell-for-adding/adding-data.serv
     CellManager,
     AddingCellService,
     AddingDataService,
+    NgTableState,
     {
       provide: TableDataService,
       useClass: TableDataService,
@@ -58,10 +58,8 @@ export class NgTableComponent implements OnInit, OnDestroy, AfterViewInit {
     this._data = value || new TableData();
     this.patchTableData(this._data);
     this._dataService.setTableData(this.configurations, this._data);
+    this._state.data = this._data;
   }
-
-  public readonly words = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-    'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
   public isEditing = false;
 
@@ -75,9 +73,12 @@ export class NgTableComponent implements OnInit, OnDestroy, AfterViewInit {
                private _addingDataService: AddingDataService,
                private _ngZone: NgZone,
                private _route: ActivatedRoute,
+               private _state: NgTableState,
   ) {}
 
   ngOnInit () {
+    this._state.configurations = this.configurations;
+
     this.isEditing = this.configs.editing.enabled;
 
     this.patchConfigs();
@@ -98,56 +99,6 @@ export class NgTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
   trackByIndex (index) {
     return index;
-  }
-
-  getRowIndex(currentIndex, parent: any = {}) {
-    const indexConfigs = this.configurations.states.index;
-    const paging = this.configurations.states.paging;
-
-    const index = paging.enabled ? (paging.pageNumber - 1) * paging.pageSize + currentIndex : currentIndex;
-
-    if (indexConfigs.rowIndexPattern) {
-      return indexConfigs.rowIndexPattern(index, parent);
-    }
-
-    if (indexConfigs.rowIndexType === 'romanNumeral') {
-      return romanize(index);
-    }
-
-    return index + 1;
-  }
-
-  getActions(index, rowIndex, group?) {
-    const actionConfigs = this.configurations.states.actions[index];
-    const actionsOnRow = actionConfigs.actionsOnRow;
-    const hiddenActions = this.configurations.hiddenActions.get(actionConfigs) || [];
-
-    if (actionsOnRow && typeof actionsOnRow === 'function') {
-      const rowData = this._dataService.getRow(rowIndex, group);
-      const actions = actionsOnRow({
-        row: rowData,
-        types: actionConfigs.types,
-      });
-
-      return difference(actions, hiddenActions);
-    }
-
-    // TODO: implement this
-    return difference(actionConfigs.static, hiddenActions);
-  }
-
-  onActionClicked (index, actionType, rowIndex, group) {
-    if (!this.configs.actions[index].clicked) {
-      return;
-    }
-
-    this.configs.actions[index].clicked({
-      type: actionType,
-      row: this._dataService.getRow(rowIndex, group),
-      rowIndex: rowIndex,
-      tableData: this.data,
-      ...group ? { group } : {},
-    });
   }
 
   onGroupActionClicked (action: string, actionConfigs: TableRowGroupActionsConfiguration, group) {

@@ -2,8 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { difference } from 'lodash';
 import { TableDataService } from '../data/table-data.service';
 import { romanize } from '../data/table-data.utils';
-import { TableConfigurations } from '../table-configurations';
-import { TableData } from '../table-data';
+import { NgTableState } from '@app/table/core/ng-table-state.service';
 
 @Component({
   selector: 'tr[table-row]',
@@ -12,8 +11,6 @@ import { TableData } from '../table-data';
 })
 export class TableRowComponent implements OnInit {
 
-  @Input() configs: TableConfigurations;
-  @Input() data: TableData;
   @Input() isEditing: boolean;
 
   @Input() row;
@@ -23,15 +20,22 @@ export class TableRowComponent implements OnInit {
   @Input() parentIndex;
   @Input() parentText;
 
-  @Input() showIndex;
-  @Input() showActions: boolean;
-
   public readonly words = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
     'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
-  constructor (private _dataService: TableDataService) { }
+  constructor (private _dataService: TableDataService,
+               public state: NgTableState,
+  ) {}
 
   ngOnInit () {
+  }
+
+  get configs () {
+    return this.state.configurations;
+  }
+
+  get data () {
+    return this.state.data;
   }
 
   trackByIndex (index) {
@@ -39,17 +43,20 @@ export class TableRowComponent implements OnInit {
   }
 
   getRowIndex(currentIndex, parent: any = {}) {
-    const indexConfigs = this.configs.states.index;
+    const indexConfigs = this.state.configurations.states.index;
+    const paging = this.state.configurations.states.paging;
+
+    const index = paging.enabled ? (paging.pageNumber - 1) * paging.pageSize + currentIndex : currentIndex;
 
     if (indexConfigs.rowIndexPattern) {
-      return indexConfigs.rowIndexPattern(currentIndex, parent);
+      return indexConfigs.rowIndexPattern(index, parent);
     }
 
     if (indexConfigs.rowIndexType === 'romanNumeral') {
-      return romanize(currentIndex);
+      return romanize(index);
     }
 
-    return currentIndex + 1;
+    return index + 1;
   }
 
   onActionClicked (index, actionType, rowIndex, group) {
