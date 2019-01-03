@@ -14,6 +14,7 @@ import { AddingRowComponent } from './core/adding-row/adding-row.component';
 import { PaginatorModule } from '../paginator/paginator.module';
 import { TableRowComponent } from './core/table-row/table-row.component';
 import { DataOnlyCellComponent } from './core/cells/data-only-cell/data-only-cell.component';
+import { TableGroupHeaderComponent } from './core/table-group-header/table-group-header.component';
 
 const PIPES = [
   DateToStringPipe,
@@ -45,6 +46,7 @@ const TABLE_IMPLEMENTS = [
     ...DIRECTIVES,
     TableRowComponent,
     DataOnlyCellComponent,
+    TableGroupHeaderComponent,
   ],
   imports: [
     CommonModule,

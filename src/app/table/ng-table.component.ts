@@ -19,7 +19,6 @@ import { ActivatedRoute } from '@angular/router';
 import { FormMode } from 'src/app/core/interfaces/app/form-mode';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { distinctUntilChanged, pluck } from 'rxjs/operators';
-import { TableRowGroupActionsConfiguration, TableRowGroupsConfiguration } from './core/table.models';
 import { CellData } from './core/data/table-data-internal';
 import { AddingCellService } from './core/table-cell-for-adding/adding-cell.service';
 import { AddingDataService } from './core/table-cell-for-adding/adding-data.service';
@@ -99,18 +98,6 @@ export class NgTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
   trackByIndex (index) {
     return index;
-  }
-
-  onGroupActionClicked (action: string, actionConfigs: TableRowGroupActionsConfiguration, group) {
-    const groupConfigs: TableRowGroupsConfiguration = group.configs;
-    if (groupConfigs.actions && actionConfigs.clicked) {
-      const firstRowData = this.getFirstRowOfGroup(group);
-      actionConfigs.clicked({
-        type: action,
-        groupBy: groupConfigs.groupBy,
-        firstRow: firstRowData,
-      });
-    }
   }
 
   couldRenderRow (row: CellData[]) {
@@ -227,15 +214,4 @@ export class NgTableComponent implements OnInit, OnDestroy, AfterViewInit {
     data['_configs'] = this.configurations;
   }
 
-  private getFirstRowOfGroup (group) {
-    if (group.data) {
-      return group.originalData[0];
-    }
-
-    if (group.subGroups.length === 0) {
-      return [];
-    }
-
-    return this.getFirstRowOfGroup(group.subGroups[0]);
-  }
 }

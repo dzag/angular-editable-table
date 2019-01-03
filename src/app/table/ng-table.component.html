@@ -60,27 +60,11 @@
              let-parentIndex="parentIndex"
              let-parentText="parentText">
   <!-- GROUP HEADER RENDERING -->
-  <tr class="group-level-{{ group.groupIndex + 1 }}">
-    <td class="group-index">{{ group.indexFn(groupIndex, { parentIndex: parentIndex, parentText: parentText }) }}</td>
-    <ng-container *ngFor="let col of group.columns; let colIndex = index; trackBy: trackByIndex">
-      <ng-container [ngSwitch]="col.type">
-        <ng-container *ngSwitchCase="'actions'">
-          <td class="{{ col.value.class }}">
-            <ng-container *ngFor="let action of col.value.static; let actionIndex = index">
-              <i class="{{ col.value.types[action].icon }} cursor-pointer icon icon-{{ action }} {{ actionIndex > 0 ? 'ml-2' : '' }}"
-                 (click.out-zone)="onGroupActionClicked(action, col.value, group)"
-                 data-placement="bottom"
-                 data-toggle="tooltip"
-                 stopPropagation
-                 title="{{ col.value.types[action].name }}">
-              </i>
-            </ng-container>
-          </td>
-        </ng-container>
-        <td *ngSwitchCase="'name'" [attr.colspan]="col.colspan" class="group-name">{{ col.value }}</td>
-        <td *ngSwitchDefault>{{ col.value }}</td>
-      </ng-container>
-    </ng-container>
+  <tr table-group-header
+      [group]="group"
+      [groupIndex]="groupIndex"
+      [parentIndex]="parentIndex"
+      [parentText]="parentText">
   </tr>
   <!-- END GROUP HEADER RENDERING -->
 
