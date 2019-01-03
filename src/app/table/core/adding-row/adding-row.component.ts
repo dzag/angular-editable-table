@@ -34,13 +34,13 @@ export class AddingRowComponent implements OnInit {
                private _tableDataService: TableDataService,
                private _cd: ChangeDetectorRef,
   ) {
-    this._addingCellService.activeCell.subscribe(cell => {
-      this.activeCell = cell;
-      this._cd.markForCheck();
-    });
   }
 
   ngOnInit () {
+    this._addingCellService.activeCell.subscribe((cell) => {
+      this.activeCell = cell;
+      this._cd.detectChanges();
+    });
   }
 
   trackByIndex (index) {
@@ -52,6 +52,7 @@ export class AddingRowComponent implements OnInit {
   }
 
   onAddClick (event) {
+    this._addingCellService.setActive(null);
     this._tableDataService.addRow(this._addingDataService.addingRowData);
     this.createRow(this._data);
   }

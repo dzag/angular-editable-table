@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { TableConfigs, TableData } from '@app/table';
-import { romanize } from '../data/table-data.utils';
-import { TableDataService } from '../data/table-data.service';
-import { TableConfigurations } from '../table-configurations';
 import { difference } from 'lodash';
+import { TableDataService } from '../data/table-data.service';
+import { romanize } from '../data/table-data.utils';
+import { TableConfigurations } from '../table-configurations';
+import { TableData } from '../table-data';
 
 @Component({
   selector: 'tr[table-row]',

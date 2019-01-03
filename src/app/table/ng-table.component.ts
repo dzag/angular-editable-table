@@ -18,7 +18,7 @@ import { romanize } from './core/data/table-data.utils';
 import { TableData } from './core/table-data';
 import { difference } from 'lodash';
 import { ActivatedRoute } from '@angular/router';
-import { FormMode } from '@app/core/interfaces/app/form-mode';
+import { FormMode } from 'src/app/core/interfaces/app/form-mode';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { distinctUntilChanged, pluck } from 'rxjs/operators';
 import { TableRowGroupActionsConfiguration, TableRowGroupsConfiguration } from './core/table.models';
@@ -228,8 +228,8 @@ export class NgTableComponent implements OnInit, OnDestroy, AfterViewInit {
     const eventListener = this.deActiveCellOnClickedOutside['listener'] = event => {
       const $tableBodies: HTMLElement[] = Array.from(this._elementRef.nativeElement.querySelectorAll('.ng-table-body'));
       if ($tableBodies && !$tableBodies.some(e => e.contains(event.target))) {
-        this._cellService.setActive(null);
-        this._addingCellService.setActive(null);
+        // this._cellService.setActive(null);
+        // this._addingCellService.setActive(null);
       }
     };
 
@@ -242,7 +242,7 @@ export class NgTableComponent implements OnInit, OnDestroy, AfterViewInit {
       const eventListener = this.deActiveAddingCellOnClickedOutside['listener'] = event => {
         $addingRow = $addingRow || this._elementRef.nativeElement.querySelector('.ng-table-adding-row');
         if ($addingRow && !$addingRow.contains(event.target)) {
-          this._addingCellService.setActive(null);
+          // this._addingCellService.setActive(null);
         }
       };
 

@@ -13,10 +13,15 @@ export class AddingDataService {
 
   constructor (private _addingCellService: AddingCellService) {
     _addingCellService.activeCell.pipe(pairwise()).subscribe(([prev, current]: [CellOrNull, CellOrNull]) => {
-      if (current === null && prev) {
-        this.addingRowData[prev.columnConfigs.prop] = this.formControl.value;
+      if (prev !== current) {
+        if (prev !== null) {
+          this.saveEditedValue(prev);
+        }
+
         this.formControl.reset(null, { emitEvent: false });
-      } else if (current) {
+      }
+
+      if (current) {
         Promise.resolve().then(() => this.formControl.setValue(current.data));
       }
     });

@@ -77,9 +77,6 @@ export class TableCellComponent implements OnInit, OnDestroy {
       return;
     }
 
-    console.log('this.columnConfigs.editable', this.columnConfigs.editable);
-    console.log('this.columnConfigs.editable', this.columnConfigs.editableWhen);
-
     if (!this.columnConfigs.editable) {
       this._cellService.setActive(null);
       return;
@@ -90,7 +87,6 @@ export class TableCellComponent implements OnInit, OnDestroy {
       return;
     }
 
-    console.log('active!');
     this._cellService.setActive(this);
   }
 

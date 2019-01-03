@@ -14,6 +14,10 @@ export class AddingCellService {
   }
 
   setActive(cell: TableCellForAddingComponent) {
+    if (cell === this.activatedCell$.getValue()) {
+      return;
+    }
+
     this.activatedCell$.next(cell);
   }
 
