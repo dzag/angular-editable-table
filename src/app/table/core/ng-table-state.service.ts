@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TableConfigurations } from './table-configurations';
-import { TableData } from '@app/table';
+import { TableConfigs, TableData } from '@app/table';
 
 @Injectable()
 export class NgTableState {
@@ -11,6 +11,10 @@ export class NgTableState {
   isEditing: boolean;
 
   constructor () {
+  }
+
+  get configStates(): TableConfigs {
+    return this.configurations.states;
   }
 
   get showIndex() {
