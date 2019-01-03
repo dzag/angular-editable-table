@@ -162,22 +162,6 @@ export class NgTableComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.configurations.states;
   }
 
-  get showIndex() {
-    return this.configurations.states.index.show;
-  }
-
-  get showActions() {
-    return this.configurations.states.actions.length > 0;
-  }
-
-  get actions() {
-    if (!this.showActions) {
-      return [];
-    }
-
-    return this.configs.actions || [];
-  }
-
   private deActiveCellOnClickedOutside() {
     const eventListener = this.deActiveCellOnClickedOutside['listener'] = event => {
       const $tableBodies: HTMLElement[] = Array.from(this._elementRef.nativeElement.querySelectorAll('.ng-table-body'));

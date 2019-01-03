@@ -1,11 +1,7 @@
 <ng-template #content>
   <div class="{{ class }} table-responsive">
     <table class="table table-bordered">
-      <thead table-header
-             [configurations]="configurations"
-             [withIndex]="showIndex"
-             [withActions]="showActions"
-             [actions]="actions"></thead>
+      <thead table-header></thead>
       <!-- SIMPLE ROWS-->
       <ng-container *ngIf="tableDataInternal.isSimple">
         <tbody class="ng-table-body">
@@ -35,8 +31,7 @@
   </div>
 </ng-template>
 
-<div *ngTemplateOutlet="wrapper, context: { content: content }">
-</div>
+<div *ngTemplateOutlet="wrapper, context: { content: content }"></div>
 
 <!-- GROUP TEMPLATE -->
 <ng-template #groupTemplate let-groups="groups" let-parentIndex="parentIndex" let-parentText="parentText">

@@ -1,19 +1,9 @@
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { buildPropToPathMap, depth as getDepth, emptyArrays, getPath, insertAt, pushEmptyArrays, totalSubGroupProps } from '../table.utils';
 import { get, last } from 'lodash';
-import { TableConfigurations } from '../table-configurations';
 import { DomSanitizer } from '@angular/platform-browser';
 import { filter } from 'rxjs/operators';
-
-type RowSpan = number;
-type ColSpan = number;
-type GroupName = string;
-type GroupClass = string;
-type HeaderTuple = [GroupName, GroupClass, RowSpan, ColSpan];
-type Group = {
-  name: string,
-  class: string,
-};
+import { NgTableState } from '@app/table/core/ng-table-state.service';
 
 @Component({
   selector: '[table-header]',
@@ -21,21 +11,13 @@ type Group = {
   styleUrls: ['./table-header.component.scss']
 })
 export class TableHeaderComponent implements OnInit {
-  @Input() withIndex;
-  @Input() withActions;
-
-  @Input() actions: any[];
   @Input() class;
-
-  @Input() prop;
-  @Input() indexClass;
-  @Input() configurations: TableConfigurations;
 
   public headers;
   public subHeaders;
 
-
   constructor(public domSanitizer: DomSanitizer,
+              public state: NgTableState,
               private _cd: ChangeDetectorRef,
   ) { }
 
@@ -49,6 +31,30 @@ export class TableHeaderComponent implements OnInit {
     }
 
     this.watchConfigsChanges();
+  }
+
+  get indexClass() {
+    return this.state.configurations.states.index.class;
+  }
+
+  get withIndex() {
+    return this.state.showIndex;
+  }
+
+  get withActions() {
+    return this.state.showActions;
+  }
+
+  get actions() {
+    if (!this.withActions) {
+      return [];
+    }
+
+    return this.state.configurations.states.actions || [];
+  }
+
+  get configurations() {
+    return this.state.configurations;
   }
 
   get indexName() {
