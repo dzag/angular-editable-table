@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { SimpleTableExampleComponent } from './examples/simple-table-example/simple-table-example.component';
 import { SheetExampleComponent } from './examples/sheet-example/sheet-example.component';
 
 @NgModule({
@@ -10,6 +11,10 @@ import { SheetExampleComponent } from './examples/sheet-example/sheet-example.co
         {
           path: 'sheet',
           component: SheetExampleComponent
+        },
+        {
+          path: 'simple',
+          component: SimpleTableExampleComponent,
         }
       ]
     }

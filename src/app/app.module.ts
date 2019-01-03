@@ -7,11 +7,13 @@ import { AppRoutingModule } from './app-routing.module';
 import { FormContainerModule } from './common-input/form-container.module';
 import { NgTableModule } from './table';
 import { CustomEventManager } from './custom-event-manager';
+import { SimpleTableExampleComponent } from './examples/simple-table-example/simple-table-example.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    SheetExampleComponent
+    SheetExampleComponent,
+    SimpleTableExampleComponent
   ],
   imports: [
     BrowserModule,
