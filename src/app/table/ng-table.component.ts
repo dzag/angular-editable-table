@@ -88,12 +88,10 @@ export class NgTableComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy (): void {
     this._ngZone.runOutsideAngular(() => {
       document.removeEventListener('click', this.deActiveCellOnClickedOutside['listener']);
-      document.removeEventListener('click', this.deActiveAddingCellOnClickedOutside['listener']);
     });
   }
 
   ngAfterViewInit (): void {
-    this.subscribeToAddingCellEvents();
   }
 
   trackByIndex (index) {
@@ -161,32 +159,6 @@ export class NgTableComponent implements OnInit, OnDestroy, AfterViewInit {
     this._ngZone.runOutsideAngular(() => document.addEventListener('click', eventListener));
   }
 
-  private deActiveAddingCellOnClickedOutside() {
-    Promise.resolve().then(() => {
-      let $addingRow: null | HTMLElement;
-      const eventListener = this.deActiveAddingCellOnClickedOutside['listener'] = event => {
-        $addingRow = $addingRow || this._elementRef.nativeElement.querySelector('.ng-table-adding-row');
-        if ($addingRow && !$addingRow.contains(event.target)) {
-          // this._addingCellService.setActive(null);
-        }
-      };
-
-      this._ngZone.runOutsideAngular(() => document.addEventListener('click', eventListener));
-    });
-  }
-
-  private subscribeToAddingCellEvents () {
-    if (this.deActiveAddingCellOnClickedOutside['listener']) {
-      this._ngZone.runOutsideAngular(() => {
-        document.removeEventListener('click', this.deActiveAddingCellOnClickedOutside['listener']);
-      });
-    }
-
-    if (this.configs.editing.enabled && this.configs.editing.allowAdding && this.isEditing) {
-      this.deActiveAddingCellOnClickedOutside();
-    }
-  }
-
   private watchFormModeChanges() {
     if (!this._route.parent || !this._route.parent.snapshot.params.mode) {
       return;
@@ -198,9 +170,6 @@ export class NgTableComponent implements OnInit, OnDestroy, AfterViewInit {
       distinctUntilChanged()
     ).subscribe(mode => {
       this.isEditing = mode === FormMode.Edit;
-      if (mode === FormMode.Edit) {
-        this.subscribeToAddingCellEvents();
-      }
     });
   }
 
