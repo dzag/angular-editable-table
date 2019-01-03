@@ -102,16 +102,19 @@ export class NgTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getRowIndex(currentIndex, parent: any = {}) {
     const indexConfigs = this.configurations.states.index;
+    const paging = this.configurations.states.paging;
+
+    const index = paging.enabled ? (paging.pageNumber - 1) * paging.pageSize + currentIndex : currentIndex;
 
     if (indexConfigs.rowIndexPattern) {
-      return indexConfigs.rowIndexPattern(currentIndex, parent);
+      return indexConfigs.rowIndexPattern(index, parent);
     }
 
     if (indexConfigs.rowIndexType === 'romanNumeral') {
-      return romanize(currentIndex);
+      return romanize(index);
     }
 
-    return currentIndex + 1;
+    return index + 1;
   }
 
   getActions(index, rowIndex, group?) {
