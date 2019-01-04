@@ -1,7 +1,7 @@
-import { cloneDeep, forEachRight, get, orderBy, repeat, set } from 'lodash';
+import { cloneDeep, forEachRight, get, orderBy, set } from 'lodash';
 import { TableConfigurations } from '../table-configurations';
 import { TableColumnConfigurations, TableRowGroupsConfiguration } from '../table.models';
-import { groupByCriteria, getCachedArray, extractParentKey } from './row-grouping.utils';
+import { extractParentKey, getCachedArray, groupByCriteria } from './row-grouping.utils';
 import { getIndexFunction, mapToTableCells } from './table-data.utils';
 import { TableData } from '../table-data';
 
@@ -25,7 +25,7 @@ export interface InternalGroupData {
   name?: string;
   path?: string;
   data?: CellData[][];
-  columns?: any[];
+  firstRow?: any;
   subGroups?: InternalGroupData[];
 }
 
@@ -195,7 +195,6 @@ export class TableDataInternal {
             originalData: arrayOfData,
             groupIndex,
             configs: groupConfigs,
-            columns: this.getGroupColumns(groupConfigs, arrayOfData[0]),
             data: arrayOfData.map(item => mapToTableCells(columnConfigs, item)),
           };
           if (!parentKey) {
@@ -208,9 +207,7 @@ export class TableDataInternal {
       } else if (groupIndex > 0) { // other group
         const copiedPrevMap = {...prevGroupedRowsMap};
         prevGroupedRowsMap = {};
-        const subGroupsPath = repeat('.subGroups[0]', groupedRows.length - 2 - groupIndex);
         this.objectEntriesWithOrders(copiedPrevMap, groupConfigs).forEach(([key, arrayOfChildGroups]) => {
-          const _data = get(arrayOfChildGroups, '[0]' + subGroupsPath + '.originalData[0]');
           const parentKey = extractParentKey(key);
           const cacheArray = getCachedArray(prevGroupedRowsMap, parentKey);
           cacheArray.push({
@@ -218,20 +215,16 @@ export class TableDataInternal {
             originalData: arrayOfChildGroups,
             groupIndex,
             configs: groupConfigs,
-            columns: this.getGroupColumns(groupConfigs, _data),
             subGroups: arrayOfChildGroups
           } as InternalGroupData);
         });
       } else { // first group
-        const subGroupsPath = repeat('.subGroups[0]', groupedRows.length - 2);
         this.objectEntriesWithOrders(prevGroupedRowsMap, groupConfigs).forEach(([key, arrayOfChildGroups]) => {
-          const firstRow = get(arrayOfChildGroups, '[0]' + subGroupsPath + '.originalData[0]');
           result.push({
             indexFn: getIndexFunction(groupConfigs),
             originalData: arrayOfChildGroups,
             groupIndex,
             configs: groupConfigs,
-            columns: this.getGroupColumns(groupConfigs, firstRow),
             subGroups: arrayOfChildGroups,
           } as InternalGroupData);
         });
@@ -239,34 +232,6 @@ export class TableDataInternal {
     });
 
     return result;
-  }
-
-  getGroupColumns (groupConfigs: TableRowGroupsConfiguration, firstRow) {
-    let totalLength = this.configs.states.columns.length + this.configs.states.actions.length;
-    totalLength = groupConfigs.namespan > totalLength ? totalLength : totalLength - groupConfigs.namespan + 1;
-
-    const array = Array(totalLength).fill(undefined).map(() => ({
-      value: '',
-      type: '',
-      colspan: 1,
-    }) as any);
-
-    const nameAtIndex = 0;
-    array[nameAtIndex].value = groupConfigs.name(firstRow);
-    array[nameAtIndex].type = 'name';
-    array[nameAtIndex].colspan = !groupConfigs.summaries ? groupConfigs.namespan : 1;
-
-    const actions = groupConfigs.actions;
-    if (actions) {
-      for (let i = this.configs.states.columns.length - groupConfigs.namespan + 1, j = 0; i < array.length; i++, j++) {
-        if (actions[j]) {
-          array[i].value = actions[j];
-          array[i].type = 'actions';
-        }
-      }
-    }
-
-    return array;
   }
 
   private objectEntriesWithOrders (groupData: {[p: string]: any[]}, group: TableRowGroupsConfiguration) {

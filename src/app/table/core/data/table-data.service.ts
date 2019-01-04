@@ -113,6 +113,10 @@ export class TableDataService {
     );
   }
 
+  allChanges() {
+    return this._changesObs;
+  }
+
   addRow(data: any | any[]) {
     const canGeneratedId = this._configurations.states.editing.generateIdentifier;
     const idKey = this._configurations.states.rowIdentifier;

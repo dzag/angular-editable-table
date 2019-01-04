@@ -1,5 +1,5 @@
 <td class="group-index">{{ group.indexFn(groupIndex, { parentIndex: parentIndex, parentText: parentText }) }}</td>
-<ng-container *ngFor="let col of group.columns; let colIndex = index; trackBy: trackByIndex">
+<ng-container *ngFor="let col of columns; let colIndex = index; trackBy: trackByIndex">
   <ng-container [ngSwitch]="col.type">
     <ng-container *ngSwitchCase="'actions'">
       <td class="{{ col.value.class }}">
