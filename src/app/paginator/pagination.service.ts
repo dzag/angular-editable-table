@@ -1,11 +1,15 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { merge } from 'lodash';
 
 export interface CurrentPage {
   pageNumber: number;
   pageSize: number;
+}
+
+export interface InternalCurrentPage extends CurrentPage {
+  $$fromUser: boolean;
 }
 
 export interface PageMetadata {
@@ -17,9 +21,10 @@ export interface PageMetadata {
 @Injectable()
 export class PaginationService {
 
-  private page$ = new BehaviorSubject<CurrentPage>({
+  private page$ = new BehaviorSubject<InternalCurrentPage>({
     pageNumber: 1,
     pageSize: 10,
+    $$fromUser: false,
   });
 
   private metadata$ = new BehaviorSubject<PageMetadata>({
@@ -32,7 +37,7 @@ export class PaginationService {
 
   constructor() { }
 
-  set(page: Partial<CurrentPage>) {
+  set(page: Partial<InternalCurrentPage>) {
     const newPage = this.mergePage(page);
     this.page$.next(newPage);
     this.calculateMeta();
@@ -43,8 +48,20 @@ export class PaginationService {
     this.calculateMeta();
   }
 
-  getPage(): Observable<CurrentPage> {
-    return this.page$.asObservable();
+  getPage(noFilter?): Observable<CurrentPage> {
+    const array = [
+      filter<any>(page => !page.$$fromUser),
+      map<any, any>(page => ({
+        pageNumber: page.pageNumber,
+        pageSize: page.pageSize
+      }))
+    ];
+    if (noFilter) {
+      array.shift();
+    }
+    const obs = this.page$.asObservable();
+
+    return obs.pipe.apply(obs, array);
   }
 
   getMetadata(): Observable<PageMetadata> {
@@ -75,22 +92,19 @@ export class PaginationService {
     this.set({ pageNumber: 1 });
   }
 
-  select(prop: keyof CurrentPage) {
-    return this.getPage().pipe(
-      map(pageable => pageable[prop]),
-      distinctUntilChanged(),
-    );
-  }
-
-  private mergePage(page: Partial<CurrentPage>) {
-    const newPage = { ...this.page$.getValue() };
-    merge(newPage, page);
-    return newPage;
+  private mergePage(newPage: Partial<InternalCurrentPage>) {
+    const oldPage = { ...this.page$.getValue() };
+    if (!Object.prototype.hasOwnProperty.call(newPage, '$$fromUser')) {
+      newPage.$$fromUser = false;
+    }
+    merge(oldPage, newPage);
+    return oldPage;
   }
 
   private calculateMeta() {
     const page = this.page$.getValue();
-    const totalPage = Math.ceil(this.totalItems$.getValue() / page.pageSize);
+    let totalPage = page.pageSize !== 0 ? this.totalItems$.getValue() / page.pageSize : 0;
+    totalPage = Math.ceil(!isNaN(totalPage) ? totalPage : 0);
     const canNext = page.pageNumber < totalPage;
     const canPrev = page.pageNumber > 1;
     this.metadata$.next({

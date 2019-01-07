@@ -4,19 +4,19 @@ import { range } from 'lodash';
 import { PaginationService } from './pagination.service';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { Observable } from 'rxjs';
-import { map, pluck, skip } from 'rxjs/operators';
+import { map, pluck } from 'rxjs/operators';
 
 @Component({
   selector: 'table-pagination',
-  templateUrl: './table-pagination.component.html',
-  styleUrls: ['./table-pagination.component.scss']
+  templateUrl: './table-paginator.component.html',
+  styleUrls: ['./table-paginator.component.scss']
 })
-export class TablePaginationComponent implements OnInit, OnDestroy {
+export class TablePaginatorComponent implements OnInit, OnDestroy {
 
   @Input() alignItem = 'align-right';
 
-  @Input() set pageNumber(value: number) {
-    this.pagination.set({ pageNumber: value });
+  @Input() set pageNumber (value: number) {
+    this.pagination.set({ pageNumber: value, $$fromUser: true });
   }
 
   @Output() page = new EventEmitter();
@@ -29,18 +29,15 @@ export class TablePaginationComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit () {
-    this.pagination.select('pageNumber')
-      .pipe(
-        untilDestroyed(this),
-      ).subscribe(page => {
-      this.pageControl.setValue(page, { emitEvent: false });
-    });
-
     this.totalPages$ = this.pagination.getMetadata().pipe(pluck('$$totalPages'));
     this.listPage$ = this.totalPages$.pipe(map(total => range(1, total + 1)));
 
+    this.pagination.getPage(true).pipe(untilDestroyed(this)).subscribe(page => {
+      this.pageControl.setValue(page.pageNumber, { emitEvent: false });
+    });
+
     this.pagination.getPage()
-      .pipe(skip(1), untilDestroyed(this))
+      .pipe(untilDestroyed(this))
       .subscribe(this.page);
 
     this.pageControl.valueChanges
@@ -50,11 +47,11 @@ export class TablePaginationComponent implements OnInit, OnDestroy {
       });
   }
 
-  get canNext() {
+  get canNext () {
     return this.pagination.getMetadata().pipe(map(res => !res.$$next));
   }
 
-  get canPrev() {
+  get canPrev () {
     return this.pagination.getMetadata().pipe(map(res => !res.$$prev));
   }
 

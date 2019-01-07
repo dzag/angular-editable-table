@@ -1,0 +1,116 @@
+<ng-template #content>
+  <div class="{{ class }} table-responsive">
+    <table class="table table-bordered">
+      <thead table-header></thead>
+      <!-- SIMPLE ROWS-->
+      <ng-container *ngIf="tableDataInternal.isSimple">
+        <tbody class="ng-table-body">
+          <ng-container *ngFor="let row of tableDataInternal.data; let rowIndex = index; trackBy: trackByIndex">
+            <tr table-row
+                [isEditing]="isEditing"
+                [row]="row"
+                [rowIndex]="rowIndex"
+            ></tr>
+          </ng-container>
+          <tr class="ng-table-adding-row"
+              adding-row
+              [configs]="configs"
+              [data]="data"
+              *ngIf="configs.editing.enabled && configs.editing.allowAdding && isEditing">
+          </tr>
+        </tbody>
+      </ng-container>
+      <!-- END SIMPLE ROWS-->
+
+      <!-- GROUP ROWS -->
+      <ng-container *ngIf="tableDataInternal.isGroup">
+        <ng-container *ngTemplateOutlet="groupTemplate; context: { groups: tableDataInternal.groupData }"></ng-container>
+      </ng-container>
+      <!-- END GROUP ROWS -->
+    </table>
+  </div>
+</ng-template>
+
+<div *ngTemplateOutlet="wrapper, context: { content: content }"></div>
+
+<!-- GROUP TEMPLATE -->
+<ng-template #groupTemplate let-groups="groups" let-parentIndex="parentIndex" let-parentText="parentText">
+  <ng-container *ngFor="let group of groups; let groupIndex = index">
+
+    <ng-container *ngIf="group.groupIndex === 0">
+      <tbody class="ng-table-body ng-table-group ng-table-group-{{groupIndex}}">
+      <ng-container *ngTemplateOutlet="groupContentTemplate;
+      context: { group: group, groupIndex: groupIndex, parentIndex: parentIndex, parentText: parentText }">
+      </ng-container>
+      </tbody>
+    </ng-container>
+
+    <ng-container *ngIf="group.groupIndex != 0">
+      <ng-container *ngTemplateOutlet="groupContentTemplate;
+      context: { group: group, groupIndex: groupIndex, parentIndex: parentIndex, parentText: parentText }">
+      </ng-container>
+    </ng-container>
+  </ng-container>
+</ng-template>
+<!-- END GROUP TEMPLATE -->
+
+<ng-template #groupContentTemplate
+             let-group="group"
+             let-groupIndex="groupIndex"
+             let-parentIndex="parentIndex"
+             let-parentText="parentText">
+  <!-- GROUP HEADER RENDERING -->
+  <tr table-group-header
+      [group]="group"
+      [groupIndex]="groupIndex"
+      [parentIndex]="parentIndex"
+      [parentText]="parentText">
+  </tr>
+  <!-- END GROUP HEADER RENDERING -->
+
+  <!-- DATA RENDERING -->
+  <ng-container *ngIf="group.data">
+    <ng-container *ngFor="let row of group.data; let rowIndex = index; trackBy: trackByIndex">
+      <tr table-row *ngIf="couldRenderRow(row)"
+          [isEditing]="isEditing"
+          [row]="row"
+          [rowIndex]="rowIndex"
+          [group]="group"
+          [groupIndex]="groupIndex"
+          [parentIndex]="parentIndex"
+          [parentText]="parentText"
+      ></tr>
+    </ng-container>
+  </ng-container>
+  <!-- END DATA RENDERING -->
+
+  <!-- RECURSIVE -->
+  <ng-container *ngIf="group.subGroups">
+    <ng-container *ngTemplateOutlet="groupTemplate; context: {
+        groups: group.subGroups,
+        parentIndex: groupIndex,
+        parentText: group.indexFn(groupIndex, { parentIndex: parentIndex, parentText: parentText })
+      }"></ng-container>
+  </ng-container>
+  <!-- END RECURSIVE -->
+</ng-template>
+
+<ng-template #wrapper let-content="content">
+  <ng-container *ngIf="configs.paging.enabled">
+    <pageable>
+      <table-metadata *ngIf="configs.paging.metadata"
+                      [totalItems]="configs.paging.totalRecords"
+                      [pageSize]="configs.paging.pageSize"
+                      (totalRecords)="onTotalRecordsChanged($event)"
+      ></table-metadata>
+
+      <ng-container [ngTemplateOutlet]="content"></ng-container>
+
+      <table-pagination (page)="onPageChanged($event)"
+                        [pageNumber]="configs.paging.pageNumber"></table-pagination>
+    </pageable>
+  </ng-container>
+  <ng-container *ngIf="!configs.paging.enabled">
+    <ng-container [ngTemplateOutlet]="content"></ng-container>
+  </ng-container>
+</ng-template>

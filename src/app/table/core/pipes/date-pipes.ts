@@ -4,6 +4,10 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class DateToStringPipe implements PipeTransform {
 
   transform(value: Date, args?: any): any {
+    if (!value) {
+      return '';
+    }
+
     const date = value.getDate() < 10 ? `0${value.getDate()}` : value.getDate();
     let month = value.getMonth() + 1;
     const _month = month < 10 ? `0${month}` : month;

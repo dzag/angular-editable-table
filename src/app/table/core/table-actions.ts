@@ -1,4 +1,4 @@
-export const tableButtons = {
+export const tableActions = {
   edit: {
     icon: 'fa fa-pencil-square-o',
     name: 'Sửa'

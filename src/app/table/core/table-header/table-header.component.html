@@ -1,0 +1,19 @@
+<tr class="text-center font-weight-bold" *ngFor="let header of headers">
+  <ng-container *ngFor="let col of header">
+    <th *ngIf="col.length > 0"
+        [class]="col[1]"
+        [attr.rowspan]="col[2]"
+        [attr.colspan]="col[3]" [innerHTML]="col[0]">
+    </th>
+  </ng-container>
+</tr>
+
+<tr *ngIf="configurations.hasSubHeader">
+  <th *ngIf="withIndex" [class]="configurations.states.index.subHeaderClass">
+    {{ configurations.states.index.subHeader }}
+  </th>
+  <th *ngFor="let sub of subHeaders; let i = index"
+      [class]="sub.class">
+    <div>{{ sub.name }}</div>
+  </th>
+</tr>

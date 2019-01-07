@@ -1,27 +1,27 @@
-<div *ngIf="active">
-  <common-input [formControl]="formControl"
-                [type]="descriptor['type']"
-                [data]="{ 'options': descriptor.options }"
-                gaStopPropagation
-  ></common-input>
-</div>
-<div *ngIf="!active">
-  <ng-container [ngSwitch]="descriptor.type">
-    <ng-container *ngSwitchCase="'select'">
-      {{ descriptor['$$options'][data] }}
-    </ng-container>
-    <ng-container *ngSwitchCase="'date'">
-      {{ data | dateToString }}
-    </ng-container>
-    <ng-container *ngSwitchCase="'link'">
-      <a class="text-link" *ngIf="descriptor.link && descriptor.useRouter" [routerLink]="cell.url">{{ cell.value }}</a>
-      <a class="text-link" *ngIf="descriptor.link && !descriptor.useRouter" [href]="cell.url">{{ cell.value }}</a>
-    </ng-container>
-    <ng-container *ngSwitchCase="'currency'">
-      {{ data | vnd }}
-    </ng-container>
-    <ng-container *ngSwitchDefault>
-      {{ data }}
-    </ng-container>
+<div *ngIf="columnConfigs.dataType !== 'checkbox'">
+  <ng-container *ngIf="active">
+    <ng-container *ngTemplateOutlet="input"></ng-container>
+  </ng-container>
+  <ng-container *ngIf="!active">
+    <data-only-cell [columnConfigs]="columnConfigs" [cellData]="cell"></data-only-cell>
   </ng-container>
 </div>
+
+<div *ngIf="columnConfigs.dataType === 'checkbox'">
+  <ng-container *ngIf="active">
+    <ng-container *ngTemplateOutlet="input"></ng-container>
+  </ng-container>
+  <ng-container *ngIf="!active">
+    <i class="fa fa-check" *ngIf="data"></i>
+  </ng-container>
+</div>
+
+<ng-template #input>
+  <common-input [formControl]="formControl"
+                [type]="columnConfigs.dataType"
+                [data]="{ 'options': options }"
+                (blur)="onBlurred($event)"
+                (keyup.out-zone)="onKeyUp($event)"
+                stopPropagation
+  ></common-input>
+</ng-template>

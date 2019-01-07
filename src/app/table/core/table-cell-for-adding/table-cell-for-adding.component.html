@@ -1,0 +1,40 @@
+<div *ngIf="columnConfigs.dataType !== 'checkbox'">
+  <ng-container *ngIf="active">
+    <ng-container *ngTemplateOutlet="input"></ng-container>
+  </ng-container>
+  <ng-container *ngIf="!active">
+    <ng-container [ngSwitch]="columnConfigs.dataType">
+      <ng-container *ngSwitchCase="'select'">
+        {{ columnConfigs['$$options'][data] }}
+      </ng-container>
+      <ng-container *ngSwitchCase="'date'">
+        {{ data | dateToString }}
+      </ng-container>
+      <ng-container *ngSwitchCase="'currency'">
+        {{ data | vnd }}
+      </ng-container>
+      <ng-container *ngSwitchDefault>
+        {{ data }}
+      </ng-container>
+    </ng-container>
+  </ng-container>
+</div>
+
+<!--<div *ngIf="columnConfigs.dataType === 'checkbox'">-->
+  <!--<ng-container *ngIf="active">-->
+    <!--<ng-container *ngTemplateOutlet="input"></ng-container>-->
+  <!--</ng-container>-->
+  <!--<ng-container *ngIf="!active">-->
+    <!--<i class="fa fa-check" *ngIf="data"></i>-->
+  <!--</ng-container>-->
+<!--</div>-->
+
+<ng-template #input>
+  <common-input [formControl]="formControl"
+                [type]="columnConfigs.dataType"
+                [data]="{ 'options': options }"
+                (blur)="onBlurred($event)"
+                (keyup.out-zone)="onKeyUp($event)"
+                stopPropagation
+  ></common-input>
+</ng-template>

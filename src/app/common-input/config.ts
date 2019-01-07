@@ -22,6 +22,7 @@ export function getComponentFromType (type: string): Type<any> {
     case 'textarea':
       component = InputTypeTextareaComponent;
       break;
+    case 'currency':
     case 'number':
       component = InputTypeNumberComponent;
       break;

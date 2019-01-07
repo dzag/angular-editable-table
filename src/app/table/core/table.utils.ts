@@ -1,5 +1,5 @@
 // See: https://gist.github.com/hapticdata/08c9d7f9e18e2ab72e715264c251f46e
-import { ColumnGroup } from './table.models';
+import { TableColumnGroupsConfiguration } from './table.models';
 
 function maxDepth (a) {
   let maxVal = Number.MIN_VALUE;
@@ -46,7 +46,7 @@ export function pushEmptyArrays (targetArray, number: number) {
   return targetArray;
 }
 
-export function buildPropToPathMap (colGroups: ColumnGroup<any>[]) {
+export function buildPropToPathMap (colGroups: TableColumnGroupsConfiguration[]) {
   const obj = {};
   const indexStack = [];
   const makeObject = (_groups) => {
@@ -65,7 +65,7 @@ export function buildPropToPathMap (colGroups: ColumnGroup<any>[]) {
   return obj;
 }
 
-export function totalSubGroupProps(colGroups: ColumnGroup<any>[]) {
+export function totalSubGroupProps(colGroups: TableColumnGroupsConfiguration[]) {
   let total = 0;
   const countProps = (gr) => {
     gr.forEach(g => {

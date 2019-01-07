@@ -3,6 +3,8 @@ import { Observable } from 'rxjs';
 import { createAddress, getLocation, getLocationFromStringLocator } from './cell-manager.utils';
 import { TableCellComponent } from './table-cell.component';
 
+const log = (...message) => console.log('CellManager', ...message);
+
 export const returnOutside = (fn): Observable<any> => {
   return new Observable(observer => {
     Promise.resolve().then(() => { // this is a trick to push the code to the event loop
@@ -22,13 +24,20 @@ export class CellManager {
 
   private _addressCellMap = new Map<string, TableCellComponent>();
   private _cellAddressMap = new Map<TableCellComponent, string>();
+  private _groupCellsMap = new Map<string, TableCellComponent[]>();
 
-  constructor () {}
+  constructor () { }
 
   register (cell: TableCellComponent) {
-    const address = createAddress(cell.row, cell.column);
+    const address = createAddress(cell.row, cell.column, cell.group);
     this._addressCellMap.set(address, cell);
     this._cellAddressMap.set(cell, address);
+
+    if (cell.group) {
+      const cells = this._groupCellsMap.has(cell.group.path) ? this._groupCellsMap.get(cell.group.path) : [];
+      cells.push(cell);
+      this._groupCellsMap.set(cell.group.path, cells);
+    }
   }
 
   unregister(cell: TableCellComponent) {
@@ -50,15 +59,19 @@ export class CellManager {
     return returnOutside(() => this._addressCellMap.get(locationOrAddress as string));
   }
 
-  getCellsInRow (row: number): Observable<TableCellComponent[]> {
+  getCellsInRow (row: number, group?): Observable<TableCellComponent[]> {
     return returnOutside(() => {
       const results = [];
-      this._addressCellMap.forEach((value, key) => {
-        const { row: currentRow } = getLocation(key);
-        if (row === currentRow) {
-          results.push(value);
+      const pushToResults = (rowIndex, cell) => {
+        if (cell.row === row) {
+          results.push(cell);
         }
-      });
+      };
+      if (group) {
+        this._groupCellsMap.get(group.path).forEach(cell => pushToResults(row, cell));
+      } else {
+        this._addressCellMap.forEach(cell => pushToResults(row, cell));
+      }
       return results;
     });
   }

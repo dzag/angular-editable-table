@@ -1,0 +1,39 @@
+<!-- START INDEX -->
+<td [class]="configs.states.index.class" *ngIf="state.showIndex">
+  {{
+  getRowIndex(rowIndex, group ? {
+    parentIndex: groupIndex,
+    parentText: group.indexFn(groupIndex, { parentIndex: parentIndex, parentText: parentText })
+  } : null)
+  }}
+</td>
+<!-- END INDEX -->
+
+<!-- START DATA -->
+<td *ngFor="let data of row; let colIndex = index; trackBy: trackByIndex"
+    table-cell
+    [readonly]="configs.states.editing.enabled ? !isEditing : true"
+    [column]="colIndex"
+    [row]="rowIndex"
+    [group]="group"
+    [columnWord]="words[colIndex]"
+    [wordAddress]="words[colIndex] + '.' + rowIndex"
+    [columnConfigs]="configs.states.columns[colIndex]"
+></td>
+<!-- END DATA -->
+
+<!-- START ACTIONS -->
+<ng-container *ngFor="let _ of configs.states.actions; let i = index">
+  <td *ngIf="state.showActions" [class]="configs.states.actions[i].class">
+    <ng-container *ngFor="let action of getActions(i, rowIndex, group); let actionIndex = index">
+      <i class="{{ configs.states.actions[i].types[action].icon }} cursor-pointer icon icon-{{ action }} {{ actionIndex > 0 ? 'ml-2' : '' }}"
+         (click.out-zone)="onActionClicked(i, action, rowIndex, group)"
+         data-placement="bottom"
+         data-toggle="tooltip"
+         stopPropagation
+         title="{{ configs.states.actions[i].types[action].name }}">
+      </i>
+    </ng-container>
+  </td>
+</ng-container>
+<!-- END ACTIONS -->
