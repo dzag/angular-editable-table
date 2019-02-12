@@ -30,5 +30,5 @@ export function groupByCriteria <T, R> (data: T[], groupByCriteria: string, pare
 
 export function extractParentKey (childKey: string) {
   const lastDot = childKey.lastIndexOf('.');
-  return lastDot > 0 ? childKey.substr(0, lastDot) : childKey;
+  return lastDot ? childKey.substr(0, lastDot) : childKey;
 }

@@ -3,7 +3,7 @@ import { TableDataInternal } from './table-data-internal';
 import { Subject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import * as math from 'mathjs';
-import { merge } from 'lodash';
+import { merge, pick } from 'lodash';
 import { CellManager } from '../table-cell/cell-manager.service';
 import { FormulaParser } from '../formula/formula-parser';
 import { CellService } from '../table-cell/cell.service';
@@ -51,39 +51,48 @@ export class TableDataService {
     }
   }
 
-  setValue (row, col, group, value, options?: ValueSetterOptions) {
+  setValue (row, col, group, value, options?: ValueSetterOptions, ignores = []) {
     options = merge({...defaultValueSetterOptions}, options);
     const prevValue = this.tableDataInternal.getCell(row, col, group).value;
     this.tableDataInternal.setCell(row, col, group, {value});
 
+    if (options.formulaCheck) {
+      const prop = this._configurations.states.columns[col].prop;
+      const expresionTrees = this._configurations.states.formulas.all
+        .map(e => e.expression)
+        .map(e => math.parse(e));
+
+      for (const parsedTree of expresionTrees) {
+        const symbolNodes = getSymbolNodes(parsedTree.value).map(n => n.name);
+
+        const compiled = parsedTree.value.compile();
+        const leftNode = parsedTree['object'].name;
+        const leftCol = this._configurations.states.columns.findIndex(c => c.prop === leftNode);
+
+        const rowData = this.tableDataInternal.getRow(row, group);
+
+        const otherSymbolNames = symbolNodes.filter(name => !name.includes(prop));
+
+        const scope = pick(rowData, otherSymbolNames);
+        scope[prop] = value;
+
+        Object.keys(scope).forEach(k => scope[k] = scope[k] || 0);
+
+        const newValue = compiled.eval(scope);
+        const oldValue = this.tableDataInternal.getCellValue(row, leftCol, group);
+        this.tableDataInternal.setCellValue(row, leftCol, group, newValue);
+        this._changes$.next({ row, col: leftCol, group, value: newValue, prevValue: oldValue });
+      }
+    }
+
     if (options.detect) {
       // TODO: fix cell manager
       // this._cellManager.detectChanges({row, column: col});
+      this._cd.detectChanges();
     }
 
     if (options.emitEvent) {
       this._changes$.next({row, col, group, value, prevValue});
-    }
-
-    if (options.formulaCheck) {
-      const formula = this._formulaParser.getFormulaForColumn(col);
-      if (formula) {
-        const [resultSymbol, expression] = formula.split('=');
-        const replacers = this._formulaParser.getReplacersForFormula(formula).filter(r => {
-          const column = this._formulaParser.symbolMap[r].substr(1);
-          return col !== (+column) || r !== resultSymbol;
-        });
-        this._cellManager.getCellsInRow(row, group).subscribe(cells => {
-          const resultCell = cells.find(cell => cell.column === getColumnFromSymbol(resultSymbol));
-          const scope = merge({}, ...cells.filter(cell => replacers.includes(cell.prop)).map(cell => ({
-            ['x' + cell.column]: cell.data || 0
-          })));
-          const resultValue = math.eval(expression, scope);
-          this.setValue(resultCell.row, resultCell.column, group, resultValue, {
-            formulaCheck: false,
-          });
-        });
-      }
     }
   }
 
@@ -132,4 +141,14 @@ export class TableDataService {
     this._cd.markForCheck();
   }
 
+}
+
+function getSymbolNodes (tree) {
+  const nodes = [];
+  tree.traverse(node => {
+    if (node.isSymbolNode) {
+      nodes.push(node);
+    }
+  });
+  return nodes;
 }

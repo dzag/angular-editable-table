@@ -21,6 +21,9 @@ export const DEFAULT_CONFIGS = {
   rowGroup: {
     orders: 'asc',
     namespan: 1,
+    summaries: {
+      0: '$name',
+    }
   } as Partial<TableRowGroupsConfiguration>,
   editing: {
     enabled: true,

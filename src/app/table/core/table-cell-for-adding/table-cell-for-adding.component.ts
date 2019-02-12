@@ -50,7 +50,7 @@ export class TableCellForAddingComponent implements OnInit, OnDestroy {
   ngOnDestroy (): void {
   }
 
-  @HostListener('click.out-zone')
+  @HostListener('click')
   click() {
     this._addingCellService.setActive(this);
   }

@@ -190,16 +190,25 @@ export class TableConfigurations {
     }
 
     if (initialConfig.rowGroups) {
-      mergedConfigs.rowGroups = initialConfig.rowGroups.map(i => {
-        const newRowGroups = Object.assign({ ...DEFAULT_CONFIGS.rowGroup }, i);
+      mergedConfigs.rowGroups = initialConfig.rowGroups.map(rGroup => {
+        let { summaries, ...defaultConfig } = DEFAULT_CONFIGS.rowGroup;
+
+        const newRowGroup = Object.assign(cloneDeep(defaultConfig), rGroup);
 
         let actions;
-        if (i.actions) {
-          actions = i.actions.map(action => Object.assign({ ...DEFAULT_CONFIGS.action }, action));
-          newRowGroups.actions = actions;
+        if (rGroup.actions) {
+          actions = rGroup.actions.map(action => Object.assign({ ...DEFAULT_CONFIGS.action }, action));
+          newRowGroup.actions = actions;
         }
 
-        return newRowGroups;
+        summaries = cloneDeep(rGroup.summaries) || {};
+        if (!summaries.hasOwnProperty('0')) {
+          merge(summaries, { 0: DEFAULT_CONFIGS.rowGroup.summaries[0] });
+        }
+
+        newRowGroup.summaries = summaries;
+
+        return newRowGroup;
       });
     }
 
@@ -218,6 +227,8 @@ export class TableConfigurations {
     });
 
     mergedConfigs.paging = Object.assign({...DEFAULT_CONFIGS.paging}, initialConfig.paging);
+
+    console.log('mergedConfigs', mergedConfigs);
 
     return mergedConfigs;
   }

@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { difference } from 'lodash';
 import { TableDataService } from '../data/table-data.service';
 import { romanize } from '../data/table-data.utils';
-import { NgTableState } from '@app/table/core/ng-table-state.service';
+import { NgTableState } from '../ng-table-state.service';
 
 @Component({
   selector: 'tr[table-row]',

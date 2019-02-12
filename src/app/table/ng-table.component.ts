@@ -16,13 +16,13 @@ import { CellManager } from './core/table-cell/cell-manager.service';
 import { CellService } from './core/table-cell/cell.service';
 import { TableData } from './core/table-data';
 import { ActivatedRoute } from '@angular/router';
-import { FormMode } from 'src/app/core/interfaces/app/form-mode';
+import { FormMode } from '@app/core/interfaces/app/form-mode';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { distinctUntilChanged, pluck } from 'rxjs/operators';
 import { CellData } from './core/data/table-data-internal';
 import { AddingCellService } from './core/table-cell-for-adding/adding-cell.service';
 import { AddingDataService } from './core/table-cell-for-adding/adding-data.service';
-import { NgTableState } from '@app/table/core/ng-table-state.service';
+import { NgTableState } from './core/ng-table-state.service';
 
 @Component({
   selector: 'ng-table',
@@ -73,7 +73,9 @@ export class NgTableComponent implements OnInit, OnDestroy, AfterViewInit {
                private _ngZone: NgZone,
                private _route: ActivatedRoute,
                private _state: NgTableState,
-  ) {}
+  ) {
+    (this._dataService as any)['_cellService'] = _cellService; // this is a hack for circular dependency
+  }
 
   ngOnInit () {
     this._state.configurations = this.configurations;
@@ -149,10 +151,18 @@ export class NgTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private deActiveCellOnClickedOutside() {
     const eventListener = this.deActiveCellOnClickedOutside['listener'] = event => {
-      const $tableBodies: HTMLElement[] = Array.from(this._elementRef.nativeElement.querySelectorAll('.ng-table-body'));
-      if ($tableBodies && !$tableBodies.some(e => e.contains(event.target))) {
-        // this._cellService.setActive(null);
-        // this._addingCellService.setActive(null);
+      const $element = event.target;
+      const isDataCell = $element.tagName.toLowerCase() === 'data-only-cell';
+
+      let hasTableCellAtr = false;
+      if (!isDataCell) {
+        const isTd = $element.tagName.toLowerCase() === 'td';
+        hasTableCellAtr = isTd && $element.getAttributeNames().includes('table-cell');
+      }
+
+      if (!(isDataCell || hasTableCellAtr)) {
+        this._cellService.setActive(null);
+        this._addingCellService.setActive(null);
       }
     };
 

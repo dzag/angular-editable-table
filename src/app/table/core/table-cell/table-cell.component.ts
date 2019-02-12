@@ -38,9 +38,7 @@ export class TableCellComponent implements OnInit, OnDestroy {
                private _cellManager: CellManager,
                private _dataService: TableDataService,
                private _elementRef: ElementRef,
-  ) {
-    (this._dataService as any)['_cellService'] = _cellService; // this is a hack for circular dependency
-  }
+  ) {}
 
   ngOnInit () {
     this.prop = this.columnConfigs.prop as string;
@@ -71,7 +69,7 @@ export class TableCellComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  @HostListener('click.out-zone')
+  @HostListener('click')
   onClicked() {
     if (this.readonly) {
       return;
@@ -96,7 +94,7 @@ export class TableCellComponent implements OnInit, OnDestroy {
 
   onKeyUp ({keyCode}: KeyboardEvent) {
     if (keyCode === 13) { // enter key
-      this._cellService.saveEditedValue();
+      this._cellService.setActive(null);
     }
   }
 

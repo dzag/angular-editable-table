@@ -1,4 +1,5 @@
 import { TableData } from './table-data';
+import { Observable } from 'rxjs';
 
 export type DataType = 'text' | 'textarea' | 'select' | 'date' | 'buttons' | 'link' | 'checkbox' | 'number' | 'currency';
 
@@ -68,6 +69,9 @@ export interface TableRowGroupsConfiguration extends CustomConfigs {
   dataOrders?: [string, 'asc' | 'desc'];
   namespan?: number;
   actions?: TableRowGroupActionsConfiguration[];
+  summaries?: {
+    [index: number]: string | ((data: { rows: any[], cells: any[] }) => any | Observable<any>);
+  };
 }
 
 export interface TableColumnGroupsConfiguration extends CustomConfigs {

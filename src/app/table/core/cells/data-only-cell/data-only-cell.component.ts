@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { TableColumnConfigurations } from '@app/table';
-import { CellData } from '@app/table/core/data/table-data-internal';
+import { TableColumnConfigurations } from '../../table.models';
+import { CellData } from '../../data/table-data-internal';
 
 @Component({
   selector: 'data-only-cell',

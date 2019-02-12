@@ -3,7 +3,7 @@ import { buildPropToPathMap, depth as getDepth, emptyArrays, getPath, insertAt, 
 import { get, last } from 'lodash';
 import { DomSanitizer } from '@angular/platform-browser';
 import { filter } from 'rxjs/operators';
-import { NgTableState } from '@app/table/core/ng-table-state.service';
+import { NgTableState } from '../ng-table-state.service';
 
 @Component({
   selector: '[table-header]',

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { TableConfigurations } from './table-configurations';
-import { TableConfigs, TableData } from '@app/table';
+import { TableData } from './table-data';
+import { TableConfigs } from './table.models';
 
 @Injectable()
 export class NgTableState {
