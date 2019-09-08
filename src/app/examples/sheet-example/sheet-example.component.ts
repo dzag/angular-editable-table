@@ -100,7 +100,6 @@ export class SheetExampleComponent implements OnInit {
           {id: 4, value: 'hello 7'}
         ],
         partialOptions(row) {
-          console.log(row);
           if (parseInt(row.col3, 10) < 3) {
             return [1, 2];
           }
