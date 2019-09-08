@@ -9,6 +9,11 @@ import { SheetExampleComponent } from './examples/sheet-example/sheet-example.co
       path: '',
       children: [
         {
+          path: '',
+          redirectTo: 'sheet',
+          pathMatch: 'full',
+        },
+        {
           path: 'sheet',
           component: SheetExampleComponent
         },
