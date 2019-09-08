@@ -4,23 +4,23 @@ import { ActionEvent, TableData } from '../../table';
 import { TableConfigurations } from '../../table/core/table-configurations';
 
 const nameMapper = {
-  1: 'Tỉnh 1',
-  2: 'Tỉnh 2',
-  3: 'Tỉnh 3',
-  4: 'Tỉnh 4',
-  5: 'Tỉnh 5',
+  1: 'State 1',
+  2: 'State 2',
+  3: 'State 3',
+  4: 'State 4',
+  5: 'State 5',
 };
 
 const name2Mapper = {
-  1: 'Huyện 1',
-  2: 'Huyện 2',
-  3: 'Huyện 3',
+  1: 'Street 1',
+  2: 'Street 2',
+  3: 'Street 3',
 };
 
 const name3Mapper = {
-  1: 'Xã 1',
-  2: 'Xã 2',
-  3: 'Xã 3',
+  1: 'Avenue 1',
+  2: 'Avenue 2',
+  3: 'Avenue 3',
 };
 
 @Component({
@@ -45,7 +45,7 @@ export class SheetExampleComponent implements OnInit {
     columns: [
       {
         prop: 'total',
-        name: 'Total',
+        name: 'Col Red',
         dataType: 'currency',
         headerClass: 'hello2',
         dataClass: 'hello',
@@ -121,7 +121,8 @@ export class SheetExampleComponent implements OnInit {
       {
         prop: 'col8',
         name: 'Col 8',
-        dataType: 'date'
+        dataType: 'date',
+        editable: true,
       },
     ],
     rowGroups: [
@@ -145,7 +146,7 @@ export class SheetExampleComponent implements OnInit {
     ],
     columnGroups: [
       {
-        groupName: 'Hello world',
+        groupName: 'Super Group',
         groupClass: 'first-class',
         props: ['col1', 'col2'],
         subGroups: [
@@ -162,7 +163,8 @@ export class SheetExampleComponent implements OnInit {
     ],
     index: {
       show: true,
-      subHeader: 'indexSubheader',
+      name: 'Index',
+      subHeader: 'Index Sub Header',
       subHeaderClass: 'indexSubheaderClass',
       rowIndexPattern: (currentIndex, {parentIndex, parentText}) => {
         return parentText + `.${currentIndex + 1}`;
@@ -207,7 +209,7 @@ export class SheetExampleComponent implements OnInit {
     ]);
 
     setTimeout(() => {
-      this.data = new TableData(Array(100).fill(null).map((value, index) => (() => {
+      this.data = new TableData(Array(30).fill(null).map((value, index) => (() => {
         const id = random(1, 5);
         const subId = random(1, 3);
         const subId2 = random(1, 3);
@@ -235,12 +237,8 @@ export class SheetExampleComponent implements OnInit {
     }, 0);
 
     setTimeout(() => {
-      this.configs.renameGroup('[0].groupName', 'What this <span style="color: red">123</span>?');
-    }, 2000);
-
-    setTimeout(() => {
       this.configs.showActionType('edit');
-      this.configs.renameColumn(0, 'What this <span style="color: red">123</span>?');
+      this.configs.renameColumn(0, 'Col <span style="color: red">Red</span>');
     }, 3000);
   }
 
